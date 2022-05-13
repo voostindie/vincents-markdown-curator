@@ -5,6 +5,8 @@ import nl.ulso.markdown_curator.query.QueryCatalog;
 import nl.ulso.markdown_curator.vault.FileSystemVault;
 import nl.ulso.markdown_curator.vault.Vault;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
+import nl.ulso.vmc.project.ProjectListQuery;
+import nl.ulso.vmc.project.ProjectListSettings;
 
 import java.io.IOException;
 
@@ -21,6 +23,7 @@ public class TweevvNotesCurator
     @Override
     protected void registerQueries(QueryCatalog catalog, Vault vault)
     {
+        catalog.register(new ProjectListQuery(vault, ProjectListSettings.DUTCH));
         catalog.register(new OmniFocusQuery(vault));
     }
 }

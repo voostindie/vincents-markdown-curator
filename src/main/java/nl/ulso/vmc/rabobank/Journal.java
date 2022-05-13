@@ -26,7 +26,7 @@ import static nl.ulso.markdown_curator.vault.Section.createAnchor;
 class Journal
 {
     private static final String JOURNAL_FOLDER = "Journal";
-    private static final String REVERSE_TIMELINE_SECTION = "Reverse timeline";
+    private static final String ACTIVITIES_TIMELINE = "Activities";
     private static final String UNCATEGORIZED_ACTIVITIES_SECTION = "Uncategorized activities";
     static final List<String> FOLDERS_IN_ORDER = List.of(
             JOURNAL_FOLDER, "GROW!", "Projects", "Teams", "Systems", "Contacts"
@@ -105,7 +105,7 @@ class Journal
             if (!folder.contentEquals(JOURNAL_FOLDER))
             {
                 if (section.level() == 2 &&
-                        section.title().contentEquals(REVERSE_TIMELINE_SECTION))
+                        section.title().contentEquals(ACTIVITIES_TIMELINE))
                 {
                     super.visit(section);
                 }
