@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.query.QueryResult.failure;
+import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class ArticlesQuery
@@ -47,7 +47,7 @@ class ArticlesQuery
             var articles = finder.articles;
             articles.sort(comparing((Map<String, String> e) -> e.get("Date")).reversed());
             return table(List.of("Date", "Title", "Publication"), articles);
-        }).orElse(failure("Couldn't find the folder 'Articles'"));
+        }).orElse(error("Couldn't find the folder 'Articles'"));
     }
 
     private static class ArticleFinder

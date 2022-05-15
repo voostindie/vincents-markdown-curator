@@ -7,7 +7,7 @@ import nl.ulso.markdown_curator.vault.*;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.query.QueryResult.failure;
+import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class TeamQuery
@@ -45,7 +45,7 @@ class TeamQuery
             var members = finder.members;
             members.sort(comparing((Map<String, String> e) -> e.get("Name")));
             return table(List.of("Name", "Scope"), members);
-        }).orElse(failure("Couldn't find the folder 'Contacts'"));
+        }).orElse(error("Couldn't find the folder 'Contacts'"));
     }
 
     private static class MemberFinder

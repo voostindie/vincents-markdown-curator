@@ -13,7 +13,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.query.QueryResult.failure;
+import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class OneOnOneQuery
@@ -50,7 +50,7 @@ class OneOnOneQuery
             var contacts = finder.contacts;
             contacts.sort(comparing((Map<String, String> e) -> e.get("Date")));
             return table(List.of("Date", "Name", "When"), contacts);
-        }).orElse(failure("Couldn't find the folder 'Contacts'"));
+        }).orElse(error("Couldn't find the folder 'Contacts'"));
     }
 
     private static class OneOnOneFinder
@@ -87,7 +87,7 @@ class OneOnOneQuery
             var days = DAYS.between(date, today);
             if (days < 7)
             {
-                return  days + " days(s) ago";
+                return days + " days(s) ago";
             }
             return WEEKS.between(date, today) + " week(s) ago";
         }

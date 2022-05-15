@@ -7,6 +7,9 @@ import nl.ulso.markdown_curator.vault.QueryBlock;
 
 import java.util.*;
 
+import static nl.ulso.markdown_curator.query.QueryResult.error;
+import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
+
 class DepartmentsQuery
         implements Query
 {
@@ -49,7 +52,7 @@ class DepartmentsQuery
                         .map(Document::link)
                         .sorted()
                         .toList();
-                return QueryResult.list(units);
+                return unorderedList(units);
             case "table":
                 var roles = queryBlock.configuration().listOfStrings("roles");
                 var rows = orgChart.forParent(parent).stream()
@@ -73,7 +76,7 @@ class DepartmentsQuery
                 columns.addAll(roles);
                 return QueryResult.table(columns, rows);
             default:
-                return QueryResult.failure("Unsupported style: " + style);
+                return error("Unsupported style: " + style);
         }
     }
 }

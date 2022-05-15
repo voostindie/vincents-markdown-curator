@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.query.QueryResult.failure;
+import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 public class ProjectListQuery
@@ -53,8 +53,7 @@ public class ProjectListQuery
             projects.sort(
                     comparing((Map<String, String> e) -> e.get(settings.dateColumn())).reversed());
             return table(List.of(settings.dateColumn(), settings.projectColumn()), projects);
-        }).orElse(failure(
-                "Couldn't find the folder '" + settings.projectFolder() + "'"));
+        }).orElse(error("Couldn't find the folder '" + settings.projectFolder() + "'"));
     }
 
     private static class ProjectFinder

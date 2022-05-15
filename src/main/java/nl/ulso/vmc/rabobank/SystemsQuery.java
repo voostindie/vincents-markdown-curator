@@ -7,6 +7,7 @@ import nl.ulso.markdown_curator.vault.*;
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
+import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
 class SystemsQuery
         implements Query
@@ -41,8 +42,8 @@ class SystemsQuery
             folder.accept(finder);
             var systems = finder.systems;
             Collections.sort(systems);
-            return QueryResult.list(systems);
-        }).orElse(QueryResult.failure("Couldn't find the folder 'Systems'"));
+            return unorderedList(systems);
+        }).orElse(QueryResult.error("Couldn't find the folder 'Systems'"));
     }
 
     private static class SystemFinder

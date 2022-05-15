@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.query.QueryResult.failure;
+import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class ArchitectureDecisionRecordsQuery
@@ -47,7 +47,7 @@ class ArchitectureDecisionRecordsQuery
             var adrs = finder.adrs;
             adrs.sort(comparing((Map<String, String> e) -> e.get("ID")));
             return table(List.of("ID", "Date", "Status", "Name"), adrs);
-        }).orElse(failure("Couldn't find the folder 'ADRs'"));
+        }).orElse(error("Couldn't find the folder 'ADRs'"));
     }
 
     private static class AdrFinder

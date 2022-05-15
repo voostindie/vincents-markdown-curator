@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
-import static nl.ulso.markdown_curator.query.QueryResult.failure;
+import static nl.ulso.markdown_curator.query.QueryResult.error;
 
 public class OmniFocusQuery
         implements Query
@@ -59,12 +59,12 @@ public class OmniFocusQuery
         var projectFolder = configuration.string(PROJECT_FOLDER, null);
         if (projectFolder == null)
         {
-            return failure("Property '" + PROJECT_FOLDER + "' is missing.");
+            return error("Property '" + PROJECT_FOLDER + "' is missing.");
         }
         var omniFocusFolder = configuration.string(OMNIFOCUS_FOLDER, null);
         if (omniFocusFolder == null)
         {
-            return failure("Property '" + OMNIFOCUS_FOLDER + "' is missing.");
+            return error("Property '" + OMNIFOCUS_FOLDER + "' is missing.");
         }
         var ignoredProjects = new HashSet<>(configuration.listOfStrings(IGNORED_PROJECTS));
         var refreshInterval = configuration.integer(REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL);
@@ -74,7 +74,7 @@ public class OmniFocusQuery
                                 omniFocusRepository.projects(omniFocusFolder, refreshInterval),
                                 folder,
                                 ignoredProjects))
-                .orElse(failure("Project folder not found: '" + projectFolder + "'"));
+                .orElse(error("Project folder not found: '" + projectFolder + "'"));
     }
 
     private static class OmniFocusQueryResult
