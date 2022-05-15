@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.QueryBlock;
 
 import java.util.*;
@@ -37,9 +36,9 @@ class RolesQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
-        var contact = queryBlock.document().name();
+        var contact = definition.document().name();
         var roles = orgChart.forContact(contact).stream()
                 .sorted(comparing(orgUnit -> orgUnit.team().name()))
                 .map(unit -> Map.of("Team", unit.team().link(),

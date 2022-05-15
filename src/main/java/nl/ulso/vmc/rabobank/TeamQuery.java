@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -36,10 +35,10 @@ class TeamQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
         return vault.folder("Contacts").map(folder -> {
-            var team = queryBlock.configuration().string("name", "none");
+            var team = definition.configuration().string("name", "none");
             var finder = new MemberFinder(team);
             folder.accept(finder);
             var members = finder.members;

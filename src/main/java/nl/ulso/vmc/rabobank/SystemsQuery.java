@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -35,7 +34,7 @@ class SystemsQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
         return vault.folder("Systems").map(folder -> {
             var finder = new SystemFinder();

@@ -1,7 +1,6 @@
 package nl.ulso.vmc.omnifocus;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -53,9 +52,9 @@ public class OmniFocusQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
-        var configuration = queryBlock.configuration();
+        var configuration = definition.configuration();
         var projectFolder = configuration.string(PROJECT_FOLDER, null);
         if (projectFolder == null)
         {

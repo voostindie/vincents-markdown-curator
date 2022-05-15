@@ -1,5 +1,15 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Fast tests" type="JUnit" factoryName="JUnit" activateToolWindowBeforeRun="false">
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="nl.ulso.markdown_curator.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="nl.ulso.vmc.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
     <option name="PACKAGE_NAME" value="nl.ulso" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />

@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 import nl.ulso.markdown_curator.vault.QueryBlock;
 
@@ -42,11 +41,11 @@ class WeeklyQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
         var date = LocalDate.now();
-        var year = queryBlock.configuration().integer("year", date.getYear());
-        var week = queryBlock.configuration()
+        var year = definition.configuration().integer("year", date.getYear());
+        var week = definition.configuration()
                 .integer("week", date.get(WeekFields.of(Locale.getDefault()).weekOfYear()));
         return new Weekly(journal.forWeek(year, week));
     }

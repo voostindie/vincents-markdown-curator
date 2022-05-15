@@ -1,7 +1,6 @@
 package nl.ulso.vmc.project;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -44,7 +43,7 @@ public class ProjectListQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
         return vault.folder(settings.projectFolder()).map(folder -> {
             var finder = new ProjectFinder(settings);

@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +41,7 @@ class OneOnOneQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
         return vault.folder("Contacts").map(folder -> {
             var finder = new OneOnOneFinder();

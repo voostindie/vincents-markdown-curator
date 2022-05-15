@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.markdown_curator.query.QueryResult;
+import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 import nl.ulso.markdown_curator.vault.QueryBlock;
 
@@ -40,10 +39,10 @@ class DepartmentsQuery
     }
 
     @Override
-    public QueryResult run(QueryBlock queryBlock)
+    public QueryResult run(QueryDefinition definition)
     {
-        var parent = queryBlock.document().name();
-        var style = queryBlock.configuration().string("style", "list");
+        var parent = definition.document().name();
+        var style = definition.configuration().string("style", "list");
         switch (style)
         {
             case "list":
@@ -54,7 +53,7 @@ class DepartmentsQuery
                         .toList();
                 return unorderedList(units);
             case "table":
-                var roles = queryBlock.configuration().listOfStrings("roles");
+                var roles = definition.configuration().listOfStrings("roles");
                 var rows = orgChart.forParent(parent).stream()
                         .sorted(Comparator.comparing(orgUnit -> orgUnit.team().name()))
                         .map(orgUnit ->
