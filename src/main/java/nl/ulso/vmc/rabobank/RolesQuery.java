@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.QueryBlock;
 
 import java.util.*;
 
@@ -42,7 +41,7 @@ class RolesQuery
         var roles = orgChart.forContact(contact).stream()
                 .sorted(comparing(orgUnit -> orgUnit.team().name()))
                 .map(unit -> Map.of("Team", unit.team().link(),
-                        "Role", unit.leadership().entrySet().stream()
+                        "Role", unit.roles().entrySet().stream()
                                 .filter(e -> e.getValue().name().contentEquals(contact))
                                 .map(Map.Entry::getKey).findFirst().orElse("")))
                 .toList();

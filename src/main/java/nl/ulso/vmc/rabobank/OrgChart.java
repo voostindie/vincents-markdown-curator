@@ -38,14 +38,15 @@ public class OrgChart
     List<OrgUnit> forParent(String parentTeamName)
     {
         return orgUnits.stream()
-                .filter(orgUnit -> orgUnit.parent().name().contentEquals(parentTeamName))
+                .filter(orgUnit -> orgUnit.parent()
+                        .map(parent -> parent.name().contentEquals(parentTeamName)).orElse(false))
                 .toList();
     }
 
     List<OrgUnit> forContact(String contactName)
     {
         return orgUnits.stream()
-                .filter(orgUnit -> orgUnit.leadership().values().stream()
+                .filter(orgUnit -> orgUnit.roles().values().stream()
                         .anyMatch(document -> document.name().contentEquals(contactName)))
                 .toList();
     }
@@ -60,7 +61,7 @@ public class OrgChart
         private final Folder contacts;
 
         private Document parent;
-        private Map<String, Document> leadership;
+        private Map<String, Document> roles;
 
         OrgUnitFinder(Folder teams, Folder contacts)
         {
@@ -84,12 +85,9 @@ public class OrgChart
                         .findFirst()
                         .orElse(null);
             }
-            if (parent != null)
-            {
-                leadership = new HashMap<>();
-                super.visit(document);
-                orgUnits.add(new OrgUnit(document, parent, leadership));
-            }
+            roles = new HashMap<>();
+            super.visit(document);
+            orgUnits.add(new OrgUnit(document, Optional.ofNullable(parent), roles));
         }
 
         @Override
@@ -105,11 +103,6 @@ public class OrgChart
         @Override
         public void visit(TextBlock textBlock)
         {
-            if (parent == null)
-            {
-                return;
-            }
-
             String content = textBlock.content();
             textBlock.findInternalLinks().stream()
                     .filter(link -> contacts.document(link.targetDocument()).isPresent())
@@ -119,7 +112,7 @@ public class OrgChart
                         var matcher = regex.matcher(content);
                         if (matcher.find())
                         {
-                            leadership.put(matcher.group(1),
+                            roles.put(matcher.group(1),
                                     contacts.document(link.targetDocument()).orElseThrow());
                         }
                     });

@@ -2,7 +2,6 @@ package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
-import nl.ulso.markdown_curator.vault.QueryBlock;
 
 import java.util.*;
 
@@ -62,7 +61,7 @@ class DepartmentsQuery
                             row.put("Name", orgUnit.team().link());
                             for (String role : roles)
                             {
-                                var contact = orgUnit.leadership().get(role);
+                                var contact = orgUnit.roles().get(role);
                                 if (contact != null)
                                 {
                                     row.put(role, contact.link());
