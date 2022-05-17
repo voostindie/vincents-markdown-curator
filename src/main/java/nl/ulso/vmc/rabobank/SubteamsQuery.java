@@ -5,15 +5,16 @@ import nl.ulso.markdown_curator.vault.Document;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.joining;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
-class DepartmentsQuery
+class SubteamsQuery
         implements Query
 {
     private final OrgChart orgChart;
 
-    public DepartmentsQuery(OrgChart orgChart)
+    public SubteamsQuery(OrgChart orgChart)
     {
         this.orgChart = orgChart;
     }
@@ -21,13 +22,13 @@ class DepartmentsQuery
     @Override
     public String name()
     {
-        return "departments";
+        return "subteams";
     }
 
     @Override
     public String description()
     {
-        return "lists all departments of a team";
+        return "Lists all subteams of a team.";
     }
 
     @Override
@@ -61,10 +62,11 @@ class DepartmentsQuery
                             row.put("Name", orgUnit.team().link());
                             for (String role : roles)
                             {
-                                var contact = orgUnit.roles().get(role);
-                                if (contact != null)
+                                var contactMap = orgUnit.roles().get(role);
+                                if (contactMap != null)
                                 {
-                                    row.put(role, contact.link());
+                                    row.put(role, contactMap.values().stream()
+                                            .map(Document::link).collect(joining(", ")));
                                 }
                             }
                             return row;

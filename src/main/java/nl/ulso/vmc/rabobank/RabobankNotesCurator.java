@@ -36,7 +36,7 @@ public class RabobankNotesCurator
         journal = new Journal(vault);
         catalog.register(new WeeklyQuery(journal));
         orgChart = new OrgChart(vault);
-        catalog.register(new DepartmentsQuery(orgChart));
+        catalog.register(new SubteamsQuery(orgChart));
         catalog.register(new RolesQuery(orgChart));
     }
 

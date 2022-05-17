@@ -25,7 +25,7 @@ class TeamQuery
     @Override
     public String description()
     {
-        return "outputs an overview of team members";
+        return "Outputs an overview of team members.";
     }
 
     @Override

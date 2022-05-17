@@ -42,7 +42,7 @@ class RolesQuery
                 .sorted(comparing(orgUnit -> orgUnit.team().name()))
                 .map(unit -> Map.of("Team", unit.team().link(),
                         "Role", unit.roles().entrySet().stream()
-                                .filter(e -> e.getValue().name().contentEquals(contact))
+                                .filter(e -> e.getValue().containsKey(contact))
                                 .map(Map.Entry::getKey).findFirst().orElse("")))
                 .toList();
         return QueryResult.table(List.of("Team", "Role"), roles);

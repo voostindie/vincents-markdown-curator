@@ -1,8 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.vault.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -12,7 +10,6 @@ import static java.util.regex.Pattern.quote;
 
 public class OrgChart
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrgChart.class);
     public static final String TEAMS_FOLDER = "Teams";
     public static final String CONTACTS_FOLDER = "Contacts";
 
@@ -47,7 +44,7 @@ public class OrgChart
     {
         return orgUnits.stream()
                 .filter(orgUnit -> orgUnit.roles().values().stream()
-                        .anyMatch(document -> document.name().contentEquals(contactName)))
+                        .anyMatch(roles -> roles.containsKey(contactName)))
                 .toList();
     }
 
@@ -61,7 +58,7 @@ public class OrgChart
         private final Folder contacts;
 
         private Document parent;
-        private Map<String, Document> roles;
+        private Map<String, Map<String, Document>> roles;
 
         OrgUnitFinder(Folder teams, Folder contacts)
         {
@@ -112,8 +109,11 @@ public class OrgChart
                         var matcher = regex.matcher(content);
                         if (matcher.find())
                         {
-                            roles.put(matcher.group(1),
-                                    contacts.document(link.targetDocument()).orElseThrow());
+                            var role = matcher.group(1);
+                            var contact = contacts.document(link.targetDocument());
+                            contact.ifPresent(c ->
+                                    roles.computeIfAbsent(role, r -> new HashMap<>())
+                                            .put(c.name(), c));
                         }
                     });
         }
