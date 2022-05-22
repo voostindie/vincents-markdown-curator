@@ -25,5 +25,6 @@ public class TweevvNotesCurator
     {
         catalog.register(new ProjectListQuery(vault, ProjectListSettings.DUTCH));
         catalog.register(new OmniFocusQuery(vault));
+        catalog.register(new VolunteersQuery(vault));
     }
 }
