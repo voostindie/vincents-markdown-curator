@@ -20,7 +20,10 @@ class OneOnOneQuery
 {
     private final Vault vault;
 
-    OneOnOneQuery(Vault vault) {this.vault = vault;}
+    OneOnOneQuery(Vault vault)
+    {
+        this.vault = vault;
+    }
 
     @Override
     public String name()

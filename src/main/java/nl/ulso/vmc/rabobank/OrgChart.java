@@ -1,5 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -9,12 +10,12 @@ import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 
 public class OrgChart
+        implements DataModel
 {
     public static final String TEAMS_FOLDER = "Teams";
     public static final String CONTACTS_FOLDER = "Contacts";
 
     private final Vault vault;
-
     private final Set<OrgUnit> orgUnits;
 
     public OrgChart(Vault vault)
@@ -23,7 +24,8 @@ public class OrgChart
         this.orgUnits = new HashSet<>();
     }
 
-    void refresh()
+    @Override
+    public void refreshOnVaultChange()
     {
         orgUnits.clear();
         vault.folder(TEAMS_FOLDER).ifPresent(teams ->

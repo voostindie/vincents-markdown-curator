@@ -17,7 +17,10 @@ class ArticlesQuery
 {
     private final Vault vault;
 
-    ArticlesQuery(Vault vault) {this.vault = vault;}
+    ArticlesQuery(Vault vault)
+    {
+        this.vault = vault;
+    }
 
     @Override
     public String name()

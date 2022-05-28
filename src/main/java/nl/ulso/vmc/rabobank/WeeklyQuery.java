@@ -2,7 +2,6 @@ package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
-import nl.ulso.markdown_curator.vault.QueryBlock;
 
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;

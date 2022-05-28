@@ -14,7 +14,10 @@ class TeamQuery
 {
     private final Vault vault;
 
-    TeamQuery(Vault vault) {this.vault = vault;}
+    TeamQuery(Vault vault)
+    {
+        this.vault = vault;
+    }
 
     @Override
     public String name()

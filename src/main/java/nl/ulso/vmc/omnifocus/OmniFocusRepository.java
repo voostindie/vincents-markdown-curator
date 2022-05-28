@@ -50,7 +50,7 @@ public class OmniFocusRepository
         {
             return;
         }
-        LOGGER.debug("Refreshing OmniFocus projects in folder '{}'", folder);
+        LOGGER.debug("Refreshing OmniFocus projects in folder: {}", folder);
         projects.clear();
         try
         {

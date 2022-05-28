@@ -1,5 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.vault.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import static nl.ulso.markdown_curator.vault.Section.createAnchor;
  * once per change in the vault.
  */
 class Journal
+        implements DataModel
 {
     private static final String JOURNAL_FOLDER = "Journal";
     private static final String ACTIVITIES_TIMELINE = "Activities";
@@ -33,8 +35,7 @@ class Journal
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
-    private final
-    Vault vault;
+    private final Vault vault;
 
     private final Set<JournalEntry> entries;
 
@@ -60,7 +61,8 @@ class Journal
                 );
     }
 
-    void refresh()
+    @Override
+    public void refreshOnVaultChange()
     {
         LOGGER.debug("Rebuilding the journal");
         entries.clear();

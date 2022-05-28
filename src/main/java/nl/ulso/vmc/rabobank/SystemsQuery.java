@@ -13,7 +13,10 @@ class SystemsQuery
 {
     private final Vault vault;
 
-    SystemsQuery(Vault vault) {this.vault = vault;}
+    SystemsQuery(Vault vault)
+    {
+        this.vault = vault;
+    }
 
     @Override
     public String name()
