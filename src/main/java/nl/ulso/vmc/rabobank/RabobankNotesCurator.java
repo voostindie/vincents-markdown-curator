@@ -22,7 +22,7 @@ public class RabobankNotesCurator
     }
 
     @Override
-    protected Set<? extends DataModel> createDataModels(Vault vault)
+    protected Set<DataModel> createDataModels(Vault vault)
     {
         return Set.of(
                 new Journal(vault),

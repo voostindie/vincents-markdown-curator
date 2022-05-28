@@ -24,7 +24,7 @@ public class TweevvNotesCurator
     }
 
     @Override
-    protected Set<? extends DataModel> createDataModels(Vault vault)
+    protected Set<DataModel> createDataModels(Vault vault)
     {
         return emptySet();
     }
