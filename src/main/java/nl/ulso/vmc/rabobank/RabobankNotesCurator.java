@@ -38,7 +38,6 @@ public class RabobankNotesCurator
         catalog.register(new ArticlesQuery(vault));
         catalog.register(new SystemsQuery(vault));
         catalog.register(new ArchitectureDecisionRecordsQuery(vault));
-        catalog.register(new TeamQuery(vault));
         catalog.register(new OneOnOneQuery(vault));
         catalog.register(new WeeklyQuery(dataModels.get(Journal.class)));
         catalog.register(new SubteamsQuery(dataModels.get(OrgChart.class)));
