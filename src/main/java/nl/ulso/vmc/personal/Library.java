@@ -1,6 +1,6 @@
 package nl.ulso.vmc.personal;
 
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.time.LocalDate;
@@ -16,10 +16,9 @@ import static java.util.regex.Pattern.compile;
 /**
  * This is the start of what will hopefully be a richer data model at some point. For example
  * I'd like to keep track of book series as well, and list them in order.
- *
  */
 public class Library
-        implements DataModel
+        extends DataModelTemplate
 {
     private final Vault vault;
     private final Map<String, Author> authors;
@@ -35,7 +34,7 @@ public class Library
     }
 
     @Override
-    public void refreshOnVaultChange()
+    protected void fullRefresh()
     {
         authors.clear();
         books.clear();

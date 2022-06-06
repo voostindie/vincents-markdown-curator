@@ -1,6 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ import static nl.ulso.markdown_curator.vault.Section.createAnchor;
  * once per change in the vault.
  */
 class Journal
-        implements DataModel
+        extends DataModelTemplate
 {
     private static final String JOURNAL_FOLDER = "Journal";
     private static final String ACTIVITIES_TIMELINE = "Activities";
@@ -62,7 +62,7 @@ class Journal
     }
 
     @Override
-    public void refreshOnVaultChange()
+    protected void fullRefresh()
     {
         LOGGER.debug("Rebuilding the journal");
         entries.clear();
@@ -107,7 +107,7 @@ class Journal
             if (!folder.contentEquals(JOURNAL_FOLDER))
             {
                 if (section.level() == 2 &&
-                        section.title().contentEquals(ACTIVITIES_TIMELINE))
+                    section.title().contentEquals(ACTIVITIES_TIMELINE))
                 {
                     super.visit(section);
                 }
@@ -125,7 +125,7 @@ class Journal
             else
             {
                 if (section.level() == 2 &&
-                        section.title().contentEquals(UNCATEGORIZED_ACTIVITIES_SECTION))
+                    section.title().contentEquals(UNCATEGORIZED_ACTIVITIES_SECTION))
                 {
                     super.visit(section);
                 }

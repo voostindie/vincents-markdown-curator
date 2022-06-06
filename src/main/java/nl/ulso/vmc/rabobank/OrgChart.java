@@ -1,6 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -10,7 +10,7 @@ import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 
 public class OrgChart
-        implements DataModel
+        extends DataModelTemplate
 {
     public static final String TEAMS_FOLDER = "Teams";
     public static final String CONTACTS_FOLDER = "Contacts";
@@ -25,7 +25,7 @@ public class OrgChart
     }
 
     @Override
-    public void refreshOnVaultChange()
+    protected void fullRefresh()
     {
         orgUnits.clear();
         vault.folder(TEAMS_FOLDER).ifPresent(teams ->
@@ -74,7 +74,7 @@ public class OrgChart
         {
             parent = null;
             if (document.fragments().size() > 2
-                    && document.fragments().get(1) instanceof TextBlock textBlock)
+                && document.fragments().get(1) instanceof TextBlock textBlock)
             {
                 parent = textBlock.findInternalLinks().stream()
                         .map(InternalLink::targetDocument)
@@ -93,7 +93,7 @@ public class OrgChart
         public void visit(Section section)
         {
             if (section.level() == 2
-                    && section.title().contentEquals(ROLES_SECTION))
+                && section.title().contentEquals(ROLES_SECTION))
             {
                 super.visit(section);
             }
