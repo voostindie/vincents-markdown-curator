@@ -10,7 +10,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
+import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -45,9 +47,12 @@ public class Library
 
     List<ReadingSession> readingFor(int year)
     {
+        var stillReading = now();
         return readingSessions.stream()
                 .filter(session -> session.fromDate().getYear() == year)
-                .sorted(Comparator.comparing(ReadingSession::fromDate))
+                .sorted(comparing(ReadingSession::fromDate)
+                        .thenComparing(s -> s.toDate().orElse(stillReading))
+                        .thenComparing(s -> s.book().name()))
                 .toList();
     }
 
@@ -60,7 +65,7 @@ public class Library
         }
         return books.values().stream()
                 .filter(book -> book.authors().contains(author))
-                .sorted(Comparator.comparing(Book::name))
+                .sorted(comparing(Book::name))
                 .toList();
     }
 

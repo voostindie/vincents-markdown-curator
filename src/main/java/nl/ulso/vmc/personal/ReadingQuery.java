@@ -63,10 +63,15 @@ public class ReadingQuery
                                         .map(author -> author.document().link())
                                         .collect(joining(", ")),
                                 "Rating", session.book().rating()
-                                        .map(rating -> Integer.toString(rating)).orElse("?")
+                                        .map(ReadingQuery::formatRating).orElse("n/a")
                         )
                 )
                 .toList();
-        return table(List.of("Title", "Author(s)", "Rating", "From", "To"), table);
+        return table(List.of("Title", "Author(s)", "Rating"), table);
+    }
+
+    private static String formatRating(int rating)
+    {
+        return "★".repeat(rating);
     }
 }
