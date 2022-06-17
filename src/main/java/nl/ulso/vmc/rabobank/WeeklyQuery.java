@@ -88,7 +88,7 @@ class WeeklyQuery
                             .append(lineSeparator());
                     for (JournalEntry entry : map.get(document))
                     {
-                        builder.append("  - *")
+                        builder.append("    - *")
                                 .append(entry.date().getDayOfWeek()
                                         .getDisplayName(FULL, Locale.getDefault()))
                                 .append("*: [[")
