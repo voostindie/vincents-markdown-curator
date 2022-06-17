@@ -10,7 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
+import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
 public class ProjectListQuery
         implements Query
@@ -51,7 +51,9 @@ public class ProjectListQuery
             var projects = finder.projects;
             projects.sort(
                     comparing((Map<String, String> e) -> e.get(settings.dateColumn())).reversed());
-            return table(List.of(settings.dateColumn(), settings.projectColumn()), projects);
+            return unorderedList(projects.stream()
+                    .map((Map<String, String> e) -> e.get(settings.dateColumn()) + ": " +
+                                                    e.get(settings.projectColumn())).toList());
         }).orElse(error("Couldn't find the folder '" + settings.projectFolder() + "'"));
     }
 
@@ -83,8 +85,8 @@ public class ProjectListQuery
         public void visit(Section section)
         {
             if (section.level() == 2 && section.title().contentEquals(settings.timelineSection())
-                    && section.fragments().size() > 1
-                    && section.fragments().get(1) instanceof Section subsection)
+                && section.fragments().size() > 1
+                && section.fragments().get(1) instanceof Section subsection)
             {
                 var matcher = TITLE_PATTERN.matcher(subsection.title());
                 if (matcher.matches())
