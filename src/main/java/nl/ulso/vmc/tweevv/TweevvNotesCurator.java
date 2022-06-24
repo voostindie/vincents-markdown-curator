@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
-
 public class TweevvNotesCurator
         extends CuratorTemplate
 {
@@ -30,7 +28,7 @@ public class TweevvNotesCurator
     @Override
     protected Set<DataModel> createDataModels(Vault vault)
     {
-        return emptySet();
+        return Set.of(new VolunteeringModel(vault));
     }
 
     @Override
@@ -49,6 +47,7 @@ public class TweevvNotesCurator
                         "🏐 Diversen",
                         "💶 Declaraties"
                 ))));
-        catalog.register(new VolunteersQuery(vault));
+        catalog.register(new VolunteersQuery(dataModels.get(VolunteeringModel.class)));
+        catalog.register(new GroupQuery(dataModels.get(VolunteeringModel.class)));
     }
 }
