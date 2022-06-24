@@ -1,10 +1,10 @@
 package nl.ulso.vmc.personal;
 
 import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.vault.LocalDates;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,7 +120,8 @@ public class Library
 
         private void extractAuthors(TextBlock block)
         {
-            block.findInternalLinks().forEach(link -> {
+            block.findInternalLinks().forEach(link ->
+            {
                 var author = authors.get(link.targetDocument());
                 if (author != null)
                 {
@@ -160,20 +161,12 @@ public class Library
                     .filter(line -> line.startsWith("- [["))
                     .map(DATE_PATTERN::matcher)
                     .map(Matcher::results)
-                    .forEach(stream -> {
+                    .forEach(stream ->
+                    {
                         var dates = stream
                                 .map(match -> match.group(1))
                                 .limit(2)
-                                .map(dateString -> {
-                                    try
-                                    {
-                                        return LocalDate.parse(dateString);
-                                    }
-                                    catch (DateTimeParseException e)
-                                    {
-                                        return null;
-                                    }
-                                })
+                                .map(LocalDates::parseDateOrNull)
                                 .filter(Objects::nonNull)
                                 .toList();
                         if (dates.isEmpty())
