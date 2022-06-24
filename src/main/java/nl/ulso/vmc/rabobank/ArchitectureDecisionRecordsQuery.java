@@ -40,7 +40,8 @@ class ArchitectureDecisionRecordsQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        return vault.folder("ADRs").map(folder -> {
+        return vault.folder("ADRs").map(folder ->
+        {
             var finder = new AdrFinder();
             folder.accept(finder);
             var adrs = finder.adrs;

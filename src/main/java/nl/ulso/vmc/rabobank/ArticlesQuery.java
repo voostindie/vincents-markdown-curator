@@ -43,7 +43,8 @@ class ArticlesQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        return vault.folder("Articles").map(folder -> {
+        return vault.folder("Articles").map(folder ->
+        {
             var finder = new ArticleFinder();
             folder.accept(finder);
             var articles = finder.articles;

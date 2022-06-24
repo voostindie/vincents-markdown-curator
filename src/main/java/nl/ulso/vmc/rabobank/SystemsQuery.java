@@ -39,7 +39,8 @@ class SystemsQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        return vault.folder("Systems").map(folder -> {
+        return vault.folder("Systems").map(folder ->
+        {
             var finder = new SystemFinder();
             folder.accept(finder);
             var systems = finder.systems;

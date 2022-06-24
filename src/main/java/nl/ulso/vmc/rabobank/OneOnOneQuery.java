@@ -46,7 +46,8 @@ class OneOnOneQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        return vault.folder("Contacts").map(folder -> {
+        return vault.folder("Contacts").map(folder ->
+        {
             var finder = new OneOnOneFinder();
             folder.accept(finder);
             var contacts = finder.contacts;

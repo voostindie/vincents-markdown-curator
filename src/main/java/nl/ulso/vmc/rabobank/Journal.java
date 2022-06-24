@@ -1,13 +1,13 @@
 package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.vault.LocalDates;
 import nl.ulso.markdown_curator.vault.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,6 +16,7 @@ import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
+import static nl.ulso.markdown_curator.vault.LocalDates.parseDate;
 import static nl.ulso.markdown_curator.vault.Section.createAnchor;
 
 /**
@@ -116,7 +117,7 @@ class Journal
                     var matcher = TITLE_PATTERN.matcher(section.title());
                     if (matcher.matches())
                     {
-                        var date = parseDate(matcher.group(1));
+                        var date = LocalDates.parseDateOrNull(matcher.group(1));
                         var subject = createAnchor(matcher.group(2));
                         entries.add(new JournalEntry(date, folder, section, subject));
                     }
@@ -131,23 +132,11 @@ class Journal
                 }
                 if (section.level() == 3)
                 {
-                    var date = parseDate(section.document().name());
+                    var date = parseDate(section.document().name(),
+                            () -> LocalDate.of(1976, 11, 30));
                     var subject = createAnchor(section.title());
                     entries.add(new JournalEntry(date, folder, section, subject));
                 }
-            }
-        }
-
-        private LocalDate parseDate(String dateString)
-        {
-            try
-            {
-                return LocalDate.parse(dateString);
-            }
-            catch (DateTimeParseException e)
-            {
-                LOGGER.warn("Invalid date: {}. Falling back to default", dateString);
-                return LocalDate.of(1976, 11, 30);
             }
         }
     }

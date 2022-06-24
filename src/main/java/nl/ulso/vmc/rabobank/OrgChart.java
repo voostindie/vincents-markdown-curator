@@ -105,7 +105,8 @@ public class OrgChart
             String content = textBlock.content();
             textBlock.findInternalLinks().stream()
                     .filter(link -> contacts.document(link.targetDocument()).isPresent())
-                    .forEach(link -> {
+                    .forEach(link ->
+                    {
                         var regex = compile(ROLE_PATTERN_START + quote(link.toMarkdown()),
                                 Pattern.MULTILINE);
                         var matcher = regex.matcher(content);
