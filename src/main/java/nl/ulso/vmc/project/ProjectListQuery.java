@@ -45,7 +45,8 @@ public class ProjectListQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        return vault.folder(settings.projectFolder()).map(folder -> {
+        return vault.folder(settings.projectFolder()).map(folder ->
+        {
             var finder = new ProjectFinder(settings);
             folder.accept(finder);
             var projects = finder.projects;
