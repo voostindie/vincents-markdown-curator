@@ -4,6 +4,8 @@ import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.LocalDates;
 import nl.ulso.markdown_curator.vault.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -19,6 +21,7 @@ import static java.util.regex.Pattern.compile;
  * This is the start of what will hopefully be a richer data model at some point. For example
  * I'd like to keep track of book series as well, and list them in order.
  */
+@Singleton
 public class Library
         extends DataModelTemplate
 {
@@ -27,6 +30,7 @@ public class Library
     private final Map<String, Book> books;
     private final Set<ReadingSession> readingSessions;
 
+    @Inject
     public Library(Vault vault)
     {
         this.vault = vault;

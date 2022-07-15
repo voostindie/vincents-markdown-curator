@@ -2,6 +2,7 @@ package nl.ulso.vmc.personal;
 
 import nl.ulso.markdown_curator.query.*;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ public class ReadingQuery
 {
     private final Library library;
 
+    @Inject
     public ReadingQuery(Library library)
     {
         this.library = library;

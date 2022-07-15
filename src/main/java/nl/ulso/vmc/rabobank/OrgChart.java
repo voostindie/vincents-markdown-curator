@@ -3,12 +3,15 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 
+@Singleton
 public class OrgChart
         extends DataModelTemplate
 {
@@ -18,6 +21,7 @@ public class OrgChart
     private final Vault vault;
     private final Set<OrgUnit> orgUnits;
 
+    @Inject
     public OrgChart(Vault vault)
     {
         this.vault = vault;

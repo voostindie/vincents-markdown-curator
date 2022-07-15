@@ -3,6 +3,7 @@ package nl.ulso.vmc.project;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,7 @@ public class ProjectListQuery
     private final Vault vault;
     private final ProjectListSettings settings;
 
+    @Inject
     public ProjectListQuery(Vault vault, ProjectListSettings settings)
     {
         this.vault = vault;

@@ -3,6 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
+import javax.inject.Inject;
 import java.util.*;
 
 import static java.util.stream.Collectors.joining;
@@ -14,6 +15,7 @@ class SubteamsQuery
 {
     private final OrgChart orgChart;
 
+    @Inject
     public SubteamsQuery(OrgChart orgChart)
     {
         this.orgChart = orgChart;

@@ -2,6 +2,7 @@ package nl.ulso.vmc.personal;
 
 import nl.ulso.markdown_curator.query.*;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 import static nl.ulso.markdown_curator.query.QueryResult.empty;
@@ -12,6 +13,7 @@ public class BooksQuery
 {
     private final Library library;
 
+    @Inject
     public BooksQuery(Library library)
     {
         this.library = library;

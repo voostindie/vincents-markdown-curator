@@ -3,6 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,7 @@ class ArticlesQuery
 {
     private final Vault vault;
 
+    @Inject
     ArticlesQuery(Vault vault)
     {
         this.vault = vault;

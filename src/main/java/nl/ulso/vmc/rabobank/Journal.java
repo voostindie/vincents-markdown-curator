@@ -6,6 +6,8 @@ import nl.ulso.markdown_curator.vault.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
@@ -25,6 +27,7 @@ import static nl.ulso.markdown_curator.vault.Section.createAnchor;
  * multiple queries, which is why this is a singleton that updates its internal structure only
  * once per change in the vault.
  */
+@Singleton
 class Journal
         extends DataModelTemplate
 {
@@ -40,7 +43,7 @@ class Journal
 
     private final Set<JournalEntry> entries;
 
-    Journal(Vault vault)
+    @Inject Journal(Vault vault)
     {
         this.vault = vault;
         this.entries = new HashSet<>();

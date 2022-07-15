@@ -3,6 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
+import javax.inject.Inject;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -20,6 +21,7 @@ class OneOnOneQuery
 {
     private final Vault vault;
 
+    @Inject
     OneOnOneQuery(Vault vault)
     {
         this.vault = vault;

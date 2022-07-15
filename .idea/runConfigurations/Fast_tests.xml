@@ -2,7 +2,7 @@
   <configuration default="false" name="Fast tests" type="JUnit" factoryName="JUnit" activateToolWindowBeforeRun="false">
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="nl.ulso.markdown_curator.*" />
+        <option name="PATTERN" value="nl.ulso.markdown_curator.CoreModule" />
         <option name="ENABLED" value="true" />
       </pattern>
       <pattern>

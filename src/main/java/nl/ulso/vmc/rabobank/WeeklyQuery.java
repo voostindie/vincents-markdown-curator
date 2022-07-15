@@ -3,6 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -15,6 +16,7 @@ class WeeklyQuery
 {
     private final Journal journal;
 
+    @Inject
     WeeklyQuery(Journal journal)
     {
         this.journal = journal;

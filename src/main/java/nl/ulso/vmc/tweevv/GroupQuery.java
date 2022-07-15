@@ -2,6 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import nl.ulso.markdown_curator.query.*;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class GroupQuery
 {
     private final VolunteeringModel model;
 
+    @Inject
     public GroupQuery(VolunteeringModel model)
     {
         this.model = model;

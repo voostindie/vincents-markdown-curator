@@ -2,6 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import nl.ulso.markdown_curator.query.*;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ public class VolunteersQuery
 {
     private final VolunteeringModel model;
 
+    @Inject
     VolunteersQuery(VolunteeringModel model)
     {
         this.model = model;

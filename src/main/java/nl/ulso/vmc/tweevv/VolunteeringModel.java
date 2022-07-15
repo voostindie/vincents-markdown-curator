@@ -4,6 +4,8 @@ import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -13,6 +15,7 @@ import static java.util.Comparator.comparing;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
 
+@Singleton
 public class VolunteeringModel
         extends DataModelTemplate
 {
@@ -23,6 +26,7 @@ public class VolunteeringModel
     private final Map<String, Contact> contacts;
     private final Map<Season, Map<Contact, Set<Activity>>> volunteering;
 
+    @Inject
     VolunteeringModel(Vault vault)
     {
         this.vault = vault;

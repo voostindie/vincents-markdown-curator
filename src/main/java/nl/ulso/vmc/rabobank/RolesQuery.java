@@ -2,6 +2,7 @@ package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.query.*;
 
+import javax.inject.Inject;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
@@ -11,6 +12,7 @@ class RolesQuery
 {
     private final OrgChart orgChart;
 
+    @Inject
     public RolesQuery(OrgChart orgChart)
     {
         this.orgChart = orgChart;

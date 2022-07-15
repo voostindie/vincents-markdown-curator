@@ -4,6 +4,7 @@ import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Dictionary;
 import nl.ulso.markdown_curator.vault.*;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class OmniFocusQuery
         this(vault, null);
     }
 
+    @Inject
     public OmniFocusQuery(Vault vault, OmniFocusSettings settings)
     {
         this.omniFocusRepository = new OmniFocusRepository();
