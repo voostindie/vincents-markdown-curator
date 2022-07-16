@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.query.QueryResult.empty;
+import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
@@ -59,7 +59,7 @@ public class VolunteersQuery
                 .toList();
         if (list.isEmpty())
         {
-            return empty();
+            return emptyResult();
         }
         return table(List.of("Vrijwilliger", "Taak"), list);
     }

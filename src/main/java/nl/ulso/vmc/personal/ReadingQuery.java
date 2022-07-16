@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.markdown_curator.query.QueryResult.empty;
+import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.table;
 
@@ -53,7 +53,7 @@ public class ReadingQuery
         var sessions = library.readingFor(year);
         if (sessions.isEmpty())
         {
-            return empty();
+            return emptyResult();
         }
         var table = sessions.stream()
                 .map(session -> Map.of(

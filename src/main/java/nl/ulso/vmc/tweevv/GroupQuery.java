@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static nl.ulso.markdown_curator.query.QueryResult.empty;
+import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
 import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
@@ -53,7 +53,7 @@ public class GroupQuery
                             VolunteeringModel.Contact::link).toList();
                     if (list.isEmpty())
                     {
-                        return empty();
+                        return emptyResult();
                     }
                     return unorderedList(list);
                 }
