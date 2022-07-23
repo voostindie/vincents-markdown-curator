@@ -4,7 +4,7 @@ import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
-import nl.ulso.vmc.project.ProjectListQuery;
+import nl.ulso.vmc.project.ProjectsQuery;
 import nl.ulso.vmc.project.ProjectListSettings;
 
 import java.nio.file.Path;
@@ -31,7 +31,7 @@ public class TweevvNotesCuratorModule
     protected void configureCurator()
     {
         registerDataModel(VolunteeringModel.class);
-        registerQuery(ProjectListQuery.class);
+        registerQuery(ProjectsQuery.class);
         registerQuery(OmniFocusQuery.class);
         registerQuery(VolunteersQuery.class);
         registerQuery(GroupQuery.class);

@@ -7,20 +7,28 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
+import static nl.ulso.markdown_curator.query.QueryResult.table;
 import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
-public class ProjectListQuery
+public class ProjectsQuery
         implements Query
 {
     private final Vault vault;
     private final ProjectListSettings settings;
 
+    private enum Format
+    {
+        LIST,
+        TABLE
+    }
+
+    private final static Map<String, Format> FORMATS = Map.of("list", Format.LIST, "table", Format.TABLE);
+
     @Inject
-    public ProjectListQuery(Vault vault, ProjectListSettings settings)
+    public ProjectsQuery(Vault vault, ProjectListSettings settings)
     {
         this.vault = vault;
         this.settings = settings;
@@ -41,12 +49,17 @@ public class ProjectListQuery
     @Override
     public Map<String, String> supportedConfiguration()
     {
-        return emptyMap();
+        return Map.of("format", "Output format: 'table' (default) or 'list'.");
     }
 
     @Override
     public QueryResult run(QueryDefinition definition)
     {
+        var format = FORMATS.get(definition.configuration().string("format", "table"));
+        if (format == null)
+        {
+            return error("Unsupported format");
+        }
         return vault.folder(settings.projectFolder()).map(folder ->
         {
             var finder = new ProjectFinder(settings);
@@ -54,9 +67,17 @@ public class ProjectListQuery
             var projects = finder.projects;
             projects.sort(
                     comparing((Map<String, String> e) -> e.get(settings.dateColumn())).reversed());
-            return unorderedList(projects.stream()
-                    .map((Map<String, String> e) -> e.get(settings.dateColumn()) + ": " +
-                                                    e.get(settings.projectColumn())).toList());
+            return switch (format)
+                    {
+                        case LIST -> unorderedList(projects.stream()
+                                .map((Map<String, String> e) ->
+                                        e.get(settings.dateColumn()) + ": " +
+                                        e.get(settings.projectColumn()))
+                                .toList());
+                        case TABLE ->
+                                table(List.of(settings.dateColumn(), settings.projectColumn()),
+                                        projects);
+                    };
         }).orElse(error("Couldn't find the folder '" + settings.projectFolder() + "'"));
     }
 
