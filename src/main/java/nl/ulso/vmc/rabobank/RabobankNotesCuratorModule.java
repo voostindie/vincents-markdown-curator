@@ -9,6 +9,9 @@ import nl.ulso.vmc.project.ProjectListSettings;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
+
+import static java.util.Locale.ENGLISH;
 
 public class RabobankNotesCuratorModule
         extends CuratorModule
@@ -68,5 +71,11 @@ public class RabobankNotesCuratorModule
                         "💼 Various",
                         "🧠 Reminders"
                 ));
+    }
+
+    @Provides
+    Locale locale()
+    {
+        return ENGLISH;
     }
 }

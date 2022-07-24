@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
+import static java.util.ResourceBundle.getBundle;
 import static nl.ulso.markdown_curator.query.QueryResult.error;
 
 public class OmniFocusQuery
@@ -26,18 +27,15 @@ public class OmniFocusQuery
     private final OmniFocusRepository omniFocusRepository;
     private final Vault vault;
     private final OmniFocusSettings settings;
-
-    public OmniFocusQuery(Vault vault)
-    {
-        this(vault, null);
-    }
+    private final Locale locale;
 
     @Inject
-    public OmniFocusQuery(Vault vault, OmniFocusSettings settings)
+    public OmniFocusQuery(Vault vault, OmniFocusSettings settings, Locale locale)
     {
         this.omniFocusRepository = new OmniFocusRepository();
         this.vault = vault;
         this.settings = settings;
+        this.locale = locale;
     }
 
     @Override
@@ -91,7 +89,7 @@ public class OmniFocusQuery
                         (QueryResult) new OmniFocusQueryResult(
                                 omniFocusRepository.projects(omniFocusFolder, refreshInterval),
                                 folder,
-                                ignoredProjects))
+                                ignoredProjects, locale))
                 .orElse(error("Project folder not found: '" + projectFolder + "'"));
     }
 
@@ -116,14 +114,16 @@ public class OmniFocusQuery
         private final List<OmniFocusProject> omniFocusProjects;
         private final Folder projectFolder;
         private final Set<String> ignoredProjects;
+        private final ResourceBundle bundle;
 
         OmniFocusQueryResult(
                 List<OmniFocusProject> omniFocusProjects, Folder projectFolder,
-                Set<String> ignoredProjects)
+                Set<String> ignoredProjects, Locale locale)
         {
             this.omniFocusProjects = omniFocusProjects;
             this.projectFolder = projectFolder;
             this.ignoredProjects = ignoredProjects;
+            this.bundle = getBundle("OmniFocus", locale);
         }
 
         @Override
@@ -137,7 +137,8 @@ public class OmniFocusQuery
                     .toList();
             if (!missingPages.isEmpty())
             {
-                builder.append("### Projects without a matching page");
+                builder.append("### ");
+                builder.append(bundle.getString("missingPages.title"));
                 builder.append(lineSeparator());
                 builder.append(lineSeparator());
                 missingPages.forEach(
@@ -152,7 +153,8 @@ public class OmniFocusQuery
                     .toList();
             if (!missingProjects.isEmpty())
             {
-                builder.append("### Pages without a matching project");
+                builder.append("### ");
+                builder.append(bundle.getString("missingProjects.title"));
                 builder.append(lineSeparator());
                 builder.append(lineSeparator());
                 missingProjects.forEach(
@@ -162,10 +164,11 @@ public class OmniFocusQuery
             }
             if (missingPages.isEmpty() && missingProjects.isEmpty())
             {
-                builder.append("### All good!");
+                builder.append("### ");
+                builder.append(bundle.getString("allGood.title"));
                 builder.append(lineSeparator());
                 builder.append(lineSeparator());
-                builder.append("There are no inconsistencies to report.");
+                builder.append(bundle.getString("allGood.text"));
                 builder.append(lineSeparator());
             }
             return builder.toString().trim();

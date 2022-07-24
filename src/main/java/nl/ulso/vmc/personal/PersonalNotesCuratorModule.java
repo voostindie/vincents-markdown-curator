@@ -1,13 +1,8 @@
 package nl.ulso.vmc.personal;
 
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.query.QueryCatalog;
-import nl.ulso.markdown_curator.vault.FileSystemVault;
-import nl.ulso.markdown_curator.vault.Vault;
+import nl.ulso.markdown_curator.CuratorModule;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
 
 public class PersonalNotesCuratorModule
         extends CuratorModule
