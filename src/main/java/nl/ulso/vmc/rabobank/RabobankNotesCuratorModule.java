@@ -4,14 +4,11 @@ import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
-import nl.ulso.vmc.project.ProjectsQuery;
 import nl.ulso.vmc.project.ProjectListSettings;
+import nl.ulso.vmc.project.ProjectsQuery;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
-
-import static java.util.Locale.ENGLISH;
 
 public class RabobankNotesCuratorModule
         extends CuratorModule
@@ -71,11 +68,5 @@ public class RabobankNotesCuratorModule
                         "💼 Various",
                         "🧠 Reminders"
                 ));
-    }
-
-    @Provides
-    Locale locale()
-    {
-        return ENGLISH;
     }
 }

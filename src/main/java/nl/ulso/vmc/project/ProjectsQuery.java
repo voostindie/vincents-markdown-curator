@@ -9,15 +9,13 @@ import java.util.regex.Pattern;
 
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
-import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
 public class ProjectsQuery
         implements Query
 {
     private final Vault vault;
     private final ProjectListSettings settings;
+    private final QueryResultFactory resultFactory;
 
     private enum Format
     {
@@ -25,13 +23,16 @@ public class ProjectsQuery
         TABLE
     }
 
-    private final static Map<String, Format> FORMATS = Map.of("list", Format.LIST, "table", Format.TABLE);
+    private final static Map<String, Format> FORMATS =
+            Map.of("list", Format.LIST, "table", Format.TABLE);
 
     @Inject
-    public ProjectsQuery(Vault vault, ProjectListSettings settings)
+    public ProjectsQuery(
+            Vault vault, ProjectListSettings settings, QueryResultFactory resultFactory)
     {
         this.vault = vault;
         this.settings = settings;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ProjectsQuery
         var format = FORMATS.get(definition.configuration().string("format", "table"));
         if (format == null)
         {
-            return error("Unsupported format");
+            return resultFactory.error("Unsupported format");
         }
         return vault.folder(settings.projectFolder()).map(folder ->
         {
@@ -69,16 +70,17 @@ public class ProjectsQuery
                     comparing((Map<String, String> e) -> e.get(settings.dateColumn())).reversed());
             return switch (format)
                     {
-                        case LIST -> unorderedList(projects.stream()
+                        case LIST -> resultFactory.unorderedList(projects.stream()
                                 .map((Map<String, String> e) ->
                                         e.get(settings.dateColumn()) + ": " +
                                         e.get(settings.projectColumn()))
                                 .toList());
-                        case TABLE ->
-                                table(List.of(settings.dateColumn(), settings.projectColumn()),
-                                        projects);
+                        case TABLE -> resultFactory.table(
+                                List.of(settings.dateColumn(), settings.projectColumn()),
+                                projects);
                     };
-        }).orElse(error("Couldn't find the folder '" + settings.projectFolder() + "'"));
+        }).orElseGet(() -> resultFactory.error(
+                "Couldn't find the folder '" + settings.projectFolder() + "'"));
     }
 
     private static class ProjectFinder

@@ -10,18 +10,18 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class ArticlesQuery
         implements Query
 {
     private final Vault vault;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    ArticlesQuery(Vault vault)
+    ArticlesQuery(Vault vault, QueryResultFactory resultFactory)
     {
         this.vault = vault;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -51,8 +51,8 @@ class ArticlesQuery
             folder.accept(finder);
             var articles = finder.articles;
             articles.sort(comparing((Map<String, String> e) -> e.get("Date")).reversed());
-            return table(List.of("Date", "Title", "Publication"), articles);
-        }).orElse(error("Couldn't find the folder 'Articles'"));
+            return resultFactory.table(List.of("Date", "Title", "Publication"), articles);
+        }).orElseGet(() -> resultFactory.error("Couldn't find the folder 'Articles'"));
     }
 
     private static class ArticleFinder
@@ -67,8 +67,8 @@ class ArticlesQuery
         public void visit(Section section)
         {
             if (section.level() == 2 && section.title().contentEquals("Changes")
-                    && section.fragments().size() > 0
-                    && section.fragments().get(0) instanceof TextBlock textBlock)
+                && section.fragments().size() > 0
+                && section.fragments().get(0) instanceof TextBlock textBlock)
             {
                 var lines = new ArrayList<>(textBlock.lines());
                 if (lines.isEmpty())

@@ -5,18 +5,17 @@ import nl.ulso.markdown_curator.query.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
-import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
-
 public class BooksQuery
         implements Query
 {
     private final Library library;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    public BooksQuery(Library library)
+    public BooksQuery(Library library, QueryResultFactory resultFactory)
     {
         this.library = library;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -42,11 +41,7 @@ public class BooksQuery
     {
         var author = definition.configuration()
                 .string("author", definition.document().name());
-        var books = library.booksFor(author);
-        if (books.isEmpty())
-        {
-            return emptyResult();
-        }
-        return unorderedList(books.stream().map(book -> book.document().link()).toList());
+        return resultFactory.unorderedList(
+                library.booksFor(author).stream().map(book -> book.document().link()).toList());
     }
 }

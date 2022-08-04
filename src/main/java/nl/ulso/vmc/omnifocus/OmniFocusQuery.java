@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
 import static java.util.ResourceBundle.getBundle;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
 
 public class OmniFocusQuery
         implements Query
@@ -28,10 +27,14 @@ public class OmniFocusQuery
     private final Vault vault;
     private final OmniFocusSettings settings;
     private final Locale locale;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    public OmniFocusQuery(Vault vault, OmniFocusSettings settings, Locale locale)
+    public OmniFocusQuery(
+            Vault vault, OmniFocusSettings settings, Locale locale,
+            QueryResultFactory resultFactory)
     {
+        this.resultFactory = resultFactory;
         this.omniFocusRepository = new OmniFocusRepository();
         this.vault = vault;
         this.settings = settings;
@@ -75,12 +78,12 @@ public class OmniFocusQuery
         var projectFolder = configuration.string(PROJECT_FOLDER, null);
         if (projectFolder == null)
         {
-            return error("Property '" + PROJECT_FOLDER + "' is missing.");
+            return resultFactory.error("Property '" + PROJECT_FOLDER + "' is missing.");
         }
         var omniFocusFolder = configuration.string(OMNIFOCUS_FOLDER, null);
         if (omniFocusFolder == null)
         {
-            return error("Property '" + OMNIFOCUS_FOLDER + "' is missing.");
+            return resultFactory.error("Property '" + OMNIFOCUS_FOLDER + "' is missing.");
         }
         var ignoredProjects = new HashSet<>(configuration.listOfStrings(IGNORED_PROJECTS));
         var refreshInterval = configuration.integer(REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL);
@@ -90,7 +93,8 @@ public class OmniFocusQuery
                                 omniFocusRepository.projects(omniFocusFolder, refreshInterval),
                                 folder,
                                 ignoredProjects, locale))
-                .orElse(error("Project folder not found: '" + projectFolder + "'"));
+                .orElseGet(() -> resultFactory.error(
+                        "Project folder not found: '" + projectFolder + "'"));
     }
 
     protected Dictionary configuration(QueryDefinition definition)

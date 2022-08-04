@@ -6,19 +6,17 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
-
 public class GroupQuery
         implements Query
 {
     private final VolunteeringModel model;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    public GroupQuery(VolunteeringModel model)
+    public GroupQuery(VolunteeringModel model, QueryResultFactory resultFactory)
     {
         this.model = model;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -51,13 +49,9 @@ public class GroupQuery
                 {
                     var list = model.contactsFor(season, group).map(
                             VolunteeringModel.Contact::link).toList();
-                    if (list.isEmpty())
-                    {
-                        return emptyResult();
-                    }
-                    return unorderedList(list);
+                    return resultFactory.unorderedList(list);
                 }
-        ).orElseGet(() -> error("Invalid season: " + seasonString));
+        ).orElseGet(() -> resultFactory.error("Invalid season: " + seasonString));
     }
 
     private String currentSeason()

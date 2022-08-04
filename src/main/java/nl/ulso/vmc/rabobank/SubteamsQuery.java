@@ -7,18 +7,18 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.unorderedList;
 
 class SubteamsQuery
         implements Query
 {
     private final OrgChart orgChart;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    public SubteamsQuery(OrgChart orgChart)
+    public SubteamsQuery(OrgChart orgChart, QueryResultFactory resultFactory)
     {
         this.orgChart = orgChart;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -53,7 +53,7 @@ class SubteamsQuery
                         .map(Document::link)
                         .sorted()
                         .toList();
-                return unorderedList(units);
+                return resultFactory.unorderedList(units);
             case "table":
                 var roles = definition.configuration().listOfStrings("roles");
                 var rows = orgChart.forParent(parent).stream()
@@ -76,9 +76,9 @@ class SubteamsQuery
                 var columns = new ArrayList<String>(roles.size() + 1);
                 columns.add("Name");
                 columns.addAll(roles);
-                return QueryResult.table(columns, rows);
+                return resultFactory.table(columns, rows);
             default:
-                return error("Unsupported style: " + style);
+                return resultFactory.error("Unsupported style: " + style);
         }
     }
 }

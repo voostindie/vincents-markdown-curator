@@ -8,19 +8,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 public class VolunteersQuery
         implements Query
 {
     private final VolunteeringModel model;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    VolunteersQuery(VolunteeringModel model)
+    VolunteersQuery(VolunteeringModel model, QueryResultFactory resultFactory)
     {
         this.model = model;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class VolunteersQuery
         var season = definition.configuration().string("season", null);
         if (season == null)
         {
-            return error("Property 'season' is not specified");
+            return resultFactory.error("Property 'season' is not specified");
         }
         var list = model.volunteersFor(season).entrySet().stream()
                 .map(entry -> Map.of("Vrijwilliger", entry.getKey().link(),
@@ -57,10 +56,6 @@ public class VolunteersQuery
                                 .collect(Collectors.joining(", "))))
                 .sorted(comparing(map -> map.get("Vrijwilliger")))
                 .toList();
-        if (list.isEmpty())
-        {
-            return emptyResult();
-        }
-        return table(List.of("Vrijwilliger", "Taak"), list);
+        return resultFactory.table(List.of("Vrijwilliger", "Taak"), list);
     }
 }

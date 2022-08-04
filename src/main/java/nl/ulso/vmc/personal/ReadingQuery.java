@@ -8,19 +8,18 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.markdown_curator.query.QueryResult.emptyResult;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 public class ReadingQuery
         implements Query
 {
     private final Library library;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    public ReadingQuery(Library library)
+    public ReadingQuery(Library library, QueryResultFactory resultFactory)
     {
         this.library = library;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -48,13 +47,9 @@ public class ReadingQuery
         var year = configuration.integer("year", -1);
         if (year == -1)
         {
-            return error("No year specified");
+            return resultFactory.error("No year specified");
         }
         var sessions = library.readingFor(year);
-        if (sessions.isEmpty())
-        {
-            return emptyResult();
-        }
         var table = sessions.stream()
                 .map(session -> Map.of(
                                 "From", session.fromDate().toString(),
@@ -69,7 +64,7 @@ public class ReadingQuery
                         )
                 )
                 .toList();
-        return table(List.of("Title", "Author(s)", "Rating"), table);
+        return resultFactory.table(List.of("Title", "Author(s)", "Rating"), table);
     }
 
     private static String formatRating(int rating)

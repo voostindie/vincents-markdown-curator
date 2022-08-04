@@ -4,7 +4,6 @@ import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import javax.inject.Inject;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -13,18 +12,18 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class OneOnOneQuery
         implements Query
 {
     private final Vault vault;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    OneOnOneQuery(Vault vault)
+    OneOnOneQuery(Vault vault, QueryResultFactory resultFactory)
     {
         this.vault = vault;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -54,14 +53,13 @@ class OneOnOneQuery
             folder.accept(finder);
             var contacts = finder.contacts;
             contacts.sort(comparing((Map<String, String> e) -> e.get("Date")));
-            return table(List.of("Date", "Name", "When"), contacts);
-        }).orElse(error("Couldn't find the folder 'Contacts'"));
+            return resultFactory.table(List.of("Date", "Name", "When"), contacts);
+        }).orElseGet(() -> resultFactory.error("Couldn't find the folder 'Contacts'"));
     }
 
     private static class OneOnOneFinder
             extends BreadthFirstVaultVisitor
     {
-        public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
         private final List<Map<String, String>> contacts = new ArrayList<>();
 
         @Override

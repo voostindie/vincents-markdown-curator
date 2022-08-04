@@ -29,6 +29,12 @@ public class TweevvNotesCuratorModule
     }
 
     @Override
+    public Locale locale()
+    {
+        return Locale.forLanguageTag("nl");
+    }
+
+    @Override
     protected void configureCurator()
     {
         registerDataModel(VolunteeringModel.class);
@@ -60,11 +66,5 @@ public class TweevvNotesCuratorModule
                         "💶 Declaraties"
                 )
         );
-    }
-
-    @Provides
-    Locale locale()
-    {
-        return Locale.forLanguageTag("nl");
     }
 }

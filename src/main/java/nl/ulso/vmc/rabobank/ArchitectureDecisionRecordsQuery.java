@@ -10,16 +10,19 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.query.QueryResult.error;
-import static nl.ulso.markdown_curator.query.QueryResult.table;
 
 class ArchitectureDecisionRecordsQuery
         implements Query
 {
     private final Vault vault;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    ArchitectureDecisionRecordsQuery(Vault vault) {this.vault = vault;}
+    ArchitectureDecisionRecordsQuery(Vault vault, QueryResultFactory resultFactory)
+    {
+        this.vault = vault;
+        this.resultFactory = resultFactory;
+    }
 
     @Override
     public String name()
@@ -48,8 +51,8 @@ class ArchitectureDecisionRecordsQuery
             folder.accept(finder);
             var adrs = finder.adrs;
             adrs.sort(comparing((Map<String, String> e) -> e.get("ID")));
-            return table(List.of("ID", "Date", "Status", "Name"), adrs);
-        }).orElse(error("Couldn't find the folder 'ADRs'"));
+            return resultFactory.table(List.of("ID", "Date", "Status", "Name"), adrs);
+        }).orElseGet(() -> resultFactory.error("Couldn't find the folder 'ADRs'"));
     }
 
     private static class AdrFinder
@@ -86,7 +89,7 @@ class ArchitectureDecisionRecordsQuery
         public void visit(Section section)
         {
             if (section.level() == 2 && section.fragments().size() > 0
-                    && section.fragments().get(0) instanceof TextBlock textBlock)
+                && section.fragments().get(0) instanceof TextBlock textBlock)
             {
                 if (section.title().contentEquals("Changes"))
                 {

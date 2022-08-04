@@ -11,11 +11,13 @@ class RolesQuery
         implements Query
 {
     private final OrgChart orgChart;
+    private final QueryResultFactory resultFactory;
 
     @Inject
-    public RolesQuery(OrgChart orgChart)
+    public RolesQuery(OrgChart orgChart, QueryResultFactory resultFactory)
     {
         this.orgChart = orgChart;
+        this.resultFactory = resultFactory;
     }
 
     @Override
@@ -47,6 +49,6 @@ class RolesQuery
                                 .filter(e -> e.getValue().containsKey(contact))
                                 .map(Map.Entry::getKey).findFirst().orElse("")))
                 .toList();
-        return QueryResult.table(List.of("Team", "Role"), roles);
+        return resultFactory.table(List.of("Team", "Role"), roles);
     }
 }
