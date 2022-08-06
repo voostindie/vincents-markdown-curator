@@ -8,7 +8,7 @@ import nl.ulso.vmc.project.ProjectListSettings;
 import nl.ulso.vmc.project.ProjectsQuery;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 
 public class RabobankNotesCuratorModule
         extends CuratorModule
@@ -46,27 +46,20 @@ public class RabobankNotesCuratorModule
     @Provides
     ProjectListSettings projectListSettings()
     {
-        return new ProjectListSettings(
-                PROJECT_FOLDER,
-                "Activities",
-                "Date",
-                "Project");
+        return new ProjectListSettings(PROJECT_FOLDER, "Activities", "Date", "Project");
     }
 
     @Provides
     OmniFocusSettings omniFocusSettings()
     {
-        return new OmniFocusSettings(
-                PROJECT_FOLDER,
-                "💼 Rabobank",
-                List.of(
-                        "🤖 Routine",
-                        "👮🏼‍♂️ STEP PDA",
-                        "🌳 Study",
-                        "🌳 GROW!",
-                        "💶 Statements",
-                        "💼 Various",
-                        "🧠 Reminders"
-                ));
+        return new OmniFocusSettings(PROJECT_FOLDER, "💼 Rabobank",
+                (name) -> !name.startsWith("⚡️") &&
+                          !Set.of("🤖 Routine",
+                                  "👮🏼‍♂️ STEP PDA",
+                                  "🌳 Study",
+                                  "🌳 GROW!",
+                                  "💶 Statements",
+                                  "💼 Various",
+                                  "🧠 Reminders").contains(name));
     }
 }

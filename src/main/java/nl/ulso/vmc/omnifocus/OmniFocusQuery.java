@@ -1,11 +1,12 @@
 package nl.ulso.vmc.omnifocus;
 
 import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.Dictionary;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.markdown_curator.vault.Folder;
+import nl.ulso.markdown_curator.vault.Vault;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
@@ -14,13 +15,6 @@ import static java.util.ResourceBundle.getBundle;
 public class OmniFocusQuery
         implements Query
 {
-    private static final String PROJECT_FOLDER = "project-folder";
-    private static final String OMNIFOCUS_FOLDER = "omnifocus-folder";
-    private static final String IGNORED_PROJECTS = "ignored-projects";
-    private static final String REFRESH_INTERVAL = "refresh-interval";
-    private static final String REFRESH_INTERVAL_TEXT =
-            "Minimum number of milliseconds to wait for refreshes; defaults to 60000 (1 " +
-            "minute)";
     private static final int DEFAULT_REFRESH_INTERVAL = 60000;
 
     private final OmniFocusRepository omniFocusRepository;
@@ -56,60 +50,25 @@ public class OmniFocusQuery
     @Override
     public Map<String, String> supportedConfiguration()
     {
-        if (settings != null)
-        {
-            return Map.of(
-                    REFRESH_INTERVAL,
-                    REFRESH_INTERVAL_TEXT
-            );
-        }
-        return Map.of(
-                PROJECT_FOLDER, "Folder in the vault where projects are stored",
-                OMNIFOCUS_FOLDER, "OmniFocus folder to select projects from",
-                IGNORED_PROJECTS, "list of OmniFocus projects to ignore; defaults to empty list",
-                REFRESH_INTERVAL,
-                REFRESH_INTERVAL_TEXT);
+        return Map.of("refresh-interval",
+                "Minimum number of milliseconds to wait for refreshes; defaults to 60000 (1 " +
+                "minute)");
     }
 
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        var configuration = configuration(definition);
-        var projectFolder = configuration.string(PROJECT_FOLDER, null);
-        if (projectFolder == null)
-        {
-            return resultFactory.error("Property '" + PROJECT_FOLDER + "' is missing.");
-        }
-        var omniFocusFolder = configuration.string(OMNIFOCUS_FOLDER, null);
-        if (omniFocusFolder == null)
-        {
-            return resultFactory.error("Property '" + OMNIFOCUS_FOLDER + "' is missing.");
-        }
-        var ignoredProjects = new HashSet<>(configuration.listOfStrings(IGNORED_PROJECTS));
-        var refreshInterval = configuration.integer(REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL);
-        return vault.folder(projectFolder)
+        var refreshInterval =
+                definition.configuration().integer("refresh-interval", DEFAULT_REFRESH_INTERVAL);
+        return vault.folder(settings.projectFolder())
                 .map(folder ->
                         (QueryResult) new OmniFocusQueryResult(
-                                omniFocusRepository.projects(omniFocusFolder, refreshInterval),
+                                omniFocusRepository.projects(settings.omniFocusFolder(),
+                                        refreshInterval),
                                 folder,
-                                ignoredProjects, locale))
+                                settings.includePredicate(), locale))
                 .orElseGet(() -> resultFactory.error(
-                        "Project folder not found: '" + projectFolder + "'"));
-    }
-
-    protected Dictionary configuration(QueryDefinition definition)
-    {
-        if (settings != null)
-        {
-            return Dictionary.mapDictionary(Map.of(
-                    PROJECT_FOLDER, settings.projectFolder(),
-                    OMNIFOCUS_FOLDER, settings.omniFocusFolder(),
-                    IGNORED_PROJECTS, settings.ignoredProjects(),
-                    REFRESH_INTERVAL,
-                    definition.configuration().integer(REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL)
-            ));
-        }
-        return definition.configuration();
+                        "Project folder not found: '" + settings.projectFolder() + "'"));
     }
 
     private static class OmniFocusQueryResult
@@ -117,16 +76,16 @@ public class OmniFocusQuery
     {
         private final List<OmniFocusProject> omniFocusProjects;
         private final Folder projectFolder;
-        private final Set<String> ignoredProjects;
+        private final Predicate<String> includePredicate;
         private final ResourceBundle bundle;
 
         OmniFocusQueryResult(
                 List<OmniFocusProject> omniFocusProjects, Folder projectFolder,
-                Set<String> ignoredProjects, Locale locale)
+                Predicate<String> includePredicate, Locale locale)
         {
             this.omniFocusProjects = omniFocusProjects;
             this.projectFolder = projectFolder;
-            this.ignoredProjects = ignoredProjects;
+            this.includePredicate = includePredicate;
             this.bundle = getBundle("OmniFocus", locale);
         }
 
@@ -136,7 +95,7 @@ public class OmniFocusQuery
             var builder = new StringBuilder();
             var missingPages = omniFocusProjects.stream()
                     .map(OmniFocusProject::name)
-                    .filter(name -> !ignoredProjects.contains(name))
+                    .filter(includePredicate)
                     .filter(name -> projectFolder.document(name).isEmpty())
                     .toList();
             if (!missingPages.isEmpty())

@@ -8,8 +8,8 @@ import nl.ulso.vmc.project.ProjectListSettings;
 import nl.ulso.vmc.project.ProjectsQuery;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class TweevvNotesCuratorModule
         extends CuratorModule
@@ -60,11 +60,9 @@ public class TweevvNotesCuratorModule
         return new OmniFocusSettings(
                 PROJECT_FOLDER,
                 "🏐 TweeVV",
-                List.of(
-                        "🤖 Routine",
-                        "🏐 Diversen",
-                        "💶 Declaraties"
-                )
-        );
+                (name) -> !name.startsWith("⚡️") &&
+                          !Set.of("🤖 Routine",
+                                  "🏐 Diversen",
+                                  "💶 Declaraties").contains(name));
     }
 }
