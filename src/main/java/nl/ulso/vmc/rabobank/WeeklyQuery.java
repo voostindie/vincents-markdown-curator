@@ -69,6 +69,7 @@ class WeeklyQuery
                 return "No entries found for this week";
             }
             var builder = new StringBuilder();
+            var total = 0;
             for (String folder : Journal.FOLDERS_IN_ORDER)
             {
                 var map = entries.get(folder);
@@ -101,11 +102,13 @@ class WeeklyQuery
                                 .append(entry.subject())
                                 .append("]]")
                                 .append(lineSeparator());
+                        total++;
                     }
                 }
                 builder.append(lineSeparator());
             }
-            return builder.toString().trim();
+            builder.append("(*").append(total).append(" journal entries*)");
+            return builder.toString();
         }
     }
 }
