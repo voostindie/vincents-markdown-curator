@@ -35,7 +35,7 @@ class Journal
     private static final String ACTIVITIES_TIMELINE = "Activities";
     private static final String UNCATEGORIZED_ACTIVITIES_SECTION = "Uncategorized activities";
     static final List<String> FOLDERS_IN_ORDER = List.of(
-            JOURNAL_FOLDER, "GROW!", "Projects", "Teams", "Systems", "Contacts"
+            JOURNAL_FOLDER, "GROW!", "Projects", "Teams", "Systems", "Contacts", "3rd Parties"
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Journal.class);
