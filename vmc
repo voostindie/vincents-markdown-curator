@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Runs the `vmc` application as a daemon, compiled from the latest code.
+
+cd "$(dirname $0)" || exit
+
+echo "Compiling and installing markdown-curator..."
+mvn -f ../markdown-curator/pom.xml -q -B install
+
+echo "Compiling and running vmc..."
+mvn -q -B exec:java
