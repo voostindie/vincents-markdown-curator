@@ -1,11 +1,18 @@
 #!/bin/sh
 #
 # Runs the `vmc` application as a daemon, compiled from the latest code.
+#
+# First the JAR is built with Maven, and then it's run separately.
+# It's also possible to run the code directory from within Maven, using
+# the Exec plugin. But that loads more classes and uses more memory.
 
 cd "$(dirname $0)" || exit
 
 echo "Compiling and installing markdown-curator..."
 mvn -f ../markdown-curator/pom.xml -q -B install
 
-echo "Compiling and running vmc..."
-mvn -q -B exec:java
+echo "Compiling and packaging vmc..."
+mvn -q -B package
+
+echo "Executing vmc..."
+java -Xmx64m -jar target/vmc-1.0.0-SNAPSHOT.jar
