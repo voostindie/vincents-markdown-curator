@@ -15,4 +15,4 @@ echo "Compiling and packaging vmc..."
 mvn -q -B package
 
 echo "Executing vmc..."
-java -Xmx64m -jar target/vmc-1.0.0-SNAPSHOT.jar
+java -Xmx96m -jar target/vmc-1.0.0-SNAPSHOT.jar
