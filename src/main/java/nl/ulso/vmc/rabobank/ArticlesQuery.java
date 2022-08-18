@@ -1,6 +1,7 @@
 package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.query.*;
+import nl.ulso.markdown_curator.vault.Dictionary;
 import nl.ulso.markdown_curator.vault.*;
 
 import javax.inject.Inject;
@@ -14,6 +15,7 @@ import static java.util.regex.Pattern.compile;
 class ArticlesQuery
         implements Query
 {
+    private static final String CONFLUENCE = "https://confluence.dev.rabobank.nl";
     private final Vault vault;
     private final QueryResultFactory resultFactory;
 
@@ -84,25 +86,30 @@ class ArticlesQuery
                             "Date", matcher.group(1),
                             "Title", section.document().link(),
                             "Publication",
-                            publicationLink(section.document().frontMatter()
-                                    .string("publication", "Unpublished"))
+                            publicationLink(section.document().frontMatter())
                     ));
                 }
             }
         }
 
-        private String publicationLink(String property)
+        private String publicationLink(Dictionary frontMatter)
         {
-            if (property.startsWith("https://"))
+            var link = frontMatter.string("publication", "Unpublished");
+            var confluencePageId = frontMatter.integer("confluence-page-id", -1);
+            if (confluencePageId != -1)
+            {
+                link = CONFLUENCE + "/pages/viewpage.action?pageId=" + confluencePageId;
+            }
+            if (link.startsWith("https://"))
             {
                 var name = "Link";
-                if (property.contains("confluence"))
+                if (link.contains(CONFLUENCE))
                 {
                     name = "Confluence";
                 }
-                return "[" + name + "](" + property + ")";
+                return "[" + name + "](" + link + ")";
             }
-            return property;
+            return link;
         }
     }
 }
