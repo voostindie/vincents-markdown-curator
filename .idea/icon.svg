@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xl="http://www.w3.org/1999/xlink" viewBox="108.14738 155.62204 63.5101 62.362206" width="63.5101" height="62.362206">
+  <defs/>
+  <g id="Canvas_1" fill-opacity="1" fill="none" stroke="none" stroke-opacity="1" stroke-dasharray="none">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_6">
+        <rect x="109.29528" y="155.62204" width="62.362206" height="62.362206" fill="black"/>
+      </g>
+      <g id="Graphic_3">
+        <text transform="translate(113.14738 160.62204)" fill="white">
+          <tspan font-family="Arial Black" font-weight="bold" font-size="23" fill="white" x="0" y="25">RUN</tspan>
+        </text>
+      </g>
+      <g id="Graphic_2">
+        <text transform="translate(113.56047 178.4803)" fill="white">
+          <tspan font-family="Arial Black" font-weight="bold" font-size="22" fill="white" x="0" y="24">VMC</tspan>
+        </text>
+      </g>
+      <g id="Graphic_4">
+        <rect x="112.83858" y="162.14173" width="55.27559" height="5.102368" fill="#be0a26"/>
+      </g>
+      <g id="Graphic_5">
+        <rect x="112.83858" y="204.6614" width="55.27559" height="5.102368" fill="#be0a26"/>
+      </g>
+    </g>
+  </g>
+</svg>
