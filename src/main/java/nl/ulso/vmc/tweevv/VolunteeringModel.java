@@ -140,7 +140,7 @@ public class VolunteeringModel
     public Stream<Contact> contactsFor(Season season, String activityName)
     {
         var activity = activities.get(activityName);
-        return volunteering.computeIfAbsent(season, s -> emptyMap())
+        return volunteering.getOrDefault(season, emptyMap())
                 .entrySet().stream()
                 .filter(entry -> entry.getValue().contains(activity))
                 .map(Map.Entry::getKey)
