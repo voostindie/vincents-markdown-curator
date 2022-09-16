@@ -6,7 +6,9 @@ import nl.ulso.markdown_curator.vault.Document;
 import javax.inject.Inject;
 import java.util.*;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
+import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 class SubteamsQuery
         implements Query
@@ -50,14 +52,14 @@ class SubteamsQuery
             case "list":
                 var units = orgChart.forParent(parent).stream()
                         .map(OrgUnit::team)
+                        .sorted(comparing(team -> stripEmojis(team.name())))
                         .map(Document::link)
-                        .sorted()
                         .toList();
                 return resultFactory.unorderedList(units);
             case "table":
                 var roles = definition.configuration().listOfStrings("roles");
                 var rows = orgChart.forParent(parent).stream()
-                        .sorted(Comparator.comparing(orgUnit -> orgUnit.team().name()))
+                        .sorted(comparing(orgUnit -> stripEmojis(orgUnit.team().name())))
                         .map(orgUnit ->
                         {
                             Map<String, String> row = new HashMap<>();

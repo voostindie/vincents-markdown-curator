@@ -60,6 +60,6 @@ public class RabobankNotesCuratorModule
                                   "🌳 GROW!",
                                   "💶 Statements",
                                   "💼 Various",
-                                  "🧠 Reminders").contains(name));
+                                  "💬 Reminders / To discuss").contains(name));
     }
 }

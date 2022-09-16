@@ -10,6 +10,8 @@ import java.util.*;
 
 import static java.lang.System.lineSeparator;
 import static java.time.format.TextStyle.FULL;
+import static java.util.Comparator.comparing;
+import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 class WeeklyQuery
         implements Query
@@ -82,7 +84,9 @@ class WeeklyQuery
                         .append(lineSeparator())
                         .append(lineSeparator());
                 var documents =
-                        map.keySet().stream().sorted(Comparator.comparing(Document::name)).toList();
+                        map.keySet().stream()
+                                .sorted(comparing(document -> stripEmojis(document.name())))
+                                .toList();
                 for (Document document : documents)
                 {
                     builder.append("- **")
