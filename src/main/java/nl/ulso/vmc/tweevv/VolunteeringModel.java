@@ -7,10 +7,11 @@ import nl.ulso.markdown_curator.vault.event.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
@@ -24,7 +25,7 @@ public class VolunteeringModel
     private final Vault vault;
     private final Map<String, Activity> activities;
     private final Map<String, Contact> contacts;
-    private final Map<Season, Map<Contact, Set<Activity>>> volunteering;
+    private final Map<Season, Set<ContactActivity>> volunteering;
 
     @Inject
     VolunteeringModel(Vault vault)
@@ -121,30 +122,36 @@ public class VolunteeringModel
         if (parentFolderName.equals(CONTACTS_FOLDER))
         {
             var contact = contacts.remove(document.name());
-            volunteering.values().forEach(map -> map.remove(contact));
+            volunteering.values().forEach(set ->
+                    set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));
         }
         else if (parentFolderName.equals(TEAMS_FOLDER))
         {
             var activity = activities.remove(document.name());
-            volunteering.values().forEach(map -> map.values().forEach(set -> set.remove(activity)));
+            volunteering.values().forEach(set ->
+                    set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
         }
     }
 
-    public Map<Contact, Set<Activity>> volunteersFor(String seasonString)
+    public Map<Contact, List<ContactActivity>> volunteersFor(String seasonString)
     {
-        return Season.fromString(seasonString)
-                .map(season -> unmodifiableMap(volunteering.getOrDefault(season, emptyMap())))
-                .orElse(emptyMap());
+        return volunteersFor(seasonString, null);
     }
 
-    public Stream<Contact> contactsFor(Season season, String activityName)
+    public Map<Contact, List<ContactActivity>> volunteersFor(String seasonString, String activityName)
     {
-        var activity = activities.get(activityName);
-        return volunteering.getOrDefault(season, emptyMap())
-                .entrySet().stream()
-                .filter(entry -> entry.getValue().contains(activity))
-                .map(Map.Entry::getKey)
-                .sorted(comparing(Contact::name));
+        Activity selectedActivity = activityName != null ? activities.get(activityName) : null;
+        if (activityName != null && selectedActivity == null)
+        {
+            return emptyMap();
+        }
+        return Season.fromString(seasonString)
+                .map(season -> unmodifiableSet(volunteering.getOrDefault(season, emptySet())))
+                .orElse(emptySet())
+                .stream()
+                .filter(ca -> selectedActivity == null || ca.activity == selectedActivity)
+                .sorted(comparing(contactActivity -> contactActivity.contact.name()))
+                .collect(Collectors.groupingBy(ContactActivity::contact));
     }
 
     public static class Season
@@ -189,8 +196,8 @@ public class VolunteeringModel
 
     public static class Activity
     {
-        private final String name;
         private final Document document;
+        private final String name;
 
         private Activity(Document document, String name)
         {
@@ -238,6 +245,15 @@ public class VolunteeringModel
         public String link()
         {
             return document.link();
+        }
+    }
+
+    public record ContactActivity(Contact contact, Activity activity, String description)
+    {
+
+        public String shortDescription()
+        {
+            return description.replace(activity.toMarkdown(), "").trim();
         }
     }
 
@@ -291,9 +307,11 @@ public class VolunteeringModel
                 var seasonString = line.substring(2, colon).trim();
                 var activityText = line.substring(colon + 1).trim();
                 Season.fromString(seasonString).ifPresent(season ->
-                        volunteering.computeIfAbsent(season, s -> new HashMap<>())
-                                .computeIfAbsent(contact, c -> new HashSet<>())
-                                .add(resolveActivity(activityText)));
+                        volunteering.computeIfAbsent(season, s -> new HashSet<>()).add(
+                                new ContactActivity(
+                                        contact,
+                                        resolveActivity(activityText),
+                                        activityText)));
             }
         }
 

@@ -51,8 +51,8 @@ public class VolunteersQuery
         var list = model.volunteersFor(season).entrySet().stream()
                 .map(entry -> Map.of("Vrijwilliger", entry.getKey().link(),
                         "Taak", entry.getValue().stream()
-                                .sorted(comparing(VolunteeringModel.Activity::name))
-                                .map(VolunteeringModel.Activity::toMarkdown)
+                                .sorted(comparing(VolunteeringModel.ContactActivity::description))
+                                .map(VolunteeringModel.ContactActivity::description)
                                 .collect(Collectors.joining(", "))))
                 .sorted(comparing(map -> map.get("Vrijwilliger")))
                 .toList();
