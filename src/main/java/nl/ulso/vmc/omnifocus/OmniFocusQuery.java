@@ -25,11 +25,11 @@ public class OmniFocusQuery
 
     @Inject
     public OmniFocusQuery(
-            Vault vault, OmniFocusSettings settings, Locale locale,
+            Vault vault, OmniFocusRepository omniFocusRepository, OmniFocusSettings settings, Locale locale,
             QueryResultFactory resultFactory)
     {
         this.resultFactory = resultFactory;
-        this.omniFocusRepository = new OmniFocusRepository();
+        this.omniFocusRepository = omniFocusRepository;
         this.vault = vault;
         this.settings = settings;
         this.locale = locale;

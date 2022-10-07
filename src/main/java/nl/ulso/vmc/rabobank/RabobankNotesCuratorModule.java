@@ -2,6 +2,9 @@ package nl.ulso.vmc.rabobank;
 
 import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
+import nl.ulso.vmc.hook.HooksQuery;
+import nl.ulso.vmc.jxa.JxaClasspathRunner;
+import nl.ulso.vmc.jxa.JxaRunner;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.project.ProjectListSettings;
@@ -30,6 +33,7 @@ public class RabobankNotesCuratorModule
     @Override
     protected void configureCurator()
     {
+        bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(Journal.class);
         registerDataModel(OrgChart.class);
         registerQuery(ProjectsQuery.class);
@@ -41,6 +45,7 @@ public class RabobankNotesCuratorModule
         registerQuery(WeeklyQuery.class);
         registerQuery(SubteamsQuery.class);
         registerQuery(RolesQuery.class);
+        registerQuery(HooksQuery.class);
     }
 
     @Provides
