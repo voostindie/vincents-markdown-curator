@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
+import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static nl.ulso.markdown_curator.vault.LocalDates.parseDate;
@@ -58,7 +59,7 @@ class Journal
         var weekDays = day.datesUntil(day.plusDays(7)).collect(Collectors.toSet());
         return entries.stream()
                 .filter(entry -> weekDays.contains(entry.date()))
-                .sorted(Comparator.comparing(JournalEntry::date))
+                .sorted(comparing(JournalEntry::date))
                 .collect(
                         groupingBy(JournalEntry::folder,
                                 groupingBy(e -> e.section().document()))
