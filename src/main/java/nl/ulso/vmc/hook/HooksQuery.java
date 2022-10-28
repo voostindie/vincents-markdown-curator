@@ -20,13 +20,13 @@ public class HooksQuery
         implements Query
 {
     private static final String ARCHIVE_PATH = "/_Archive/";
-    private final HookRepository repository;
+    private final HookmarkRepository repository;
     private final DocumentPathResolver documentPathResolver;
     private final QueryResultFactory resultFactory;
 
     @Inject
     public HooksQuery(
-            HookRepository repository, DocumentPathResolver documentPathResolver,
+            HookmarkRepository repository, DocumentPathResolver documentPathResolver,
             QueryResultFactory resultFactory)
     {
         this.repository = repository;

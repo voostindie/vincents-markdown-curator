@@ -1,7 +1,7 @@
 function run(argv) {
-    let hook = Application('Hook');
+    let hookmark = Application('Hookmark');
     let documentUrl = argv[0];
-    let documentBookmark = hook.Bookmark({address: documentUrl}).make();
+    let documentBookmark = hookmark.Bookmark({address: documentUrl}).make();
     let bookmarks = documentBookmark.hookedBookmarks()
         .map(function (bookmarkFunction) {
             // Sometimes hooks "break" and become invalid. This happens for

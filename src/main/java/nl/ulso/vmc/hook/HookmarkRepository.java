@@ -11,22 +11,22 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Fetches hooks (bookmarks) for a URI from <a href="https://hookproductivity.com">Hook</a>.
+ * Fetches hooks (bookmarks) for a URI from <a href="https://hookproductivity.com">Hookmark</a>.
  * <p/>
  * This implementation uses JXA scripting.
  */
 @Singleton
-public class HookRepository
+public class HookmarkRepository
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HookRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HookmarkRepository.class);
     private static final long REFRESH_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
-    private static final String SCRIPT = "hook-bookmarks";
+    private static final String SCRIPT = "hookmark-bookmarks";
 
     private final ConcurrentMap<String, Cache> cacheMap;
     private final JxaRunner jxaRunner;
 
     @Inject
-    public HookRepository(JxaRunner jxaRunner)
+    public HookmarkRepository(JxaRunner jxaRunner)
     {
         this.cacheMap = new ConcurrentHashMap<>();
         this.jxaRunner = jxaRunner;
