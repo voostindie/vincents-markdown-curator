@@ -127,8 +127,9 @@ public class OmniFocusQuery
             }
             if (missingPages.isEmpty() && missingProjects.isEmpty())
             {
-                builder.append("### ");
+                builder.append("**");
                 builder.append(bundle.getString("allGood.title"));
+                builder.append("**");
                 builder.append(lineSeparator());
                 builder.append(lineSeparator());
                 builder.append(bundle.getString("allGood.text"));
