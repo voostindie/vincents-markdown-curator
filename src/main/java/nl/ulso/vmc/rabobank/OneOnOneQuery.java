@@ -65,6 +65,10 @@ class OneOnOneQuery
         @Override
         public void visit(Document document)
         {
+            if (!document.frontMatter().hasProperty("1-on-1"))
+            {
+                return;
+            }
             var date = document.frontMatter().date("1-on-1", null);
             if (date != null)
             {
@@ -72,6 +76,14 @@ class OneOnOneQuery
                         "Date", date.toString(),
                         "Name", document.link(),
                         "When", computeWeeksAgo(date))
+                );
+            }
+            else
+            {
+                contacts.add(Map.of(
+                        "Date", "",
+                        "Name", document.link(),
+                        "When", "Unplanned")
                 );
             }
         }
