@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
+import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 public class ProjectsQuery
         implements Query
@@ -110,7 +111,8 @@ public class ProjectsQuery
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2 && section.title().contentEquals(settings.timelineSection())
+            if (section.level() == 2
+                && stripEmojis(section.title()).contentEquals(settings.timelineSection())
                 && section.fragments().size() > 1
                 && section.fragments().get(1) instanceof Section subsection)
             {

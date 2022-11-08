@@ -21,6 +21,7 @@ import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static nl.ulso.markdown_curator.vault.LocalDates.parseDate;
 import static nl.ulso.markdown_curator.vault.Section.createAnchor;
+import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 /**
  * Builds a journal - what happened on a certain date - on top of the documents in a vault, for
@@ -112,7 +113,7 @@ class Journal
             if (!folder.contentEquals(JOURNAL_FOLDER))
             {
                 if (section.level() == 2 &&
-                    section.title().contentEquals(ACTIVITIES_TIMELINE))
+                    stripEmojis(section.title()).contentEquals(ACTIVITIES_TIMELINE))
                 {
                     super.visit(section);
                 }
@@ -130,7 +131,7 @@ class Journal
             else
             {
                 if (section.level() == 2 &&
-                    section.title().contentEquals(UNCATEGORIZED_ACTIVITIES_SECTION))
+                    stripEmojis(section.title()).contentEquals(UNCATEGORIZED_ACTIVITIES_SECTION))
                 {
                     super.visit(section);
                 }

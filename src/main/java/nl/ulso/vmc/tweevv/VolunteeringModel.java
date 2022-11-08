@@ -15,6 +15,7 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
+import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 @Singleton
 public class VolunteeringModel
@@ -138,7 +139,8 @@ public class VolunteeringModel
         return volunteersFor(seasonString, null);
     }
 
-    public Map<Contact, List<ContactActivity>> volunteersFor(String seasonString, String activityName)
+    public Map<Contact, List<ContactActivity>> volunteersFor(
+            String seasonString, String activityName)
     {
         Activity selectedActivity = activityName != null ? activities.get(activityName) : null;
         if (activityName != null && selectedActivity == null)
@@ -277,7 +279,7 @@ public class VolunteeringModel
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2 && section.title().contentEquals("Taken"))
+            if (section.level() == 2 && stripEmojis(section.title()).contentEquals("Taken"))
             {
                 inSection = true;
                 super.visit(section);
