@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 class ArchitectureDecisionRecordsQuery
         implements Query
@@ -92,7 +91,8 @@ class ArchitectureDecisionRecordsQuery
             if (section.level() == 2 && section.fragments().size() > 0
                 && section.fragments().get(0) instanceof TextBlock textBlock)
             {
-                if (stripEmojis(section.title()).contentEquals("Changes"))
+                var title = section.sortableTitle();
+                if (title.contentEquals("Changes"))
                 {
                     var lines = new ArrayList<>(textBlock.lines());
                     if (lines.isEmpty())
@@ -107,7 +107,7 @@ class ArchitectureDecisionRecordsQuery
                         date = matcher.group(1);
                     }
                 }
-                else if (stripEmojis(section.title()).contentEquals("Status"))
+                else if (title.contentEquals("Status"))
                 {
                     var lines = textBlock.lines();
                     if (lines.size() > 0)

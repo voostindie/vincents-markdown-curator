@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
-import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 @Singleton
 public class OrgChart
@@ -98,7 +97,7 @@ public class OrgChart
         public void visit(Section section)
         {
             if (section.level() == 2
-                && stripEmojis(section.title()).contentEquals(ROLES_SECTION))
+                && section.sortableTitle().contentEquals(ROLES_SECTION))
             {
                 super.visit(section);
             }

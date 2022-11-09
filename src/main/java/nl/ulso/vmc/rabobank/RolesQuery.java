@@ -6,7 +6,6 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
-import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 class RolesQuery
         implements Query
@@ -44,7 +43,7 @@ class RolesQuery
     {
         var contact = definition.document().name();
         var roles = orgChart.forContact(contact).stream()
-                .sorted(comparing(orgUnit -> stripEmojis(orgUnit.team().name())))
+                .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
                 .map(unit -> Map.of("Team", unit.team().link(),
                         "Role", unit.roles().entrySet().stream()
                                 .filter(e -> e.getValue().containsKey(contact))

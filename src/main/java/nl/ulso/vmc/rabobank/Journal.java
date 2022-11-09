@@ -1,7 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
 import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.vault.LocalDates;
 import nl.ulso.markdown_curator.vault.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static nl.ulso.markdown_curator.vault.LocalDates.parseDate;
 import static nl.ulso.markdown_curator.vault.Section.createAnchor;
-import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 /**
  * Builds a journal - what happened on a certain date - on top of the documents in a vault, for
@@ -45,7 +43,8 @@ class Journal
 
     private final Set<JournalEntry> entries;
 
-    @Inject Journal(Vault vault)
+    @Inject
+    Journal(Vault vault)
     {
         this.vault = vault;
         this.entries = new HashSet<>();
@@ -113,7 +112,7 @@ class Journal
             if (!folder.contentEquals(JOURNAL_FOLDER))
             {
                 if (section.level() == 2 &&
-                    stripEmojis(section.title()).contentEquals(ACTIVITIES_TIMELINE))
+                    section.sortableTitle().contentEquals(ACTIVITIES_TIMELINE))
                 {
                     super.visit(section);
                 }
@@ -131,7 +130,7 @@ class Journal
             else
             {
                 if (section.level() == 2 &&
-                    stripEmojis(section.title()).contentEquals(UNCATEGORIZED_ACTIVITIES_SECTION))
+                    section.sortableTitle().contentEquals(UNCATEGORIZED_ACTIVITIES_SECTION))
                 {
                     super.visit(section);
                 }

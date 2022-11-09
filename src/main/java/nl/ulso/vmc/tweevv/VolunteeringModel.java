@@ -15,7 +15,6 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
-import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 @Singleton
 public class VolunteeringModel
@@ -279,7 +278,7 @@ public class VolunteeringModel
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2 && stripEmojis(section.title()).contentEquals("Taken"))
+            if (section.level() == 2 && section.sortableTitle().contentEquals("Taken"))
             {
                 inSection = true;
                 super.visit(section);

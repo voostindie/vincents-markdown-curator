@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.vmc.emoji.EmojiFilter.stripEmojis;
 
 class ArticlesQuery
         implements Query
@@ -69,7 +68,7 @@ class ArticlesQuery
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2 && stripEmojis(section.title()).contentEquals("Changes")
+            if (section.level() == 2 && section.sortableTitle().contentEquals("Changes")
                 && section.fragments().size() > 0
                 && section.fragments().get(0) instanceof TextBlock textBlock)
             {
