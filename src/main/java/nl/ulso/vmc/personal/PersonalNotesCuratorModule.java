@@ -4,6 +4,7 @@ import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
+import nl.ulso.vmc.obsidian.StarredDocumentsQuery;
 
 import java.nio.file.Path;
 
@@ -30,5 +31,6 @@ public class PersonalNotesCuratorModule
         registerQuery(ReadingQuery.class);
         registerQuery(BooksQuery.class);
         registerQuery(HooksQuery.class);
+        registerQuery(StarredDocumentsQuery.class);
     }
 }

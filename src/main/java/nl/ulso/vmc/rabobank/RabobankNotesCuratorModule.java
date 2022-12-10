@@ -5,6 +5,7 @@ import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
+import nl.ulso.vmc.obsidian.StarredDocumentsQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.project.ProjectListSettings;
@@ -46,6 +47,7 @@ public class RabobankNotesCuratorModule
         registerQuery(SubteamsQuery.class);
         registerQuery(RolesQuery.class);
         registerQuery(HooksQuery.class);
+        registerQuery(StarredDocumentsQuery.class);
     }
 
     @Provides
