@@ -21,7 +21,7 @@ public record Hook(String name, String address)
 
     public String toMarkdown()
     {
-        return resolveApplication() + " [" + name + "](" + address + ")";
+        return resolveApplication() + " [" + name + "](" + fixHookmarkUrlEncoding(address) + ")";
     }
 
     private String resolveApplication()
@@ -33,7 +33,8 @@ public record Hook(String name, String address)
             start = HOOK_PROTOCOL_LENGTH;
             end = address.indexOf("/", HOOK_PROTOCOL_LENGTH);
         }
-        else {
+        else
+        {
             end = address.indexOf(':');
         }
         if (end == -1)
@@ -42,5 +43,16 @@ public record Hook(String name, String address)
         }
         var protocol = address.substring(start, end);
         return PROTOCOL_TO_APPLICATION.getOrDefault(protocol, UNKNOWN_PROTOCOL);
+    }
+
+    /**
+     * URLs from Hookmark seem to be encoded, but at least the character ")" is not, which
+     * breaks the Markdown formatting.
+     * @param url URL to format.
+     * @return Properly encoded URL for use in Markdown links.
+     */
+    private String fixHookmarkUrlEncoding(String url)
+    {
+        return url.replace(")", "%29");
     }
 }
