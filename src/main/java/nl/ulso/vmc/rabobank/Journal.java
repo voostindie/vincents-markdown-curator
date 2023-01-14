@@ -54,7 +54,7 @@ class Journal
     {
         LOGGER.debug("Selecting entries for year {}, week {}", year, week);
         LocalDate day = LocalDate.of(year, 12, 31)
-                .with(WEEK_OF_WEEK_BASED_YEAR, week)
+                .with(WEEK_OF_WEEK_BASED_YEAR, Math.max(week, 1))
                 .with(previousOrSame(DayOfWeek.MONDAY));
         var weekDays = day.datesUntil(day.plusDays(7)).collect(Collectors.toSet());
         return entries.stream()
