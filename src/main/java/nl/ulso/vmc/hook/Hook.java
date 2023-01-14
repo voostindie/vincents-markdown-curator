@@ -6,7 +6,7 @@ public record Hook(String name, String address)
 {
     private static final String HOOK_PROTOCOL = "hook://";
     private static final int HOOK_PROTOCOL_LENGTH = HOOK_PROTOCOL.length();
-    private static final Map<String, String> PROTOCOL_TO_APPLICATION = Map.of(
+    private static final Map<String, String> PROTOCOL_TO_EMOJI = Map.of(
             "https", "🌍",
             "http", "🌍",
             "ibooks", "📖",
@@ -42,7 +42,7 @@ public record Hook(String name, String address)
             return UNKNOWN_PROTOCOL;
         }
         var protocol = address.substring(start, end);
-        return PROTOCOL_TO_APPLICATION.getOrDefault(protocol, UNKNOWN_PROTOCOL);
+        return PROTOCOL_TO_EMOJI.getOrDefault(protocol, UNKNOWN_PROTOCOL);
     }
 
     /**
