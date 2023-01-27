@@ -1,5 +1,8 @@
 package nl.ulso.vmc.obsidian;
 
+import jakarta.json.Json;
+import jakarta.json.JsonValue;
+import jakarta.json.stream.JsonParsingException;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.FileSystemVault;
 import org.slf4j.Logger;
@@ -7,9 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.json.Json;
-import javax.json.JsonValue;
-import javax.json.stream.JsonParsingException;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;

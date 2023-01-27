@@ -2,6 +2,7 @@ package nl.ulso.vmc.rabobank;
 
 import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
+import nl.ulso.markdown_curator.journal.*;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -18,6 +19,8 @@ public class RabobankNotesCuratorModule
         extends CuratorModule
 {
     private static final String PROJECT_FOLDER = "Projects";
+    private static final String JOURNAL_FOLDER = "Journal";
+    private static final String ACTIVITIES_SECTION = "Activities";
 
     @Override
     public String name()
@@ -37,13 +40,13 @@ public class RabobankNotesCuratorModule
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(Journal.class);
         registerDataModel(OrgChart.class);
+        registerQuery(TimelineQuery.class);
         registerQuery(ProjectsQuery.class);
         registerQuery(ArticlesQuery.class);
         registerQuery(OmniFocusQuery.class);
         registerQuery(SystemsQuery.class);
         registerQuery(ArchitectureDecisionRecordsQuery.class);
         registerQuery(OneOnOneQuery.class);
-        registerQuery(WeeklyQuery.class);
         registerQuery(SubteamsQuery.class);
         registerQuery(RolesQuery.class);
         registerQuery(HooksQuery.class);
@@ -51,9 +54,15 @@ public class RabobankNotesCuratorModule
     }
 
     @Provides
+    JournalSettings journalSettings()
+    {
+        return new JournalSettings(JOURNAL_FOLDER, ACTIVITIES_SECTION);
+    }
+
+    @Provides
     ProjectListSettings projectListSettings()
     {
-        return new ProjectListSettings(PROJECT_FOLDER, "Activities", "Date", "Project");
+        return new ProjectListSettings(PROJECT_FOLDER, ACTIVITIES_SECTION, "Date", "Project");
     }
 
     @Provides

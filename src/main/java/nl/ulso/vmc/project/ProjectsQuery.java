@@ -1,5 +1,6 @@
 package nl.ulso.vmc.project;
 
+import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
@@ -16,6 +17,7 @@ public class ProjectsQuery
     private final Vault vault;
     private final ProjectListSettings settings;
     private final QueryResultFactory resultFactory;
+    private final Journal journalModel;
 
     private enum Format
     {
@@ -28,11 +30,13 @@ public class ProjectsQuery
 
     @Inject
     public ProjectsQuery(
-            Vault vault, ProjectListSettings settings, QueryResultFactory resultFactory)
+            Vault vault, ProjectListSettings settings, QueryResultFactory resultFactory,
+            Journal journalModel)
     {
         this.vault = vault;
         this.settings = settings;
         this.resultFactory = resultFactory;
+        this.journalModel = journalModel;
     }
 
     @Override
@@ -63,7 +67,7 @@ public class ProjectsQuery
         }
         return vault.folder(settings.projectFolder()).map(folder ->
         {
-            var finder = new ProjectFinder(settings);
+            var finder = new ProjectFinder(settings, journalModel);
             folder.accept(finder);
             var projects = finder.projects;
             projects.sort(
@@ -91,10 +95,12 @@ public class ProjectsQuery
 
         private final List<Map<String, String>> projects = new ArrayList<>();
         private final ProjectListSettings settings;
+        private final Journal journalModel;
 
-        public ProjectFinder(ProjectListSettings settings)
+        public ProjectFinder(ProjectListSettings settings, Journal journalModel)
         {
             this.settings = settings;
+            this.journalModel = journalModel;
         }
 
         @Override
@@ -107,6 +113,25 @@ public class ProjectsQuery
             }
         }
 
+        @Override
+        public void visit(Document document)
+        {
+            journalModel.mostRecentMentionOf(document.name()).ifPresentOrElse(
+                    (date) -> projects.add(Map.of(
+                            settings.projectColumn(), document.link(),
+                            settings.dateColumn(), "[[" + date + "]]"
+                    )),
+                    () -> super.visit(document)
+            );
+        }
+
+        /**
+         * Extracts the last modification date for a project from the activity list.
+         * THIS IS A LEGACY METHDO!
+         * Once all active projects have been mentioned in a daily note, this code is no longer
+         * touched, being replaced by the Journal. At that point in time this method
+         * and the code calling it (see "super.visit(document)" above) can go.
+         */
         @Override
         public void visit(Section section)
         {

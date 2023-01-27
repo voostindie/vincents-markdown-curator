@@ -1,11 +1,11 @@
 package nl.ulso.vmc.jxa;
 
+import jakarta.json.*;
+import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import javax.json.*;
-import javax.json.stream.JsonParsingException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;

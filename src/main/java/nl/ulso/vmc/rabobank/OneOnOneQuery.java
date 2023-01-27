@@ -73,7 +73,7 @@ class OneOnOneQuery
             if (date != null)
             {
                 contacts.add(Map.of(
-                        "Date", date.toString(),
+                        "Date", "[[" + date + "]]",
                         "Name", document.link(),
                         "When", computeWeeksAgo(date))
                 );

@@ -2,6 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
+import nl.ulso.markdown_curator.journal.*;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -19,6 +20,8 @@ public class TweevvNotesCuratorModule
         extends CuratorModule
 {
     private static final String PROJECT_FOLDER = "Projecten";
+    private static final String JOURNAL_FOLDER = "Logboek";
+    private static final String ACTIVITIES_SECTION = "Activiteiten";
 
     @Override
     public String name()
@@ -43,6 +46,8 @@ public class TweevvNotesCuratorModule
     {
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(VolunteeringModel.class);
+        registerDataModel(Journal.class);
+        registerQuery(TimelineQuery.class);
         registerQuery(ProjectsQuery.class);
         registerQuery(OmniFocusQuery.class);
         registerQuery(VolunteersQuery.class);
@@ -52,11 +57,17 @@ public class TweevvNotesCuratorModule
     }
 
     @Provides
+    JournalSettings journalSettings()
+    {
+        return new JournalSettings(JOURNAL_FOLDER, ACTIVITIES_SECTION);
+    }
+
+    @Provides
     ProjectListSettings projectListSettings()
     {
         return new ProjectListSettings(
                 PROJECT_FOLDER,
-                "Activiteiten",
+                ACTIVITIES_SECTION,
                 "Datum",
                 "Project");
     }

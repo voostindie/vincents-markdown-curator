@@ -1,12 +1,12 @@
 package nl.ulso.vmc.hook;
 
+import jakarta.json.JsonValue;
 import nl.ulso.vmc.jxa.JxaRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.json.JsonValue;
 import java.util.List;
 
 /**
