@@ -2,7 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
-import nl.ulso.markdown_curator.journal.*;
+import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -44,22 +44,15 @@ public class TweevvNotesCuratorModule
     @Override
     protected void configureCurator()
     {
+        install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION));
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(VolunteeringModel.class);
-        registerDataModel(Journal.class);
-        registerQuery(TimelineQuery.class);
         registerQuery(ProjectsQuery.class);
         registerQuery(OmniFocusQuery.class);
         registerQuery(VolunteersQuery.class);
         registerQuery(GroupQuery.class);
         registerQuery(HooksQuery.class);
         registerQuery(StarredDocumentsQuery.class);
-    }
-
-    @Provides
-    JournalSettings journalSettings()
-    {
-        return new JournalSettings(JOURNAL_FOLDER, ACTIVITIES_SECTION);
     }
 
     @Provides
