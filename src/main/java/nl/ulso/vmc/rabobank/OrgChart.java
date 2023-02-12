@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
+import static java.util.stream.Collectors.toSet;
 
 @Singleton
 public class OrgChart
@@ -32,26 +33,60 @@ public class OrgChart
     protected void fullRefresh()
     {
         orgUnits.clear();
-        vault.folder(TEAMS_FOLDER).ifPresent(teams ->
-                vault.folder(CONTACTS_FOLDER).ifPresent(contacts ->
-                        teams.documents().forEach(team ->
-                                team.accept(new OrgUnitFinder(teams, contacts)))));
+        vault.folder(TEAMS_FOLDER).ifPresent(teams -> vault.folder(CONTACTS_FOLDER).ifPresent(
+                contacts -> teams.documents()
+                        .forEach(team -> team.accept(new OrgUnitFinder(teams, contacts)))));
     }
 
     List<OrgUnit> forParent(String parentTeamName)
     {
-        return orgUnits.stream()
-                .filter(orgUnit -> orgUnit.parent()
-                        .map(parent -> parent.name().contentEquals(parentTeamName)).orElse(false))
-                .toList();
+        return orgUnits.stream().filter(orgUnit -> orgUnit.parent()
+                .map(parent -> parent.name().contentEquals(parentTeamName)).orElse(false)).toList();
     }
 
     List<OrgUnit> forContact(String contactName)
     {
+        return orgUnits.stream().filter(orgUnit -> orgUnit.roles().values().stream()
+                .anyMatch(roles -> roles.containsKey(contactName))).toList();
+    }
+
+    /**
+     * Returns all contacts with a specific role in any of the specified teams or one of their
+     * subteams.
+     *
+     * @param roleNames Substrings of roles to search for.
+     * @param unitNames Substrings of unit names to search for.
+     * @return All matching contacts.
+     */
+    List<Document> chapterFor(List<String> roleNames, List<String> unitNames)
+    {
+        var rolesSet = roleNames.stream().map(String::toLowerCase).collect(toSet());
+        var unitNameSet = unitNames.stream().map(String::toLowerCase).collect(toSet());
         return orgUnits.stream()
-                .filter(orgUnit -> orgUnit.roles().values().stream()
-                        .anyMatch(roles -> roles.containsKey(contactName)))
+                .filter(orgUnit -> isInHierarchy(orgUnit, unitNameSet))
+                .flatMap(orgUnit -> orgUnit.roles().entrySet().stream()
+                        .filter(entry -> rolesSet.stream()
+                                .anyMatch(entry.getKey().toLowerCase()::contains))
+                        .flatMap(entry -> entry.getValue().values().stream()))
+                .sorted(Comparator.comparing(Document::name))
+                .distinct()
                 .toList();
+    }
+
+    private boolean isInHierarchy(OrgUnit unit, Set<String> unitNames)
+    {
+        var simpleName = unit.team().sortableTitle().toLowerCase();
+        if (unitNames.stream().anyMatch(simpleName::contains))
+        {
+            return true;
+        }
+        return unit.parent()
+                .map(parentDocument -> orgUnits.stream()
+                        .filter(orgUnit -> orgUnit.team() == parentDocument)
+                        .findFirst()
+                        .map(p -> isInHierarchy(p, unitNames))
+                        .orElse(false))
+                .orElse(false);
     }
 
 
@@ -77,16 +112,12 @@ public class OrgChart
         public void visit(Document document)
         {
             parent = null;
-            if (document.fragments().size() > 2
-                && document.fragments().get(1) instanceof TextBlock textBlock)
+            if (document.fragments().size() > 2 &&
+                document.fragments().get(1) instanceof TextBlock textBlock)
             {
-                parent = textBlock.findInternalLinks().stream()
-                        .map(InternalLink::targetDocument)
-                        .map(teams::document)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .findFirst()
-                        .orElse(null);
+                parent = textBlock.findInternalLinks().stream().map(InternalLink::targetDocument)
+                        .map(teams::document).filter(Optional::isPresent).map(Optional::get)
+                        .findFirst().orElse(null);
             }
             roles = new HashMap<>();
             super.visit(document);
@@ -96,8 +127,7 @@ public class OrgChart
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2
-                && section.sortableTitle().contentEquals(ROLES_SECTION))
+            if (section.level() == 2 && section.sortableTitle().contentEquals(ROLES_SECTION))
             {
                 super.visit(section);
             }
@@ -109,8 +139,7 @@ public class OrgChart
             String content = textBlock.content();
             textBlock.findInternalLinks().stream()
                     .filter(link -> contacts.document(link.targetDocument()).isPresent())
-                    .forEach(link ->
-                    {
+                    .forEach(link -> {
                         var regex = compile(ROLE_PATTERN_START + quote(link.toMarkdown()),
                                 Pattern.MULTILINE);
                         var matcher = regex.matcher(content);
@@ -118,9 +147,8 @@ public class OrgChart
                         {
                             var role = matcher.group(1);
                             var contact = contacts.document(link.targetDocument());
-                            contact.ifPresent(c ->
-                                    roles.computeIfAbsent(role, r -> new HashMap<>())
-                                            .put(c.name(), c));
+                            contact.ifPresent(c -> roles.computeIfAbsent(role, r -> new HashMap<>())
+                                    .put(c.name(), c));
                         }
                     });
         }

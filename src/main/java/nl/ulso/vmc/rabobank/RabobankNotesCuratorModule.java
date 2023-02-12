@@ -48,6 +48,7 @@ public class RabobankNotesCuratorModule
         registerQuery(OneOnOneQuery.class);
         registerQuery(SubteamsQuery.class);
         registerQuery(RolesQuery.class);
+        registerQuery(ChapterQuery.class);
         registerQuery(HooksQuery.class);
         registerQuery(StarredDocumentsQuery.class);
     }
