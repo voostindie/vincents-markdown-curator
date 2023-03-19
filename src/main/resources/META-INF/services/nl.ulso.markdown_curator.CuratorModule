@@ -1,3 +1,4 @@
 nl.ulso.vmc.rabobank.RabobankNotesCuratorModule
 nl.ulso.vmc.tweevv.TweevvNotesCuratorModule
 nl.ulso.vmc.personal.PersonalNotesCuratorModule
+nl.ulso.vmc.demo.DemoCuratorModule
