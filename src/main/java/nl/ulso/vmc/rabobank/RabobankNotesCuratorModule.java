@@ -50,6 +50,7 @@ public class RabobankNotesCuratorModule
         registerQuery(RolesQuery.class);
         registerQuery(ChapterQuery.class);
         registerQuery(HooksQuery.class);
+        registerQuery(WeeklyQuery.class);
         registerQuery(StarredDocumentsQuery.class);
     }
 
