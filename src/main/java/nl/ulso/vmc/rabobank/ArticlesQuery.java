@@ -5,11 +5,14 @@ import nl.ulso.markdown_curator.vault.Dictionary;
 import nl.ulso.markdown_curator.vault.*;
 
 import javax.inject.Inject;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.regex.Pattern.compile;
 
 class ArticlesQuery
@@ -64,6 +67,23 @@ class ArticlesQuery
                 compile("^- \\[\\[(\\d{4}-\\d{2}-\\d{2})]]: (.*)$");
 
         private final List<Map<String, String>> articles = new ArrayList<>();
+        private String date;
+
+        @Override
+        public void visit(Document document)
+        {
+            date = null;
+            super.visit(document);
+            if (date == null)
+            {
+                date = Instant.ofEpochMilli(document.lastModified())
+                        .atZone(ZoneId.of("UTC")).toLocalDate().toString();
+            }
+            articles.add(Map.of(
+                    "Date", date,
+                    "Title", document.link(),
+                    "Publication", publicationLink(document.frontMatter())));
+        }
 
         @Override
         public void visit(Section section)
@@ -77,17 +97,12 @@ class ArticlesQuery
                 {
                     return;
                 }
-                lines.sort(Comparator.reverseOrder());
+                lines.sort(reverseOrder());
                 var mostRecent = lines.get(0);
                 var matcher = CHANGES_PATTERN.matcher(mostRecent);
                 if (matcher.matches())
                 {
-                    articles.add(Map.of(
-                            "Date", matcher.group(1),
-                            "Title", section.document().link(),
-                            "Publication",
-                            publicationLink(section.document().frontMatter())
-                    ));
+                    date = matcher.group(1);
                 }
             }
         }
