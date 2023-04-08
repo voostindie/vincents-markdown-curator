@@ -25,7 +25,8 @@ public class OmniFocusQuery
 
     @Inject
     public OmniFocusQuery(
-            Vault vault, OmniFocusRepository omniFocusRepository, OmniFocusSettings settings, Locale locale,
+            Vault vault, OmniFocusRepository omniFocusRepository, OmniFocusSettings settings,
+            Locale locale,
             QueryResultFactory resultFactory)
     {
         this.resultFactory = resultFactory;
@@ -100,12 +101,15 @@ public class OmniFocusQuery
                     .toList();
             if (!missingPages.isEmpty())
             {
-                builder.append("### ");
-                builder.append(bundle.getString("missingPages.title"));
-                builder.append(lineSeparator());
-                builder.append(lineSeparator());
+                builder.append("### ")
+                        .append(bundle.getString("missingPages.title"))
+                        .append(lineSeparator())
+                        .append(lineSeparator());
                 missingPages.forEach(
-                        name -> builder.append("- ").append(name).append(lineSeparator()));
+                        name -> builder.append("- [[")
+                                .append(name)
+                                .append("]]")
+                                .append(lineSeparator()));
                 builder.append(lineSeparator());
             }
             var projectSet = omniFocusProjects.stream()
@@ -116,24 +120,25 @@ public class OmniFocusQuery
                     .toList();
             if (!missingProjects.isEmpty())
             {
-                builder.append("### ");
-                builder.append(bundle.getString("missingProjects.title"));
-                builder.append(lineSeparator());
-                builder.append(lineSeparator());
+                builder.append("### ")
+                        .append(bundle.getString("missingProjects.title"))
+                        .append(lineSeparator())
+                        .append(lineSeparator());
                 missingProjects.forEach(
-                        document -> builder.append("- ").append(document.link())
+                        document -> builder.append("- ")
+                                .append(document.link())
                                 .append(lineSeparator()));
                 builder.append(lineSeparator());
             }
             if (missingPages.isEmpty() && missingProjects.isEmpty())
             {
-                builder.append("**");
-                builder.append(bundle.getString("allGood.title"));
-                builder.append("**");
-                builder.append(lineSeparator());
-                builder.append(lineSeparator());
-                builder.append(bundle.getString("allGood.text"));
-                builder.append(lineSeparator());
+                builder.append("**")
+                        .append(bundle.getString("allGood.title"))
+                        .append("**")
+                        .append(lineSeparator())
+                        .append(lineSeparator())
+                        .append(bundle.getString("allGood.text"))
+                        .append(lineSeparator());
             }
             return builder.toString().trim();
         }
