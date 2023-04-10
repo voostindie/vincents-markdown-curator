@@ -58,7 +58,7 @@ public class RabobankNotesCuratorModule
     @Provides
     ProjectListSettings projectListSettings()
     {
-        return new ProjectListSettings(PROJECT_FOLDER, ACTIVITIES_SECTION, "Date", "Project");
+        return new ProjectListSettings(PROJECT_FOLDER, ACTIVITIES_SECTION, "Last&nbsp;modified", "Project");
     }
 
     @Provides
