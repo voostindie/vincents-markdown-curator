@@ -1,8 +1,8 @@
 function run(argv) {
-    let hookmark = Application('Hookmark');
-    let documentUrl = argv[0];
-    let documentBookmark = hookmark.Bookmark({address: documentUrl}).make();
-    let bookmarks = documentBookmark.hookedBookmarks()
+    const hookmark = Application('Hookmark');
+    const documentUrl = argv[0];
+    const documentBookmark = hookmark.Bookmark({address: documentUrl}).make();
+    const bookmarks = documentBookmark.hookedBookmarks()
         .map(function (bookmarkFunction) {
             // Sometimes hooks "break" and become invalid. This happens for
             // example when the file a hook points to is moved around on disk.

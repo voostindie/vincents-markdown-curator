@@ -1,6 +1,6 @@
 function run(argv) {
-    let folderName = argv[0];
-    let projects = Application('OmniFocus')
+    const folderName = argv[0];
+    const projects = Application('OmniFocus')
         .defaultDocument()
         .folders
         .byName(folderName)
@@ -8,10 +8,10 @@ function run(argv) {
         .whose({
             _match: [ObjectSpecifier().status, 'active']
         });
-    let ids = projects.id();
-    let names = projects.name();
-    var i = 0;
-    let items = ids.map(function (id) {
+    const ids = projects.id();
+    const names = projects.name();
+    let i = 0;
+    const items = ids.map(function (id) {
         return {
             id: id,
             name: names[i++]

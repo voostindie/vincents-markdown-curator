@@ -1,11 +1,10 @@
 package nl.ulso.vmc.personal;
 
-import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.vault.LocalDates;
-import nl.ulso.markdown_curator.vault.*;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.vault.*;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;

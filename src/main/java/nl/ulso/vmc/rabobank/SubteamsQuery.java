@@ -48,14 +48,17 @@ class SubteamsQuery
         var style = definition.configuration().string("style", "list");
         switch (style)
         {
-            case "list":
+            case "list" ->
+            {
                 var units = orgChart.forParent(parent).stream()
                         .map(OrgUnit::team)
                         .sorted(comparing(Document::sortableTitle))
                         .map(Document::link)
                         .toList();
                 return resultFactory.unorderedList(units);
-            case "table":
+            }
+            case "table" ->
+            {
                 var roles = definition.configuration().listOfStrings("roles");
                 var rows = orgChart.forParent(parent).stream()
                         .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
@@ -78,8 +81,11 @@ class SubteamsQuery
                 columns.add("Name");
                 columns.addAll(roles);
                 return resultFactory.table(columns, rows);
-            default:
+            }
+            default ->
+            {
                 return resultFactory.error("Unsupported style: " + style);
+            }
         }
     }
 }
