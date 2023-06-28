@@ -46,19 +46,19 @@ public class ProjectsQuery
     @Override
     public String description()
     {
-        return "outputs all active projects in a table";
+        return "outputs all active projects";
     }
 
     @Override
     public Map<String, String> supportedConfiguration()
     {
-        return Map.of("format", "Output format: 'table' (default) or 'list'.");
+        return Map.of("format", "Output format: 'list' (default) or 'table'.");
     }
 
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        var format = FORMATS.get(definition.configuration().string("format", "table"));
+        var format = FORMATS.get(definition.configuration().string("format", "list"));
         if (format == null)
         {
             return resultFactory.error("Unsupported format");
