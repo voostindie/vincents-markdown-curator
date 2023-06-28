@@ -2,7 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import nl.ulso.markdown_curator.query.*;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;

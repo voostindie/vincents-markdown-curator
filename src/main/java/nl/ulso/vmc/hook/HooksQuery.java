@@ -4,7 +4,7 @@ import nl.ulso.markdown_curator.DocumentPathResolver;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;

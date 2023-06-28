@@ -4,7 +4,7 @@ import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.query.QueryDefinition;
 import nl.ulso.markdown_curator.query.QueryResultFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Map;
