@@ -32,7 +32,7 @@ public class TweevvNotesCuratorModule
     @Override
     public Path vaultPath()
     {
-        return pathInUserHome("Notes", "TweeVV");
+        return iCloudIAWriterFolder("TweeVV");
     }
 
     @Override
