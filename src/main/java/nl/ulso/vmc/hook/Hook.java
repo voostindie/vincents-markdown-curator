@@ -48,6 +48,7 @@ public record Hook(String name, String address)
     /**
      * URLs from Hookmark seem to be encoded, but at least the character ")" is not, which
      * breaks the Markdown formatting.
+     *
      * @param url URL to format.
      * @return Properly encoded URL for use in Markdown links.
      */
