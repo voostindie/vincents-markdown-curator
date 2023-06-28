@@ -36,13 +36,13 @@ class RolesQuery
     @Override
     public Map<String, String> supportedConfiguration()
     {
-        return Collections.emptyMap();
+        return Map.of("contact", "Name of the contact; defaults to the current document");
     }
 
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        var contact = definition.document().name();
+        var contact = definition.configuration().string("contact", definition.document().name());
         var roles = orgChart.forContact(contact).stream()
                 .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
                 .map(unit -> Map.of("Team", unit.team().link(),
