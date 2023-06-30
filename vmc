@@ -9,7 +9,7 @@
 cd "$(dirname $0)" || exit
 
 echo "Compiling and installing markdown-curator..."
-mvn -f ../markdown-curator/pom.xml -q -B install
+mvn -f ../markdown-curator/pom.xml -q -B install -DskipTests
 
 echo "Compiling and packaging vmc..."
 mvn -q -B package
