@@ -136,7 +136,7 @@ public class OrgChart
         @Override
         public void visit(TextBlock textBlock)
         {
-            String content = textBlock.content();
+            String content = textBlock.markdown();
             textBlock.findInternalLinks().stream()
                     .filter(link -> contacts.document(link.targetDocument()).isPresent())
                     .forEach(link -> {

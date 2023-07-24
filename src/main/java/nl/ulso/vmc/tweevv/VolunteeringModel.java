@@ -293,17 +293,16 @@ public class VolunteeringModel
             {
                 return;
             }
-            var lines = textBlock.lines();
-            for (var line : lines)
+            textBlock.markdown().trim().lines().forEach(line ->
             {
                 if (!line.startsWith("- "))
                 {
-                    continue;
+                    return;
                 }
                 var colon = line.indexOf(": ");
                 if (colon == -1)
                 {
-                    continue;
+                    return;
                 }
                 var seasonString = line.substring(2, colon).trim();
                 var activityText = line.substring(colon + 1).trim();
@@ -313,7 +312,8 @@ public class VolunteeringModel
                                         contact,
                                         resolveActivity(activityText),
                                         activityText)));
-            }
+
+            });
         }
 
         private Activity resolveActivity(String activityText)

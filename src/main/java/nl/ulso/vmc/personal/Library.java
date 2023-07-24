@@ -135,7 +135,7 @@ public class Library
 
         private void extractRating(TextBlock block)
         {
-            var content = block.content();
+            var content = block.markdown();
             var start = content.indexOf('(');
             if (start == -1)
             {
@@ -160,7 +160,7 @@ public class Library
 
         private void extractSessions(TextBlock block)
         {
-            block.lines().stream()
+            block.markdown().lines()
                     .filter(line -> line.startsWith("- [["))
                     .map(DATE_PATTERN::matcher)
                     .map(Matcher::results)

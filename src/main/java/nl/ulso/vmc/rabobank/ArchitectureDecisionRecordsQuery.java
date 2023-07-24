@@ -94,7 +94,7 @@ class ArchitectureDecisionRecordsQuery
                 var title = section.sortableTitle();
                 if (title.contentEquals("Changes"))
                 {
-                    var lines = new ArrayList<>(textBlock.lines());
+                    var lines = new ArrayList<>(textBlock.markdown().trim().lines().toList());
                     if (lines.isEmpty())
                     {
                         return;
@@ -109,7 +109,7 @@ class ArchitectureDecisionRecordsQuery
                 }
                 else if (title.contentEquals("Status"))
                 {
-                    var lines = textBlock.lines();
+                    var lines = textBlock.markdown().trim().lines().toList();
                     if (lines.size() > 0)
                     {
                         status = lines.get(0);

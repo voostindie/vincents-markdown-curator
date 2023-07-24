@@ -92,7 +92,7 @@ class ArticlesQuery
                 && section.fragments().size() > 0
                 && section.fragments().get(0) instanceof TextBlock textBlock)
             {
-                var lines = new ArrayList<>(textBlock.lines());
+                var lines = new ArrayList<>(textBlock.markdown().trim().lines().toList());
                 if (lines.isEmpty())
                 {
                     return;
