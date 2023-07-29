@@ -2,6 +2,7 @@ package nl.ulso.vmc.personal;
 
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.journal.JournalModule;
+import nl.ulso.markdown_curator.links.LinksModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -30,8 +31,9 @@ public class PersonalNotesCuratorModule
     @Override
     protected void configureCurator()
     {
-        bind(JxaRunner.class).to(JxaClasspathRunner.class);
         install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION));
+        install(new LinksModule());
+        bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(Library.class);
         registerQuery(ReadingQuery.class);
         registerQuery(BooksQuery.class);

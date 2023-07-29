@@ -3,6 +3,7 @@ package nl.ulso.vmc.tweevv;
 import com.google.inject.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.journal.JournalModule;
+import nl.ulso.markdown_curator.links.LinksModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -45,6 +46,7 @@ public class TweevvNotesCuratorModule
     protected void configureCurator()
     {
         install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION));
+        install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(VolunteeringModel.class);
         registerQuery(ProjectsQuery.class);
