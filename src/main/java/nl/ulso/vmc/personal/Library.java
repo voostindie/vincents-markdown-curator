@@ -106,7 +106,7 @@ public class Library
     private Folder toplevelFolder(Folder folder)
     {
         var toplevelFolder = folder;
-        while (toplevelFolder.parent() != vault)
+        while (toplevelFolder != vault && toplevelFolder.parent() != vault)
         {
             toplevelFolder = toplevelFolder.parent();
         }
