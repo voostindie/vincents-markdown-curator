@@ -1,10 +1,10 @@
 package nl.ulso.vmc.omnifocus;
 
+import jakarta.inject.Inject;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Folder;
 import nl.ulso.markdown_curator.vault.Vault;
 
-import jakarta.inject.Inject;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -63,11 +63,12 @@ public class OmniFocusQuery
                 definition.configuration().integer("refresh-interval", DEFAULT_REFRESH_INTERVAL);
         return vault.folder(settings.projectFolder())
                 .map(folder ->
-                        (QueryResult) new OmniFocusQueryResult(
-                                omniFocusRepository.projects(settings.omniFocusFolder(),
-                                        refreshInterval),
-                                folder,
-                                settings.includePredicate(), locale))
+                        resultFactory.withPerformanceWarning(
+                                new OmniFocusQueryResult(
+                                        omniFocusRepository.projects(settings.omniFocusFolder(),
+                                                refreshInterval),
+                                        folder,
+                                        settings.includePredicate(), locale)))
                 .orElseGet(() -> resultFactory.error(
                         "Project folder not found: '" + settings.projectFolder() + "'"));
     }
