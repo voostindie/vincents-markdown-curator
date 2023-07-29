@@ -105,7 +105,6 @@ public class VolunteeringModel
                 new ActivityProcessor(contact).process();
             }
         }
-        super.process(event);
     }
 
     @Override
