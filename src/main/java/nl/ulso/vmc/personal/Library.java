@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.markdown_curator.vault.event.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,6 +25,8 @@ import static java.util.regex.Pattern.compile;
 public class Library
         extends DataModelTemplate
 {
+    private static final String AUTHORS_FOLDER = "Authors";
+    private static final String BOOKS_FOLDER = "Books";
     private final Vault vault;
     private final Map<String, Author> authors;
     private final Map<String, Book> books;
@@ -44,8 +47,70 @@ public class Library
         authors.clear();
         books.clear();
         readingSessions.clear();
-        vault.folder("Authors").ifPresent(folder -> folder.accept(new AuthorFinder()));
-        vault.folder("Books").ifPresent(folder -> folder.accept(new BookFinder()));
+        vault.folder(AUTHORS_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
+        vault.folder(BOOKS_FOLDER).ifPresent(folder -> folder.accept(new BookFinder()));
+    }
+
+    @Override
+    public void process(FolderAdded event)
+    {
+        if (isFolderInScope(event.folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(FolderRemoved event)
+    {
+        if (isFolderInScope(event.folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(DocumentAdded event)
+    {
+        if (isFolderInScope(event.document().folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(DocumentChanged event)
+    {
+        if (isFolderInScope(event.document().folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(DocumentRemoved event)
+    {
+        if (isFolderInScope(event.document().folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    private boolean isFolderInScope(Folder folder)
+    {
+        var topLevelFolderName = toplevelFolder(folder).name();
+        return topLevelFolderName.contentEquals(AUTHORS_FOLDER) ||
+               topLevelFolderName.contentEquals(BOOKS_FOLDER);
+    }
+
+    private Folder toplevelFolder(Folder folder)
+    {
+        var toplevelFolder = folder;
+        while (toplevelFolder.parent() != vault)
+        {
+            toplevelFolder = toplevelFolder.parent();
+        }
+        return toplevelFolder;
     }
 
     List<ReadingSession> readingFor(int year)
