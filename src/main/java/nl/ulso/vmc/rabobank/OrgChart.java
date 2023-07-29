@@ -1,10 +1,11 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.vault.*;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.markdown_curator.vault.event.*;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -33,9 +34,74 @@ public class OrgChart
     protected void fullRefresh()
     {
         orgUnits.clear();
-        vault.folder(TEAMS_FOLDER).ifPresent(teams -> vault.folder(CONTACTS_FOLDER).ifPresent(
-                contacts -> teams.documents()
-                        .forEach(team -> team.accept(new OrgUnitFinder(teams, contacts)))));
+        var teams = vault.folder(TEAMS_FOLDER).orElse(null);
+        var contacts = vault.folder(CONTACTS_FOLDER).orElse(null);
+        if (teams != null && contacts != null)
+        {
+            teams.documents().forEach(team -> team.accept(new OrgUnitFinder(teams, contacts)));
+        }
+    }
+
+    @Override
+    public void process(FolderAdded event)
+    {
+        if (isFolderInScope(event.folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(FolderRemoved event)
+    {
+        if (isFolderInScope(event.folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(DocumentAdded event)
+    {
+        if (isFolderInScope(event.document().folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(DocumentChanged event)
+    {
+        if (isFolderInScope(event.document().folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void process(DocumentRemoved event)
+    {
+        if (isFolderInScope(event.document().folder()))
+        {
+            fullRefresh();
+        }
+    }
+
+    private boolean isFolderInScope(Folder folder)
+    {
+        var topLevelFolderName = toplevelFolder(folder).name();
+        return topLevelFolderName.contentEquals(CONTACTS_FOLDER) ||
+               topLevelFolderName.contentEquals(TEAMS_FOLDER);
+    }
+
+    private Folder toplevelFolder(Folder folder)
+    {
+        var toplevelFolder = folder;
+        while (toplevelFolder.parent() != vault)
+        {
+            toplevelFolder = toplevelFolder.parent();
+        }
+        return toplevelFolder;
     }
 
     List<OrgUnit> forParent(String parentTeamName)
