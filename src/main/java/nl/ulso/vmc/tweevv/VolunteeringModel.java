@@ -14,6 +14,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
+import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentRemoved;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
 
 @Singleton
@@ -110,6 +111,7 @@ public class VolunteeringModel
     @Override
     public void process(DocumentChanged event)
     {
+        process(documentRemoved(event.document()));
         process(documentAdded(event.document()));
     }
 
