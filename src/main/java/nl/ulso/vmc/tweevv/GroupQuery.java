@@ -13,6 +13,7 @@ import static java.util.Comparator.comparing;
 public class GroupQuery
         implements Query
 {
+    private static final int JULY_SEASON_END = 7;
     private final VolunteeringModel model;
     private final QueryResultFactory resultFactory;
 
@@ -71,7 +72,7 @@ public class GroupQuery
     {
         var date = LocalDate.now();
         var year = date.getYear();
-        if (date.getMonth().getValue() < 9)
+        if (date.getMonth().getValue() <= JULY_SEASON_END)
         {
             year--;
         }
