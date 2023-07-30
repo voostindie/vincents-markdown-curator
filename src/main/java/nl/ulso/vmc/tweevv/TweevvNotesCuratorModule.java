@@ -76,6 +76,7 @@ public class TweevvNotesCuratorModule
                 (name) -> !name.startsWith("⚡️") &&
                           !Set.of("🤖 Routine",
                                   "🏐 Diversen",
-                                  "💶 Declaraties").contains(name));
+                                  "💶 Declaraties",
+                                  "✉️ Eerstvolgende nieuwsbrief").contains(name));
     }
 }
