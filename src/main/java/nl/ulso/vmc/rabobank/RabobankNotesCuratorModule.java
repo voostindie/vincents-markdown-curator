@@ -7,7 +7,6 @@ import nl.ulso.markdown_curator.links.LinksModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
-import nl.ulso.vmc.obsidian.StarredDocumentsQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.project.ProjectListSettings;
@@ -38,7 +37,7 @@ public class RabobankNotesCuratorModule
     @Override
     protected void configureCurator()
     {
-        install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION));
+        install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION, PROJECT_FOLDER));
         install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(OrgChart.class);
@@ -52,15 +51,13 @@ public class RabobankNotesCuratorModule
         registerQuery(RolesQuery.class);
         registerQuery(ChapterQuery.class);
         registerQuery(HooksQuery.class);
-        registerQuery(PeriodQuery.class);
-        registerQuery(WeeklyQuery.class);
-        registerQuery(StarredDocumentsQuery.class);
     }
 
     @Provides
     ProjectListSettings projectListSettings()
     {
-        return new ProjectListSettings(PROJECT_FOLDER, ACTIVITIES_SECTION, "Last&nbsp;modified", "Project");
+        return new ProjectListSettings(PROJECT_FOLDER, ACTIVITIES_SECTION, "Last&nbsp;modified",
+                "Project");
     }
 
     @Provides
