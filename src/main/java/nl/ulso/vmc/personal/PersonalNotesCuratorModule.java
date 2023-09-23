@@ -25,7 +25,7 @@ public class PersonalNotesCuratorModule
     @Override
     public Path vaultPath()
     {
-        return iCloudIAWriterFolder("Personal");
+        return pathInUserHome("Notes", "Personal");
     }
 
     @Override
