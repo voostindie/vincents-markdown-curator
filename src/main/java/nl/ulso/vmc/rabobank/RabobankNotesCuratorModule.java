@@ -66,12 +66,9 @@ public class RabobankNotesCuratorModule
         return new OmniFocusSettings(PROJECT_FOLDER, "💼 Rabobank",
                 (name) -> !name.startsWith("⚡️") &&
                           !Set.of("🤖 Routine",
-                                  "👮🏼‍♂️ STEP PDA",
                                   "🌳 Study",
-                                  "🌳 GROW!",
                                   "💶 Statements",
                                   "💼 Various",
-                                  "💬 Reminders / To discuss",
-                                  "ℹ️ FYIs").contains(name));
+                                  "💬 Reminders").contains(name));
     }
 }
