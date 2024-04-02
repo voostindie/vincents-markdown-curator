@@ -128,6 +128,7 @@ public class OrgChart
     {
         var rolesSet = roleNames.stream().map(String::toLowerCase).collect(toSet());
         var unitNameSet = unitNames.stream().map(String::toLowerCase).collect(toSet());
+        // TODO: protect against loops in the structure
         return orgUnits.stream()
                 .filter(orgUnit -> isInHierarchy(orgUnit, unitNameSet))
                 .flatMap(orgUnit -> orgUnit.roles().entrySet().stream()

@@ -9,8 +9,7 @@ import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
-import nl.ulso.vmc.project.ProjectListSettings;
-import nl.ulso.vmc.project.ProjectsQuery;
+import nl.ulso.vmc.project.*;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -48,7 +47,8 @@ public class TweevvNotesCuratorModule
         install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(VolunteeringModel.class);
-        registerQuery(ProjectsQuery.class);
+        registerDataModel(ProjectList.class);
+        registerQuery(ProjectListQuery.class);
         registerQuery(OmniFocusQuery.class);
         registerQuery(VolunteersQuery.class);
         registerQuery(GroupQuery.class);
@@ -61,8 +61,11 @@ public class TweevvNotesCuratorModule
         return new ProjectListSettings(
                 PROJECT_FOLDER,
                 ACTIVITIES_SECTION,
-                "Datum",
-                "Project");
+                "Laatst&nbsp;bijgewerkt",
+                "Project",
+                "Lead",
+                "Status"
+        );
     }
 
     @Provides

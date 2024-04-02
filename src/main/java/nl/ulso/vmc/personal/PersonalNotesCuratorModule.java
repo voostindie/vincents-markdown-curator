@@ -9,8 +9,7 @@ import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
 import nl.ulso.vmc.omnifocus.OmniFocusQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
-import nl.ulso.vmc.project.ProjectListSettings;
-import nl.ulso.vmc.project.ProjectsQuery;
+import nl.ulso.vmc.project.*;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -41,18 +40,25 @@ public class PersonalNotesCuratorModule
         install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(Library.class);
+        registerDataModel(ProjectList.class);
         registerQuery(ReadingQuery.class);
         registerQuery(BooksQuery.class);
         registerQuery(HooksQuery.class);
-        registerQuery(ProjectsQuery.class);
+        registerQuery(ProjectListQuery.class);
         registerQuery(OmniFocusQuery.class);
     }
 
     @Provides
     ProjectListSettings projectListSettings()
     {
-        return new ProjectListSettings(PROJECT_FOLDER, ACTIVITIES_SECTION, "Last&nbsp;modified",
-                "Project");
+        return new ProjectListSettings(
+                PROJECT_FOLDER,
+                ACTIVITIES_SECTION,
+                "Last&nbsp;modified",
+                "Project",
+                "Lead",
+                "Status"
+        );
     }
 
     @Provides
