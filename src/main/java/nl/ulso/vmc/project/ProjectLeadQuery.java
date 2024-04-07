@@ -51,12 +51,11 @@ public final class ProjectLeadQuery
         var settings = projectList.settings();
         var projects = projectList.projects();
         return resultFactory.table(
-                List.of(settings.dateColumn(), settings.projectColumn(), settings.statusColumn()),
+                List.of(settings.projectColumn(), settings.dateColumn(), settings.statusColumn()),
                 projects.stream()
                         .filter((Project project) -> lead.contentEquals(project.leadWikiLink()))
                         .map((Project project) -> Map.of(
-                                        settings.dateColumn(),
-                                        "[[" + project.lastModified() + "]]",
+                                        settings.dateColumn(), "[[" + project.lastModified() + "]]",
                                         settings.projectColumn(), "[[" + project.name() + "]]",
                                         settings.statusColumn(), project.status().toMarkdown()
                                 )

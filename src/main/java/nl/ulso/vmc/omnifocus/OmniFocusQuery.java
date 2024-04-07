@@ -10,13 +10,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyMap;
 import static java.util.ResourceBundle.getBundle;
 
 public class OmniFocusQuery
         implements Query
 {
-    private static final int DEFAULT_REFRESH_INTERVAL = 60000;
-
     private final OmniFocusRepository omniFocusRepository;
     private final Vault vault;
     private final OmniFocusSettings settings;
@@ -51,24 +50,18 @@ public class OmniFocusQuery
     @Override
     public Map<String, String> supportedConfiguration()
     {
-        return Map.of("refresh-interval",
-                "Minimum number of milliseconds to wait for refreshes; defaults to 60000 (1 " +
-                "minute)");
+        return emptyMap();
     }
 
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        var refreshInterval =
-                definition.configuration().integer("refresh-interval", DEFAULT_REFRESH_INTERVAL);
         return vault.folder(settings.projectFolder())
                 .map(folder ->
-                        resultFactory.withPerformanceWarning(
-                                new OmniFocusQueryResult(
-                                        omniFocusRepository.projects(settings.omniFocusFolder(),
-                                                refreshInterval),
-                                        folder,
-                                        settings.includePredicate(), locale)))
+                        (QueryResult) new OmniFocusQueryResult(
+                                omniFocusRepository.projects(),
+                                folder,
+                                settings.includePredicate(), locale))
                 .orElseGet(() -> resultFactory.error(
                         "Project folder not found: '" + settings.projectFolder() + "'"));
     }
@@ -76,13 +69,13 @@ public class OmniFocusQuery
     private static class OmniFocusQueryResult
             implements QueryResult
     {
-        private final List<OmniFocusProject> omniFocusProjects;
+        private final Collection<OmniFocusProject> omniFocusProjects;
         private final Folder projectFolder;
         private final Predicate<String> includePredicate;
         private final ResourceBundle bundle;
 
         OmniFocusQueryResult(
-                List<OmniFocusProject> omniFocusProjects, Folder projectFolder,
+                Collection<OmniFocusProject> omniFocusProjects, Folder projectFolder,
                 Predicate<String> includePredicate, Locale locale)
         {
             this.omniFocusProjects = omniFocusProjects;

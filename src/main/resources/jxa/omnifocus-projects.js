@@ -14,7 +14,8 @@ function run(argv) {
     const items = ids.map(function (id) {
         return {
             id: id,
-            name: names[i++]
+            name: names[i++],
+            priority: i
         };
     });
     return JSON.stringify(items);

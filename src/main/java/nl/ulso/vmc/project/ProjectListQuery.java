@@ -64,11 +64,11 @@ public final class ProjectListQuery
                             "[[" + project.name() + "]]")
                     .toList());
             case TABLE -> resultFactory.table(
-                    List.of(settings.dateColumn(), settings.projectColumn(),
-                            settings.leadColumn(), settings.statusColumn()),
+                    List.of(settings.projectColumn(),
+                            settings.leadColumn(),
+                            settings.statusColumn()),
                     projects.stream()
                             .map((Project project) -> Map.of(
-                                    settings.dateColumn(), "[[" + project.lastModified().toString() + "]]",
                                     settings.projectColumn(), "[[" + project.name() + "]]",
                                     settings.leadColumn(), project.leadWikiLink(),
                                     settings.statusColumn(), project.status().toMarkdown()

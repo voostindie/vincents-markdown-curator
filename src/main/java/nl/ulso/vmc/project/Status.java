@@ -31,7 +31,7 @@ public enum Status
             case GREEN -> "🟢";
             case AMBER -> "🟠";
             case RED -> "🔴";
-            case UNKNOWN -> "❓";
+            case UNKNOWN -> "⚪️";
         };
     }
 }

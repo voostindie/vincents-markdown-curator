@@ -6,10 +6,13 @@ import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
+import nl.ulso.vmc.omnifocus.OmniFocusRepository;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -21,13 +24,17 @@ public final class ProjectList
 
     private final Journal journal;
     private final List<Project> projects;
-    private final ProjectListSettings settings;
+    private final ProjectListSettings projectListSettings;
+    private final OmniFocusRepository omniFocusRepository;
 
     @Inject
-    ProjectList(Journal journal, ProjectListSettings settings)
+    ProjectList(
+            Journal journal, ProjectListSettings projectListSettings,
+            OmniFocusRepository omniFocusRepository)
     {
         this.journal = journal;
-        this.settings = settings;
+        this.projectListSettings = projectListSettings;
+        this.omniFocusRepository = omniFocusRepository;
         this.projects = new ArrayList<>();
     }
 
@@ -38,7 +45,6 @@ public final class ProjectList
         journal.vault().accept(finder);
         projects.clear();
         projects.addAll(finder.projects);
-        projects.sort(comparing(Project::lastModified).reversed());
         if (LOGGER.isDebugEnabled())
         {
             LOGGER.debug("Built a project list of {} projects", projects.size());
@@ -80,7 +86,7 @@ public final class ProjectList
         var folder = eventFolder;
         while (folder != journal.vault())
         {
-            if (folder.name().contentEquals(settings.projectFolder()))
+            if (folder.name().contentEquals(projectListSettings.projectFolder()))
             {
                 fullRefresh();
             }
@@ -90,12 +96,14 @@ public final class ProjectList
 
     List<Project> projects()
     {
-        return Collections.unmodifiableList(projects);
+        var list = new ArrayList<>(projects);
+        list.sort(comparing(Project::priority));
+        return unmodifiableList(list);
     }
 
     ProjectListSettings settings()
     {
-        return settings;
+        return projectListSettings;
     }
 
     private class ProjectFinder
@@ -106,7 +114,7 @@ public final class ProjectList
         @Override
         public void visit(Vault vault)
         {
-            vault.folder(settings.projectFolder()).ifPresent(
+            vault.folder(projectListSettings.projectFolder()).ifPresent(
                     folder -> folder.documents()
                             .forEach(document -> document.accept(this)));
         }
@@ -115,7 +123,8 @@ public final class ProjectList
         public void visit(Document document)
         {
             journal.mostRecentMentionOf(document.name())
-                    .ifPresent((date) -> projects.add(new Project(document, date)));
+                    .ifPresent((date) -> projects.add(
+                            new Project(document, date, omniFocusRepository)));
         }
     }
 }
