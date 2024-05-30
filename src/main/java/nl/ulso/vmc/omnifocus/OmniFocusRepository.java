@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
+import static nl.ulso.vmc.omnifocus.Status.UNKNOWN;
 
 /**
  * Fetches projects from a folder in <a href="https://www.omnigroup.com/omnifocus">OmniFocus</a>.
@@ -32,6 +33,8 @@ public class OmniFocusRepository
     private long lastUpdated;
     private final JxaRunner jxaRunner;
     private final OmniFocusSettings settings;
+    private static final OmniFocusProject NULL_PROJECT =
+            new OmniFocusProject("null", "null", UNKNOWN, -1);
 
     @Inject
     public OmniFocusRepository(JxaRunner jxaRunner, OmniFocusSettings settings)
@@ -51,12 +54,13 @@ public class OmniFocusRepository
     public int priorityOf(String name)
     {
         refresh();
-        var project = projects.get(name);
-        if (project == null)
-        {
-            return -1;
-        }
-        return project.priority();
+        return projects.getOrDefault(name, NULL_PROJECT).priority();
+    }
+
+    public Status statusOf(String name)
+    {
+        refresh();
+        return projects.getOrDefault(name, NULL_PROJECT).status();
     }
 
     private void refresh()
@@ -82,6 +86,7 @@ public class OmniFocusRepository
                     .map(object -> new OmniFocusProject(
                             object.getString("id"),
                             object.getString("name"),
+                            Status.fromString(object.getString("status")),
                             object.getInt("priority")))
                     .collect(toMap(OmniFocusProject::name, Function.identity()));
             lastUpdated = System.currentTimeMillis();

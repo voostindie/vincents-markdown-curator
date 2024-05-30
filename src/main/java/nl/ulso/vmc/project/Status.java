@@ -5,6 +5,7 @@ public enum Status
     GREEN,
     AMBER,
     RED,
+    ON_HOLD,
     UNKNOWN;
 
     public static Status fromString(String status)
@@ -21,6 +22,10 @@ public enum Status
         {
             return RED;
         }
+        else if (status.equalsIgnoreCase("on hold") || status.contentEquals("⭕️"))
+        {
+            return ON_HOLD;
+        }
         return UNKNOWN;
     }
 
@@ -31,6 +36,7 @@ public enum Status
             case GREEN -> "🟢";
             case AMBER -> "🟠";
             case RED -> "🔴";
+            case ON_HOLD -> "⭕️";
             case UNKNOWN -> "⚪️";
         };
     }

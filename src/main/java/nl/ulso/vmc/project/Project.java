@@ -5,6 +5,8 @@ import nl.ulso.vmc.omnifocus.OmniFocusRepository;
 
 import java.time.LocalDate;
 
+import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
+
 public final class Project
 {
     private final String name;
@@ -13,7 +15,9 @@ public final class Project
     private final String leadWikiLink;
     private final Status status;
 
-    Project(Document projectDocument, LocalDate lastModified, OmniFocusRepository omniFocusRepository)
+    Project(
+            Document projectDocument, LocalDate lastModified,
+            OmniFocusRepository omniFocusRepository)
     {
         this.name = projectDocument.name();
         this.lastModified = lastModified;
@@ -41,6 +45,10 @@ public final class Project
 
     public Status status()
     {
+        if (omniFocusRepository.statusOf(name) == ON_HOLD)
+        {
+            return Status.ON_HOLD;
+        }
         return status;
     }
 }
