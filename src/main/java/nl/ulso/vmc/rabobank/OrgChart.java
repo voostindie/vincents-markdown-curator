@@ -18,6 +18,7 @@ public class OrgChart
         extends DataModelTemplate
 {
     public static final String TEAMS_FOLDER = "Teams";
+    public static final String THIRD_PARTY_FOLDER = "3rd Parties";
     public static final String CONTACTS_FOLDER = "Contacts";
 
     private final Vault vault;
@@ -39,6 +40,12 @@ public class OrgChart
         if (teams != null && contacts != null)
         {
             teams.documents().forEach(team -> team.accept(new OrgUnitFinder(teams, contacts)));
+        }
+        var thirdParties = vault.folder(THIRD_PARTY_FOLDER).orElse(null);
+        if (thirdParties != null && contacts != null)
+        {
+            thirdParties.documents().forEach(
+                    thirdParty -> thirdParty.accept(new OrgUnitFinder(thirdParties, contacts)));
         }
     }
 
@@ -91,7 +98,8 @@ public class OrgChart
     {
         var topLevelFolderName = toplevelFolder(folder).name();
         return topLevelFolderName.contentEquals(CONTACTS_FOLDER) ||
-               topLevelFolderName.contentEquals(TEAMS_FOLDER);
+               topLevelFolderName.contentEquals(TEAMS_FOLDER) ||
+               topLevelFolderName.contentEquals(THIRD_PARTY_FOLDER);
     }
 
     private Folder toplevelFolder(Folder folder)
@@ -160,18 +168,18 @@ public class OrgChart
     private class OrgUnitFinder
             extends BreadthFirstVaultVisitor
     {
-        private static final String ROLES_SECTION = "Roles";
+        private static final String CONTACTS_SECTION = "Contacts";
         private static final String ROLE_PATTERN_START = "^- (.*?): ";
-        private final Folder teams;
-        private final Folder contacts;
+        private final Folder orgUnitsFolder;
+        private final Folder contactsFolder;
 
         private Document parent;
         private Map<String, Map<String, Document>> roles;
 
-        OrgUnitFinder(Folder teams, Folder contacts)
+        OrgUnitFinder(Folder orgUnitsFolder, Folder contactsFolder)
         {
-            this.teams = teams;
-            this.contacts = contacts;
+            this.orgUnitsFolder = orgUnitsFolder;
+            this.contactsFolder = contactsFolder;
             this.parent = null;
         }
 
@@ -183,7 +191,7 @@ public class OrgChart
                 document.fragments().get(1) instanceof TextBlock textBlock)
             {
                 parent = textBlock.findInternalLinks().stream().map(InternalLink::targetDocument)
-                        .map(teams::document).filter(Optional::isPresent).map(Optional::get)
+                        .map(orgUnitsFolder::document).filter(Optional::isPresent).map(Optional::get)
                         .findFirst().orElse(null);
             }
             roles = new HashMap<>();
@@ -194,7 +202,7 @@ public class OrgChart
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2 && section.sortableTitle().contentEquals(ROLES_SECTION))
+            if (section.level() == 2 && (section.sortableTitle().contentEquals(CONTACTS_SECTION)))
             {
                 super.visit(section);
             }
@@ -205,7 +213,7 @@ public class OrgChart
         {
             String content = textBlock.markdown();
             textBlock.findInternalLinks().stream()
-                    .filter(link -> contacts.document(link.targetDocument()).isPresent())
+                    .filter(link -> contactsFolder.document(link.targetDocument()).isPresent())
                     .forEach(link -> {
                         var regex = compile(ROLE_PATTERN_START + quote(link.toMarkdown()),
                                 Pattern.MULTILINE);
@@ -213,7 +221,7 @@ public class OrgChart
                         if (matcher.find())
                         {
                             var role = matcher.group(1);
-                            var contact = contacts.document(link.targetDocument());
+                            var contact = contactsFolder.document(link.targetDocument());
                             contact.ifPresent(c -> roles.computeIfAbsent(role, r -> new HashMap<>())
                                     .put(c.name(), c));
                         }
