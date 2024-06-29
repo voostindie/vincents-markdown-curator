@@ -59,9 +59,7 @@ public final class ProjectListQuery
         return switch (format)
         {
             case LIST -> resultFactory.unorderedList(projects.stream()
-                    .map((Project project) ->
-                            "[[" + project.lastModified() + "]]: " +
-                            "[[" + project.name() + "]]")
+                    .map((Project project) -> "[[" + project.name() + "]]")
                     .toList());
             case TABLE -> resultFactory.table(
                     List.of(settings.projectColumn(),
