@@ -30,7 +30,7 @@ public class RabobankNotesCuratorModule
     @Override
     public Path vaultPath()
     {
-        return pathInUserHome("Notes", "Rabobank");
+        return iCloudObsidianVault("Rabobank");
     }
 
     @Override

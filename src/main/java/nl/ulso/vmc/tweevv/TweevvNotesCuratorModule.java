@@ -31,7 +31,7 @@ public class TweevvNotesCuratorModule
     @Override
     public Path vaultPath()
     {
-        return pathInUserHome("Notes", "TweeVV");
+        return iCloudObsidianVault("TweeVV");
     }
 
     @Override

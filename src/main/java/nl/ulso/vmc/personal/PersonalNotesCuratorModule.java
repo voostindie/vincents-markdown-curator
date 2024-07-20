@@ -30,7 +30,7 @@ public class PersonalNotesCuratorModule
     @Override
     public Path vaultPath()
     {
-        return pathInUserHome("Notes", "Personal");
+        return iCloudObsidianVault("Personal");
     }
 
     @Override
