@@ -19,6 +19,7 @@ public class TweevvNotesCuratorModule
         extends CuratorModule
 {
     private static final String PROJECT_FOLDER = "Projecten";
+    private static final String MARKER_SUB_FOLDER = "Markeringen";
     private static final String JOURNAL_FOLDER = "Logboek";
     private static final String ACTIVITIES_SECTION = "Activiteiten";
 
@@ -43,7 +44,7 @@ public class TweevvNotesCuratorModule
     @Override
     protected void configureCurator()
     {
-        install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION, PROJECT_FOLDER));
+        install(new JournalModule(JOURNAL_FOLDER, MARKER_SUB_FOLDER, ACTIVITIES_SECTION, PROJECT_FOLDER));
         install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(VolunteeringModel.class);

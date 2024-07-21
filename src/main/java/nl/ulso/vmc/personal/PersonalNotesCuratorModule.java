@@ -18,6 +18,7 @@ public class PersonalNotesCuratorModule
         extends CuratorModule
 {
     private static final String JOURNAL_FOLDER = "Journal";
+    private static final String MARKER_SUB_FOLDER = "Markers";
     private static final String ACTIVITIES_SECTION = "Activities";
     private static final String PROJECT_FOLDER = "Projects";
 
@@ -36,7 +37,8 @@ public class PersonalNotesCuratorModule
     @Override
     protected void configureCurator()
     {
-        install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION, PROJECT_FOLDER));
+        install(new JournalModule(JOURNAL_FOLDER, MARKER_SUB_FOLDER, ACTIVITIES_SECTION,
+                PROJECT_FOLDER));
         install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(Library.class);

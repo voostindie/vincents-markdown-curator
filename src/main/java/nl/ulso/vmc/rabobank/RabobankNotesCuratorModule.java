@@ -18,6 +18,7 @@ public class RabobankNotesCuratorModule
         extends CuratorModule
 {
     private static final String PROJECT_FOLDER = "Projects";
+    private static final String MARKER_SUB_FOLDER = "Markers";
     private static final String JOURNAL_FOLDER = "Journal";
     private static final String ACTIVITIES_SECTION = "Activities";
 
@@ -36,7 +37,8 @@ public class RabobankNotesCuratorModule
     @Override
     protected void configureCurator()
     {
-        install(new JournalModule(JOURNAL_FOLDER, ACTIVITIES_SECTION, PROJECT_FOLDER));
+        install(new JournalModule(JOURNAL_FOLDER, MARKER_SUB_FOLDER, ACTIVITIES_SECTION,
+                PROJECT_FOLDER));
         install(new LinksModule());
         bind(JxaRunner.class).to(JxaClasspathRunner.class);
         registerDataModel(OrgChart.class);

@@ -23,6 +23,6 @@ public class DemoCuratorModule
     @Override
     protected void configureCurator()
     {
-        install(new JournalModule("Journal", "Activities", "Projects"));
+        install(new JournalModule("Journal", "Markers", "Activities", "Projects"));
     }
 }
