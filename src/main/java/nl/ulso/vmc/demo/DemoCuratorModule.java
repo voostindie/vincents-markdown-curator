@@ -24,8 +24,8 @@ public class DemoCuratorModule
     {
         return new JournalSettings(
                 "Journal",
-                "Activities",
                 "Markers",
+                "Activities",
                 "Projects"
         );
     }
