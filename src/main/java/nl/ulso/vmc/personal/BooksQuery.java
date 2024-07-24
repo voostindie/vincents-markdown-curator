@@ -2,7 +2,7 @@ package nl.ulso.vmc.personal;
 
 import nl.ulso.markdown_curator.query.*;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 import java.util.Map;
 
 public class BooksQuery

@@ -3,7 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
 

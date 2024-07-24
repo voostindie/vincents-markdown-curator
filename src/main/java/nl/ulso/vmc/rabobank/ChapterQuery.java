@@ -1,9 +1,9 @@
 package nl.ulso.vmc.rabobank;
 
-import jakarta.inject.Inject;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 public class ChapterQuery

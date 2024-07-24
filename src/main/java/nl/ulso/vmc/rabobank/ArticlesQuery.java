@@ -4,7 +4,7 @@ import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Dictionary;
 import nl.ulso.markdown_curator.vault.*;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
@@ -89,8 +89,8 @@ class ArticlesQuery
         public void visit(Section section)
         {
             if (section.level() == 2 && section.sortableTitle().contentEquals("Changes")
-                && section.fragments().size() > 0
-                && section.fragments().get(0) instanceof TextBlock textBlock)
+                && !section.fragments().isEmpty()
+                && section.fragments().getFirst() instanceof TextBlock textBlock)
             {
                 var lines = new ArrayList<>(textBlock.markdown().trim().lines().toList());
                 if (lines.isEmpty())
@@ -98,7 +98,7 @@ class ArticlesQuery
                     return;
                 }
                 lines.sort(reverseOrder());
-                var mostRecent = lines.get(0);
+                var mostRecent = lines.getFirst();
                 var matcher = CHANGES_PATTERN.matcher(mostRecent);
                 if (matcher.matches())
                 {

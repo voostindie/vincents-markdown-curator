@@ -1,7 +1,5 @@
 package nl.ulso.vmc.project;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.vault.*;
@@ -9,6 +7,8 @@ import nl.ulso.markdown_curator.vault.event.*;
 import nl.ulso.vmc.omnifocus.OmniFocusRepository;
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +39,13 @@ public final class ProjectList
     }
 
     @Override
-    protected void fullRefresh()
+    public void fullRefresh()
     {
+        // First, an ugly hack: because we can't be sure whether the journal was fully
+        // refreshed first on start-up, because the order in which objects are instantiated
+        // is unpredictable, we force one here. Which means the journal will be fully refreshed
+        // twice.
+        journal.fullRefresh();
         var finder = new ProjectFinder();
         journal.vault().accept(finder);
         projects.clear();

@@ -8,8 +8,8 @@ import nl.ulso.markdown_curator.vault.FileSystemVault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;

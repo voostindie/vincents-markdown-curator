@@ -5,7 +5,8 @@ import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +39,11 @@ public class JxaClasspathRunner
     private static final int MAX_COMPILATION_TIME_SECONDS = 5;
 
     private final ConcurrentMap<String, Path> scriptCache = new ConcurrentHashMap<>();
+
+    @Inject
+    JxaClasspathRunner()
+    {
+    }
 
     @Override
     public JsonObject runScriptForObject(String name, String... arguments)

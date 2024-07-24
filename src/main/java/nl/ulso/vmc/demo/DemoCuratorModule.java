@@ -1,28 +1,32 @@
 package nl.ulso.vmc.demo;
 
+import dagger.Module;
+import dagger.Provides;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.journal.JournalModule;
+import nl.ulso.markdown_curator.journal.JournalSettings;
 
 import java.nio.file.Path;
 
-public class DemoCuratorModule
-        extends CuratorModule
-{
-    @Override
-    public String name()
-    {
-        return "DEMO";
-    }
+import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
 
-    @Override
-    public Path vaultPath()
+@Module(includes = {CuratorModule.class, JournalModule.class})
+public class DemoCuratorModule
+{
+    @Provides
+    static Path vaultPath()
     {
         return pathInUserHome("Code", "markdown-curator-demo", "vault");
     }
 
-    @Override
-    protected void configureCurator()
+    @Provides
+    JournalSettings journalSettings()
     {
-        install(new JournalModule("Journal", "Markers", "Activities", "Projects"));
+        return new JournalSettings(
+                "Journal",
+                "Activities",
+                "Markers",
+                "Projects"
+        );
     }
 }

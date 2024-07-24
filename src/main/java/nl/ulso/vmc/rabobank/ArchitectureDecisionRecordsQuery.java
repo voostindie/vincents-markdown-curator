@@ -3,7 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -88,8 +88,8 @@ class ArchitectureDecisionRecordsQuery
         @Override
         public void visit(Section section)
         {
-            if (section.level() == 2 && section.fragments().size() > 0
-                && section.fragments().get(0) instanceof TextBlock textBlock)
+            if (section.level() == 2 && !section.fragments().isEmpty()
+                && section.fragments().getFirst() instanceof TextBlock textBlock)
             {
                 var title = section.sortableTitle();
                 if (title.contentEquals("Changes"))
@@ -100,7 +100,7 @@ class ArchitectureDecisionRecordsQuery
                         return;
                     }
                     lines.sort(Comparator.reverseOrder());
-                    var mostRecent = lines.get(0);
+                    var mostRecent = lines.getFirst();
                     var matcher = CHANGES_PATTERN.matcher(mostRecent);
                     if (matcher.matches())
                     {
@@ -110,9 +110,9 @@ class ArchitectureDecisionRecordsQuery
                 else if (title.contentEquals("Status"))
                 {
                     var lines = textBlock.markdown().trim().lines().toList();
-                    if (lines.size() > 0)
+                    if (!lines.isEmpty())
                     {
-                        status = lines.get(0);
+                        status = lines.getFirst();
                     }
                 }
             }

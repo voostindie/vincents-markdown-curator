@@ -4,8 +4,8 @@ import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,7 +38,7 @@ public class VolunteeringModel
     }
 
     @Override
-    protected void fullRefresh()
+    public void fullRefresh()
     {
         activities.clear();
         contacts.clear();

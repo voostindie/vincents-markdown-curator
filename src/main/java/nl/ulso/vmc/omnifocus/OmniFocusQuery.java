@@ -1,10 +1,10 @@
 package nl.ulso.vmc.omnifocus;
 
-import jakarta.inject.Inject;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Folder;
 import nl.ulso.markdown_curator.vault.Vault;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;

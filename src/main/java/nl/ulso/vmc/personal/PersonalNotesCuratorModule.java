@@ -1,9 +1,14 @@
 package nl.ulso.vmc.personal;
 
-import com.google.inject.Provides;
+import dagger.*;
+import dagger.Module;
+import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.CuratorModule;
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
+import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.links.LinksModule;
+import nl.ulso.markdown_curator.query.Query;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -12,46 +17,76 @@ import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.project.*;
 
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Set;
 
-public class PersonalNotesCuratorModule
-        extends CuratorModule
+import static java.util.Locale.ENGLISH;
+import static nl.ulso.markdown_curator.VaultPaths.iCloudObsidianVault;
+
+@Module(includes = {CuratorModule.class, JournalModule.class, LinksModule.class})
+abstract class PersonalNotesCuratorModule
 {
     private static final String JOURNAL_FOLDER = "Journal";
     private static final String MARKER_SUB_FOLDER = "Markers";
     private static final String ACTIVITIES_SECTION = "Activities";
     private static final String PROJECT_FOLDER = "Projects";
 
-    @Override
-    public String name()
-    {
-        return "Personal";
-    }
-
-    @Override
-    public Path vaultPath()
+    @Provides
+    static Path vaultPath()
     {
         return iCloudObsidianVault("Personal");
     }
 
-    @Override
-    protected void configureCurator()
+    @Provides
+    static Locale locale()
     {
-        install(new JournalModule(JOURNAL_FOLDER, MARKER_SUB_FOLDER, ACTIVITIES_SECTION,
-                PROJECT_FOLDER));
-        install(new LinksModule());
-        bind(JxaRunner.class).to(JxaClasspathRunner.class);
-        registerDataModel(Library.class);
-        registerDataModel(ProjectList.class);
-        registerQuery(ReadingQuery.class);
-        registerQuery(BooksQuery.class);
-        registerQuery(HooksQuery.class);
-        registerQuery(ProjectListQuery.class);
-        registerQuery(OmniFocusQuery.class);
+        return ENGLISH;
+    }
+
+    @Binds
+    abstract JxaRunner bindJxaRunner(JxaClasspathRunner jxaClasspathRunner);
+
+    @Binds
+    @IntoSet
+    abstract DataModel bindLibrary(Library library);
+
+    @Binds
+    @IntoSet
+    abstract DataModel bindProjectList(ProjectList projectList);
+
+    @Binds
+    @IntoSet
+    abstract Query bindReadingQuery(ReadingQuery readingQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindBooksQuery(BooksQuery booksQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindHooksQuery(HooksQuery HooksQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindProjectListQuery(ProjectListQuery projectListQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindOmniFocusQuery(OmniFocusQuery omniFocusQuery);
+
+    @Provides
+    static JournalSettings journalSettings()
+    {
+        return new JournalSettings(
+                JOURNAL_FOLDER,
+                MARKER_SUB_FOLDER,
+                ACTIVITIES_SECTION,
+                PROJECT_FOLDER
+        );
     }
 
     @Provides
-    ProjectListSettings projectListSettings()
+    static ProjectListSettings projectListSettings()
     {
         return new ProjectListSettings(
                 PROJECT_FOLDER,
@@ -64,7 +99,7 @@ public class PersonalNotesCuratorModule
     }
 
     @Provides
-    OmniFocusSettings omniFocusSettings()
+    static OmniFocusSettings omniFocusSettings()
     {
         return new OmniFocusSettings(PROJECT_FOLDER, "👨🏻‍💻 Personal",
                 (name) -> !name.startsWith("⚡️") &&

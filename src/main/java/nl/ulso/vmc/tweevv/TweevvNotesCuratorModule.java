@@ -1,9 +1,14 @@
 package nl.ulso.vmc.tweevv;
 
-import com.google.inject.Provides;
+import dagger.Module;
+import dagger.*;
+import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.CuratorModule;
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
+import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.links.LinksModule;
+import nl.ulso.markdown_curator.query.Query;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -15,49 +20,72 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Set;
 
-public class TweevvNotesCuratorModule
-        extends CuratorModule
+import static nl.ulso.markdown_curator.VaultPaths.iCloudObsidianVault;
+
+@Module(includes = {CuratorModule.class, JournalModule.class, LinksModule.class})
+abstract class TweevvNotesCuratorModule
 {
     private static final String PROJECT_FOLDER = "Projecten";
     private static final String MARKER_SUB_FOLDER = "Markeringen";
     private static final String JOURNAL_FOLDER = "Logboek";
     private static final String ACTIVITIES_SECTION = "Activiteiten";
 
-    @Override
-    public String name()
-    {
-        return "TweeVV";
-    }
-
-    @Override
-    public Path vaultPath()
+    @Provides
+    static Path vaultPath()
     {
         return iCloudObsidianVault("TweeVV");
     }
 
-    @Override
-    public Locale locale()
+    @Provides
+    static Locale locale()
     {
         return Locale.forLanguageTag("nl");
     }
 
-    @Override
-    protected void configureCurator()
+    @Binds
+    abstract JxaRunner bindJxaRunner(JxaClasspathRunner jxaClasspathRunner);
+
+    @Binds
+    @IntoSet
+    abstract DataModel bindVolunteeringModel(VolunteeringModel volunteeringModel);
+
+    @Binds
+    @IntoSet
+    abstract DataModel bindProjectList(ProjectList projectList);
+
+    @Binds
+    @IntoSet
+    abstract Query bindProjectListQuery(ProjectListQuery projectListQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindOmniFocusQuery(OmniFocusQuery omniFocusQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindVolunteersQuery(VolunteersQuery volunteersQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindGroupQuery(GroupQuery groupQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindHooksQuery(HooksQuery hooksQuery);
+
+    @Provides
+    static JournalSettings journalSettings()
     {
-        install(new JournalModule(JOURNAL_FOLDER, MARKER_SUB_FOLDER, ACTIVITIES_SECTION, PROJECT_FOLDER));
-        install(new LinksModule());
-        bind(JxaRunner.class).to(JxaClasspathRunner.class);
-        registerDataModel(VolunteeringModel.class);
-        registerDataModel(ProjectList.class);
-        registerQuery(ProjectListQuery.class);
-        registerQuery(OmniFocusQuery.class);
-        registerQuery(VolunteersQuery.class);
-        registerQuery(GroupQuery.class);
-        registerQuery(HooksQuery.class);
+        return new JournalSettings(
+                JOURNAL_FOLDER,
+                MARKER_SUB_FOLDER,
+                ACTIVITIES_SECTION,
+                PROJECT_FOLDER
+        );
     }
 
     @Provides
-    ProjectListSettings projectListSettings()
+    static ProjectListSettings projectListSettings()
     {
         return new ProjectListSettings(
                 PROJECT_FOLDER,
@@ -70,7 +98,7 @@ public class TweevvNotesCuratorModule
     }
 
     @Provides
-    OmniFocusSettings omniFocusSettings()
+    static OmniFocusSettings omniFocusSettings()
     {
         return new OmniFocusSettings(
                 PROJECT_FOLDER,

@@ -1,11 +1,11 @@
 package nl.ulso.vmc.personal;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -42,7 +42,7 @@ public class Library
     }
 
     @Override
-    protected void fullRefresh()
+    public void fullRefresh()
     {
         authors.clear();
         books.clear();

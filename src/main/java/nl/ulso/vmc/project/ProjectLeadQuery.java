@@ -1,8 +1,8 @@
 package nl.ulso.vmc.project;
 
-import jakarta.inject.Inject;
 import nl.ulso.markdown_curator.query.*;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 

@@ -1,11 +1,11 @@
 package nl.ulso.vmc.rabobank;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -32,7 +32,7 @@ public class OrgChart
     }
 
     @Override
-    protected void fullRefresh()
+    public void fullRefresh()
     {
         orgUnits.clear();
         var teams = vault.folder(TEAMS_FOLDER).orElse(null);
