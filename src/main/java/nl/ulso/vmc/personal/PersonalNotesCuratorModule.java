@@ -1,7 +1,7 @@
 package nl.ulso.vmc.personal;
 
-import dagger.*;
 import dagger.Module;
+import dagger.*;
 import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.DataModel;
@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
-import static nl.ulso.markdown_curator.VaultPaths.iCloudObsidianVault;
+import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
 
 @Module(includes = {CuratorModule.class, JournalModule.class, LinksModule.class})
 abstract class PersonalNotesCuratorModule
@@ -34,7 +34,7 @@ abstract class PersonalNotesCuratorModule
     @Provides
     static Path vaultPath()
     {
-        return iCloudObsidianVault("Personal");
+        return pathInUserHome("Notes", "Personal");
     }
 
     @Provides

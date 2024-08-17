@@ -1,7 +1,7 @@
 package nl.ulso.vmc.rabobank;
 
-import dagger.*;
 import dagger.Module;
+import dagger.*;
 import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.DataModel;
@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
-import static nl.ulso.markdown_curator.VaultPaths.iCloudObsidianVault;
+import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
 
 @Module(includes = {CuratorModule.class, JournalModule.class, LinksModule.class})
 abstract class RabobankNotesCuratorModule
@@ -34,7 +34,7 @@ abstract class RabobankNotesCuratorModule
     @Provides
     static Path vaultPath()
     {
-        return iCloudObsidianVault("Rabobank");
+        return pathInUserHome("Notes", "Rabobank");
     }
 
     @Provides
@@ -57,15 +57,15 @@ abstract class RabobankNotesCuratorModule
     @Binds
     @IntoSet
     abstract Query bindProjectListQuery(ProjectListQuery projectListQuery);
-    
+
     @Binds
     @IntoSet
     abstract Query bindProjectLeadQuery(ProjectLeadQuery projectLeadQuery);
-    
+
     @Binds
     @IntoSet
     abstract Query bindArticlesQuery(ArticlesQuery articlesQuery);
-    
+
     @Binds
     @IntoSet
     abstract Query bindOmniFocusQuery(OmniFocusQuery omniFocusQuery);
@@ -76,7 +76,8 @@ abstract class RabobankNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract Query bindArchitectureDecisionRecordsQuery(ArchitectureDecisionRecordsQuery architectureDecisionRecordsQuery);
+    abstract Query bindArchitectureDecisionRecordsQuery(
+            ArchitectureDecisionRecordsQuery architectureDecisionRecordsQuery);
 
     @Binds
     @IntoSet

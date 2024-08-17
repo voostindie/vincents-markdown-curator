@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static nl.ulso.markdown_curator.VaultPaths.iCloudObsidianVault;
+import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
 
 @Module(includes = {CuratorModule.class, JournalModule.class, LinksModule.class})
 abstract class TweevvNotesCuratorModule
@@ -33,7 +34,7 @@ abstract class TweevvNotesCuratorModule
     @Provides
     static Path vaultPath()
     {
-        return iCloudObsidianVault("TweeVV");
+        return pathInUserHome("Notes", "TweeVV");
     }
 
     @Provides
