@@ -4,13 +4,7 @@ function run(argv) {
         .defaultDocument()
         .folders
         .byName(folderName)
-        .flattenedProjects
-        .whose({
-            _or: [
-                {_match: [ObjectSpecifier().status, 'active status']},
-                {_match: [ObjectSpecifier().status, 'on hold status']}
-            ]
-        });
+        .flattenedProjects;
     const ids = projects.id();
     const names = projects.name();
     const statuses = projects.status();
