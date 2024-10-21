@@ -129,7 +129,8 @@ abstract class RabobankNotesCuratorModule
         return new OmniFocusSettings(PROJECT_FOLDER, "💼 Rabobank",
                 (name) -> !name.startsWith("⚡️") &&
                           !Set.of("🤖 Routine",
-                                  "🌳 Study",
+                                  "📖 Reading material",
+                                  "💡 Newsletter topics",
                                   "💶 Statements",
                                   "💼 Various",
                                   "💬 Reminders").contains(name));
