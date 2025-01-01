@@ -60,6 +60,29 @@ class ArticlesQuery
         }).orElseGet(() -> resultFactory.error("Couldn't find the folder 'Articles'"));
     }
 
+    /**
+     * For each article found, store a map with three values, all as a string: the date, the title
+     * and the publication.
+     * <p/>
+     * The article date can be stored in on of two ways:
+     * <ul>
+     * <li>Inside a section called "Changes", in a bullet list. This one takes priority</li>
+     * <li>Through the field "date" in the front matter.</li>
+     * </ul>
+     * An example "Changes" section:
+     * <pre><code>
+     *     ## Changes
+     *
+     *     - [[2024-12-15]]: Initial version.
+     *     - [[2025-01-01]]: Processed review comments.
+     * </code></pre>
+     * <p/>
+     * The order the dated entries are in is irrelevant. This finder picks the latest.
+     * <p/>
+     * The "publication" front matter field is just a bit of text. But with a if it starts with
+     * "https://", then the text is turned into an actual link, with the label "Link". Additionally,
+     * if the link points to Rabobank's Confluence site, the label is set to "Confluence".
+     */
     private static class ArticleFinder
             extends BreadthFirstVaultVisitor
     {
@@ -76,8 +99,11 @@ class ArticlesQuery
             super.visit(document);
             if (date == null)
             {
-                date = Instant.ofEpochMilli(document.lastModified())
-                        .atZone(ZoneId.of("UTC")).toLocalDate().toString();
+                date = document.frontMatter().date("date",
+                        Instant.ofEpochMilli(document.lastModified())
+                                .atZone(ZoneId.of("UTC"))
+                                .toLocalDate()
+                ).toString();
             }
             articles.add(Map.of(
                     "Date", date,
