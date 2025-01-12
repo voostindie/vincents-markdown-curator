@@ -38,14 +38,14 @@ public final class ProjectList
         this.projects = new ArrayList<>();
     }
 
+    public int order()
+    {
+        return journal.order() + 1;
+    }
+
     @Override
     public void fullRefresh()
     {
-        // First, an ugly hack: because we can't be sure whether the journal was fully
-        // refreshed first on start-up, because the order in which objects are instantiated
-        // is unpredictable, we force one here. Which means the journal will be fully refreshed
-        // twice.
-        journal.fullRefresh();
         var finder = new ProjectFinder();
         journal.vault().accept(finder);
         projects.clear();

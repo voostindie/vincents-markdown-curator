@@ -191,7 +191,8 @@ public class OrgChart
                 document.fragments().get(1) instanceof TextBlock textBlock)
             {
                 parent = textBlock.findInternalLinks().stream().map(InternalLink::targetDocument)
-                        .map(orgUnitsFolder::document).filter(Optional::isPresent).map(Optional::get)
+                        .map(orgUnitsFolder::document).filter(Optional::isPresent)
+                        .map(Optional::get)
                         .findFirst().orElse(null);
             }
             roles = new HashMap<>();

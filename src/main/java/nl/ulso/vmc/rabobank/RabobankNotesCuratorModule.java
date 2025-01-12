@@ -9,6 +9,7 @@ import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.links.LinksModule;
 import nl.ulso.markdown_curator.query.Query;
+import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
@@ -22,13 +23,18 @@ import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
+import static nl.ulso.vmc.graph.Shape.HEXAGON;
+import static nl.ulso.vmc.graph.Shape.RECTANGLE;
 
-@Module(includes = {CuratorModule.class, JournalModule.class, LinksModule.class})
+@Module(includes = {
+        CuratorModule.class, JournalModule.class, MermaidGraphModule.class, LinksModule.class})
 abstract class RabobankNotesCuratorModule
 {
     private static final String PROJECT_FOLDER = "Projects";
     private static final String MARKER_SUB_FOLDER = "Markers";
     private static final String JOURNAL_FOLDER = "Journal";
+    private static final String CONTACS_FOLDER = "Contacts";
+    private static final String TEAMS_FOLDER = "Teams";
     private static final String ACTIVITIES_SECTION = "Activities";
 
     @Provides
@@ -134,5 +140,15 @@ abstract class RabobankNotesCuratorModule
                                   "💶 Statements",
                                   "💼 Various",
                                   "💬 Reminders").contains(name));
+    }
+
+    @Provides
+    static MermaidGraphSettings mermaidGraphSettings()
+    {
+        return new MermaidGraphSettings(Set.of(
+                new Type("project", PROJECT_FOLDER, RECTANGLE, new ProjectNodeClassifier()),
+                new Type("contact", CONTACS_FOLDER, HEXAGON),
+                new Type("team", TEAMS_FOLDER, RECTANGLE)
+        ));
     }
 }

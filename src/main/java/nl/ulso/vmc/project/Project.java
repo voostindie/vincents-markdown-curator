@@ -12,7 +12,7 @@ public final class Project
     private final String name;
     private final LocalDate lastModified;
     private final OmniFocusRepository omniFocusRepository;
-    private final String leadWikiLink;
+    private final String lead;
     private final Status status;
 
     Project(
@@ -22,8 +22,17 @@ public final class Project
         this.name = projectDocument.name();
         this.lastModified = lastModified;
         this.omniFocusRepository = omniFocusRepository;
-        this.leadWikiLink = projectDocument.frontMatter().string("lead", "");
+        this.lead = fromWikiLink(projectDocument.frontMatter().string("lead", ""));
         this.status = Status.fromString(projectDocument.frontMatter().string("status", ""));
+    }
+
+    private String fromWikiLink(String link)
+    {
+        if (link.startsWith("[[") && link.endsWith("]]"))
+        {
+            return link.substring(2, link.length() - 2);
+        }
+        return link;
     }
 
     public String name()
@@ -40,7 +49,7 @@ public final class Project
 
     public String leadWikiLink()
     {
-        return leadWikiLink;
+        return lead.isBlank() ? "" : "[[" + lead + "]]";
     }
 
     public Status status()

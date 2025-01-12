@@ -40,4 +40,16 @@ public enum Status
             case UNKNOWN -> "⚪️";
         };
     }
+
+    public String toMermaid()
+    {
+        return switch (this)
+        {
+            case GREEN -> "green";
+            case AMBER -> "amber";
+            case RED -> "red";
+            case ON_HOLD -> "on-hold";
+            case UNKNOWN -> "unknown";
+        };
+    }
 }
