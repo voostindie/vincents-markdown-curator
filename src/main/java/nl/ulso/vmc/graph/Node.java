@@ -50,9 +50,8 @@ public final class Node
 
     public String toMermaidNode()
     {
-        var postfix = type.classifier().classify(this)
-                .map(c -> ":::" + c).orElse("");
-        return type.shape().toMermaidNode(id, document().name()) + postfix;
+        var className = type.classifier().classify(this);
+        return type.shape().toMermaidNode(id, document().name(), className);
     }
 
     @Override
@@ -107,10 +106,6 @@ public final class Node
             throw new IllegalStateException(
                     "Document name mismatch. Only replace documents if they represent the same " +
                     "file!");
-        }
-        if (document == newDocument)
-        {
-            throw new IllegalStateException("Document is the same as the original document!");
         }
         this.document = newDocument;
     }

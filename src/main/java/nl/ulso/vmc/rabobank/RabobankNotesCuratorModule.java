@@ -25,6 +25,7 @@ import static java.util.Locale.ENGLISH;
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
 import static nl.ulso.vmc.graph.Shape.HEXAGON;
 import static nl.ulso.vmc.graph.Shape.RECTANGLE;
+import static nl.ulso.vmc.graph.Shape.STADIUM;
 
 @Module(includes = {
         CuratorModule.class, JournalModule.class, MermaidGraphModule.class, LinksModule.class})
@@ -147,8 +148,8 @@ abstract class RabobankNotesCuratorModule
     {
         return new MermaidGraphSettings(Set.of(
                 new Type("project", PROJECT_FOLDER, RECTANGLE, new ProjectNodeClassifier()),
-                new Type("contact", CONTACS_FOLDER, HEXAGON),
-                new Type("team", TEAMS_FOLDER, RECTANGLE)
+                new Type("contact", CONTACS_FOLDER, STADIUM),
+                new Type("team", TEAMS_FOLDER, HEXAGON)
         ));
     }
 }
