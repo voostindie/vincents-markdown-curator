@@ -17,8 +17,7 @@ import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.project.*;
 
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
 
@@ -107,6 +106,7 @@ abstract class TweevvNotesCuratorModule
                           !Set.of("🤖 Routine",
                                   "🏐 Diversen",
                                   "💶 Declaraties",
-                                  "✉️ Eerstvolgende nieuwsbrief").contains(name));
+                                  "✉️ Eerstvolgende nieuwsbrief").contains(name),
+                Optional.of("🛑 TODO"));
     }
 }

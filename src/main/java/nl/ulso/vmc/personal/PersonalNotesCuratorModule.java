@@ -17,8 +17,7 @@ import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.project.*;
 
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
@@ -104,6 +103,7 @@ abstract class PersonalNotesCuratorModule
         return new OmniFocusSettings(PROJECT_FOLDER, "👨🏻‍💻 Personal",
                 (name) -> !name.startsWith("⚡️") &&
                           !Set.of("🤖 Routine",
-                                  "👨🏻‍💻 Various").contains(name));
+                                  "👨🏻‍💻 Various").contains(name),
+                Optional.of("🗂️ Projects"));
     }
 }

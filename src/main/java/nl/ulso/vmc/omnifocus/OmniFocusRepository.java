@@ -1,16 +1,22 @@
 package nl.ulso.vmc.omnifocus;
 
 import jakarta.json.JsonValue;
+import nl.ulso.markdown_curator.DocumentPathResolver;
+import nl.ulso.markdown_curator.vault.Vault;
 import nl.ulso.vmc.jxa.JxaRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import static java.util.Collections.emptyMap;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.stream.Collectors.toMap;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
@@ -19,23 +25,30 @@ import static nl.ulso.vmc.omnifocus.Status.UNKNOWN;
 /**
  * Fetches projects from a folder in <a href="https://www.omnigroup.com/omnifocus">OmniFocus</a>.
  * <p/>
- * This implementation uses JXA scripting. Data is refreshed at most once every minute to ensure
- * queries run efficiently.
+ * This implementation uses JXA scripting. Data is refreshed every 5 minutes, independently of the
+ * queries themselves, to ensure queries run efficiently. If the OmniFocus database hasn't changed
+ * (based on the modification timestamp of the database folder), refresh is skipped. Optionally if,
+ * after a refresh, a change is detected to the set of projects in memory, a file in the vault is
+ * touched to force the curator to rerun all queries and write changed documents.
  */
-
 @Singleton
 public class OmniFocusRepository
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(OmniFocusRepository.class);
-    private static final String SCRIPT = "omnifocus-projects";
-    private static final int REFRESH_INTERVAL = 60000;
 
-    private Map<String, OmniFocusProject> projects;
-    private long lastUpdated;
-    private final JxaRunner jxaRunner;
-    private final OmniFocusSettings settings;
+    private static final File DATABASE_PATH =
+            Path.of(System.getProperty("user.home"), "Library", "Containers",
+                    "com.omnigroup.OmniFocus4", "Data", "Library", "Application Support",
+                    "OmniFocus", "OmniFocus.ofocus").toFile();
+    private static final String JXA_SCRIPT = "omnifocus-projects";
     private static final OmniFocusProject NULL_PROJECT =
             new OmniFocusProject("null", "null", UNKNOWN, -1);
+    private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
+    private static final int REFRESH_DELAY_MINUTES = 5;
+
+    private final AtomicReference<Map<String, OmniFocusProject>> cache;
+    private long lastModified = 0L;
+
     /**
      * The filtering on statuses is ideally done in the JXA script to limit the data pulled from
      * OmniFocus, but this broke in OmniFocus 4.3.3. Now the filtering is in here.
@@ -43,60 +56,91 @@ public class OmniFocusRepository
     private static final Set<Status> SELECTED_STATUSES = Set.of(ACTIVE, ON_HOLD);
 
     @Inject
-    public OmniFocusRepository(JxaRunner jxaRunner, OmniFocusSettings settings)
+    public OmniFocusRepository(
+            Vault vault, DocumentPathResolver resolver, JxaRunner jxaRunner,
+            OmniFocusSettings settings)
     {
-        this.jxaRunner = jxaRunner;
-        this.settings = settings;
-        projects = emptyMap();
-        lastUpdated = -1L;
+        if (!DATABASE_PATH.canRead())
+        {
+            throw new IllegalStateException("OmniFocus database is inaccessible: " + DATABASE_PATH);
+        }
+        this.cache = new AtomicReference<>();
+        scheduleBackgroundRefresh(vault, resolver, jxaRunner, settings);
+    }
+
+    private void scheduleBackgroundRefresh(
+            Vault vault, DocumentPathResolver resolver, JxaRunner jxaRunner,
+            OmniFocusSettings settings)
+    {
+        var curatorName = MDC.get("curator");
+        REFRESH_EXECUTOR.scheduleAtFixedRate(() -> {
+            MDC.put("curator", curatorName);
+            if (lastModified == DATABASE_PATH.lastModified())
+            {
+                LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
+                return;
+            }
+            var newProjects = fetchProjects(jxaRunner, settings);
+            var oldProjects = cache.getAndSet(newProjects);
+            lastModified = DATABASE_PATH.lastModified();
+            if (oldProjects == null)
+            {
+                LOGGER.debug("Initial fetch from OmniFocus completed.");
+                return;
+            }
+            if (newProjects.equals(oldProjects))
+            {
+                LOGGER.debug("No changes in projects fetched from OmniFocus; skipping refresh.");
+                return;
+            }
+            touchDocumentToForceRefresh(vault, resolver, settings);
+        }, 0, REFRESH_DELAY_MINUTES, TimeUnit.MINUTES);
+    }
+
+    private Map<String, OmniFocusProject> fetchProjects(
+            JxaRunner jxaRunner, OmniFocusSettings settings)
+    {
+        LOGGER.debug("Fetching OmniFocus projects in folder: {}", settings.omniFocusFolder());
+        var array = jxaRunner.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
+        return array.stream()
+                .map(JsonValue::asJsonObject)
+                .map(object -> new OmniFocusProject(
+                        object.getString("id"),
+                        object.getString("name"),
+                        Status.fromString(object.getString("status")),
+                        object.getInt("priority")))
+                .filter(project -> SELECTED_STATUSES.contains(project.status()))
+                .collect(toMap(OmniFocusProject::name, Function.identity()));
+    }
+
+    private void touchDocumentToForceRefresh(
+            Vault vault, DocumentPathResolver resolver, OmniFocusSettings settings)
+    {
+        settings.documentToTouchAfterRefresh()
+                .flatMap(vault::findDocument)
+                .ifPresent(document ->
+                {
+                    LOGGER.info("Changes in OmniFocus projects detected; triggering refresh.");
+                    var path = resolver.resolveAbsolutePath(document);
+                    if (!path.toFile().setLastModified(lastModified))
+                    {
+                        LOGGER.warn("Couldn't update modification time of file: {}", path);
+                    }
+                });
     }
 
     public Collection<OmniFocusProject> projects()
     {
-        refresh();
-        return projects.values();
+        return cache.get().values();
     }
 
     public int priorityOf(String name)
     {
-        refresh();
-        return projects.getOrDefault(name, NULL_PROJECT).priority();
+        return cache.get().getOrDefault(name, NULL_PROJECT).priority();
     }
 
     public Status statusOf(String name)
     {
-        refresh();
-        return projects.getOrDefault(name, NULL_PROJECT).status();
-    }
-
-    private void refresh()
-    {
-        // Bail out as quickly as possible: if the last refresh was recent
-        if (lastUpdated > 0 && REFRESH_INTERVAL > System.currentTimeMillis() - lastUpdated)
-        {
-            return;
-        }
-        // Make sure at most one refresh job is running concurrently
-        synchronized (this)
-        {
-            // Bail out as quickly as possible: if another refresh job just finished
-            if (lastUpdated > 0 && REFRESH_INTERVAL > System.currentTimeMillis() - lastUpdated)
-            {
-                return;
-            }
-            // Now we have no choice but to refresh.
-            LOGGER.debug("Refreshing OmniFocus projects in folder: {}", settings.omniFocusFolder());
-            var array = jxaRunner.runScriptForArray(SCRIPT, settings.omniFocusFolder());
-            projects = array.stream()
-                    .map(JsonValue::asJsonObject)
-                    .map(object -> new OmniFocusProject(
-                            object.getString("id"),
-                            object.getString("name"),
-                            Status.fromString(object.getString("status")),
-                            object.getInt("priority")))
-                    .filter(project -> SELECTED_STATUSES.contains(project.status()))
-                    .collect(toMap(OmniFocusProject::name, Function.identity()));
-            lastUpdated = System.currentTimeMillis();
-        }
+        return cache.get().getOrDefault(name, NULL_PROJECT).status();
     }
 }
