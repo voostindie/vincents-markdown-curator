@@ -103,7 +103,6 @@ abstract class PersonalNotesCuratorModule
         return new OmniFocusSettings(PROJECT_FOLDER, "👨🏻‍💻 Personal",
                 (name) -> !name.startsWith("⚡️") &&
                           !Set.of("🤖 Routine",
-                                  "👨🏻‍💻 Various").contains(name),
-                Optional.of("🗂️ Projects"));
+                                  "👨🏻‍💻 Various").contains(name));
     }
 }

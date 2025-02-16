@@ -106,7 +106,6 @@ abstract class TweevvNotesCuratorModule
                           !Set.of("🤖 Routine",
                                   "🏐 Diversen",
                                   "💶 Declaraties",
-                                  "✉️ Eerstvolgende nieuwsbrief").contains(name),
-                Optional.of("🛑 TODO"));
+                                  "✉️ Eerstvolgende nieuwsbrief").contains(name));
     }
 }

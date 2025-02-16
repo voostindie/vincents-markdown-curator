@@ -139,8 +139,7 @@ abstract class RabobankNotesCuratorModule
                                   "💡 Newsletter topics",
                                   "💶 Statements",
                                   "💼 Various",
-                                  "💬 Reminders").contains(name),
-                Optional.of("🛑 TODO"));
+                                  "💬 Reminders").contains(name));
     }
 
     @Provides

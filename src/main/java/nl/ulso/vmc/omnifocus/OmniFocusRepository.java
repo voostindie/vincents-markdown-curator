@@ -1,8 +1,7 @@
 package nl.ulso.vmc.omnifocus;
 
 import jakarta.json.JsonValue;
-import nl.ulso.markdown_curator.DocumentPathResolver;
-import nl.ulso.markdown_curator.vault.Vault;
+import nl.ulso.markdown_curator.vault.VaultRefresher;
 import nl.ulso.vmc.jxa.JxaRunner;
 import org.slf4j.*;
 
@@ -27,9 +26,9 @@ import static nl.ulso.vmc.omnifocus.Status.UNKNOWN;
  * <p/>
  * This implementation uses JXA scripting. Data is refreshed every 5 minutes, independently of the
  * queries themselves, to ensure queries run efficiently. If the OmniFocus database hasn't changed
- * (based on the modification timestamp of the database folder), refresh is skipped. Optionally if,
- * after a refresh, a change is detected to the set of projects in memory, a file in the vault is
- * touched to force the curator to rerun all queries and write changed documents.
+ * (based on the modification timestamp of the database folder), refresh is skipped. If, after a
+ * refresh, a change is detected to the set of projects in memory, the vault is refreshed, forcing
+ * it to re-run all queries and write changed documents.
  */
 @Singleton
 public class OmniFocusRepository
@@ -57,20 +56,18 @@ public class OmniFocusRepository
 
     @Inject
     public OmniFocusRepository(
-            Vault vault, DocumentPathResolver resolver, JxaRunner jxaRunner,
-            OmniFocusSettings settings)
+            VaultRefresher refresher, JxaRunner jxaRunner, OmniFocusSettings settings)
     {
         if (!DATABASE_PATH.canRead())
         {
             throw new IllegalStateException("OmniFocus database is inaccessible: " + DATABASE_PATH);
         }
         this.cache = new AtomicReference<>();
-        scheduleBackgroundRefresh(vault, resolver, jxaRunner, settings);
+        scheduleBackgroundRefresh(refresher, jxaRunner, settings);
     }
 
     private void scheduleBackgroundRefresh(
-            Vault vault, DocumentPathResolver resolver, JxaRunner jxaRunner,
-            OmniFocusSettings settings)
+            VaultRefresher refresher, JxaRunner jxaRunner, OmniFocusSettings settings)
     {
         var curatorName = MDC.get("curator");
         REFRESH_EXECUTOR.scheduleAtFixedRate(() -> {
@@ -93,7 +90,8 @@ public class OmniFocusRepository
                 LOGGER.debug("No changes in projects fetched from OmniFocus; skipping refresh.");
                 return;
             }
-            touchDocumentToForceRefresh(vault, resolver, settings);
+            LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh in the vault.");
+            refresher.triggerRefresh();
         }, 0, REFRESH_DELAY_MINUTES, TimeUnit.MINUTES);
     }
 
@@ -111,22 +109,6 @@ public class OmniFocusRepository
                         object.getInt("priority")))
                 .filter(project -> SELECTED_STATUSES.contains(project.status()))
                 .collect(toMap(OmniFocusProject::name, Function.identity()));
-    }
-
-    private void touchDocumentToForceRefresh(
-            Vault vault, DocumentPathResolver resolver, OmniFocusSettings settings)
-    {
-        settings.documentToTouchAfterRefresh()
-                .flatMap(vault::findDocument)
-                .ifPresent(document ->
-                {
-                    LOGGER.info("Changes in OmniFocus projects detected; triggering refresh.");
-                    var path = resolver.resolveAbsolutePath(document);
-                    if (!path.toFile().setLastModified(lastModified))
-                    {
-                        LOGGER.warn("Couldn't update modification time of file: {}", path);
-                    }
-                });
     }
 
     public Collection<OmniFocusProject> projects()
