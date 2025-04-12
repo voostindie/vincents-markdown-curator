@@ -89,6 +89,7 @@ abstract class TweevvNotesCuratorModule
         return new ProjectListSettings(
                 PROJECT_FOLDER,
                 ACTIVITIES_SECTION,
+                "Prio",
                 "Laatst&nbsp;bijgewerkt",
                 "Project",
                 "Lead",

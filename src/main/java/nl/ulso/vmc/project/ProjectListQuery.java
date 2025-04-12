@@ -62,13 +62,17 @@ public final class ProjectListQuery
                     .map((Project project) -> "[[" + project.name() + "]]")
                     .toList());
             case TABLE -> resultFactory.table(
-                    List.of(settings.projectColumn(),
+                    List.of(settings.priorityColumn(),
+                            settings.projectColumn(),
                             settings.leadColumn(),
+                            settings.dateColumn(),
                             settings.statusColumn()),
                     projects.stream()
                             .map((Project project) -> Map.of(
+                                    settings.priorityColumn(), Integer.toString(project.priority()),
                                     settings.projectColumn(), "[[" + project.name() + "]]",
                                     settings.leadColumn(), project.leadWikiLink(),
+                                    settings.dateColumn(), "[[" + project.lastModified().toString() + "]]",
                                     settings.statusColumn(), project.status().toMarkdown()
                             )).toList());
         };

@@ -122,6 +122,7 @@ abstract class RabobankNotesCuratorModule
         return new ProjectListSettings(
                 PROJECT_FOLDER,
                 ACTIVITIES_SECTION,
+                "Prio",
                 "Last&nbsp;modified",
                 "Project",
                 "Lead",
