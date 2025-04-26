@@ -5,11 +5,12 @@ import nl.ulso.markdown_curator.vault.Folder;
 import nl.ulso.markdown_curator.vault.Vault;
 
 import javax.inject.Inject;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
+import static java.net.URLEncoder.encode;
 import static java.util.Collections.emptyMap;
 import static java.util.ResourceBundle.getBundle;
 
@@ -58,29 +59,20 @@ public class OmniFocusQuery
     {
         return vault.folder(settings.projectFolder())
                 .map(folder ->
-                        (QueryResult) new OmniFocusQueryResult(
-                                omniFocusRepository.projects(),
-                                folder,
-                                settings.includePredicate(), locale))
+                        (QueryResult) new OmniFocusQueryResult(folder))
                 .orElseGet(() -> resultFactory.error(
                         "Project folder not found: '" + settings.projectFolder() + "'"));
     }
 
-    private static class OmniFocusQueryResult
+    private class OmniFocusQueryResult
             implements QueryResult
     {
-        private final Collection<OmniFocusProject> omniFocusProjects;
         private final Folder projectFolder;
-        private final Predicate<String> includePredicate;
         private final ResourceBundle bundle;
 
-        OmniFocusQueryResult(
-                Collection<OmniFocusProject> omniFocusProjects, Folder projectFolder,
-                Predicate<String> includePredicate, Locale locale)
+        OmniFocusQueryResult(Folder projectFolder)
         {
-            this.omniFocusProjects = omniFocusProjects;
             this.projectFolder = projectFolder;
-            this.includePredicate = includePredicate;
             this.bundle = getBundle("OmniFocus", locale);
         }
 
@@ -88,9 +80,10 @@ public class OmniFocusQuery
         public String toMarkdown()
         {
             var builder = new StringBuilder();
+            var omniFocusProjects = omniFocusRepository.projects();
             var missingPages = omniFocusProjects.stream()
                     .map(OmniFocusProject::name)
-                    .filter(includePredicate)
+                    .filter(settings.includePredicate())
                     .filter(name -> projectFolder.document(name).isEmpty())
                     .toList();
             if (!missingPages.isEmpty())
@@ -121,6 +114,15 @@ public class OmniFocusQuery
                 missingProjects.forEach(
                         document -> builder.append("- ")
                                 .append(document.link())
+                                .append(" [")
+                                .append(bundle.getString("create.text"))
+                                .append("](omnifocus:///paste")
+                                .append("?index=1")
+                                .append("&target=/folder/")
+                                .append(urlEncode(settings.omniFocusFolder()))
+                                .append("&content=")
+                                .append(urlEncode(document.name() + ":"))
+                                .append(")")
                                 .append(lineSeparator()));
                 builder.append(lineSeparator());
             }
@@ -135,6 +137,11 @@ public class OmniFocusQuery
                         .append(lineSeparator());
             }
             return builder.toString().trim();
+        }
+
+        private String urlEncode(String value)
+        {
+            return encode(value, StandardCharsets.UTF_8).replace("+", "%20");
         }
     }
 }
