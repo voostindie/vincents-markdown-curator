@@ -4,7 +4,7 @@ import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Folder;
 import nl.ulso.markdown_curator.vault.Vault;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;

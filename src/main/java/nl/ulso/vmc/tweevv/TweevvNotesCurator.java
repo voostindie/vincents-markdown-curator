@@ -1,9 +1,8 @@
 package nl.ulso.vmc.tweevv;
 
 import dagger.Component;
+import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.Curator;
-
-import javax.inject.Singleton;
 
 @Singleton
 @Component(modules = TweevvNotesCuratorModule.class)

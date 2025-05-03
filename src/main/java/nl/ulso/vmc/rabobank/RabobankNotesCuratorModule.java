@@ -1,24 +1,24 @@
 package nl.ulso.vmc.rabobank;
 
-import dagger.Module;
 import dagger.*;
+import dagger.Module;
 import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.links.LinksModule;
+import nl.ulso.markdown_curator.project.*;
 import nl.ulso.markdown_curator.query.Query;
 import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.jxa.JxaClasspathRunner;
 import nl.ulso.vmc.jxa.JxaRunner;
-import nl.ulso.vmc.omnifocus.OmniFocusQuery;
-import nl.ulso.vmc.omnifocus.OmniFocusSettings;
-import nl.ulso.vmc.project.*;
+import nl.ulso.vmc.omnifocus.*;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Locale;
+import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
@@ -27,7 +27,11 @@ import static nl.ulso.vmc.graph.Shape.RECTANGLE;
 import static nl.ulso.vmc.graph.Shape.STADIUM;
 
 @Module(includes = {
-        CuratorModule.class, JournalModule.class, MermaidGraphModule.class, LinksModule.class})
+        CuratorModule.class,
+        JournalModule.class,
+        ProjectModule.class,
+        MermaidGraphModule.class,
+        LinksModule.class})
 abstract class RabobankNotesCuratorModule
 {
     private static final String PROJECT_FOLDER = "Projects";
@@ -58,15 +62,18 @@ abstract class RabobankNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract DataModel bindProjectList(ProjectList projectList);
+    abstract AttributeValueResolver<?> priorityAttributeValueResolver(
+            OmniFocusPriorityAttributeValueResolver resolver);
 
     @Binds
     @IntoSet
-    abstract Query bindProjectListQuery(ProjectListQuery projectListQuery);
+    abstract AttributeValueResolver<?> statusAttributeValueResolver(
+            OmniFocusStatusAttributeValueResolver resolver);
 
     @Binds
     @IntoSet
-    abstract Query bindProjectLeadQuery(ProjectLeadQuery projectLeadQuery);
+    abstract AttributeValueResolver<?> lastModifiedAttributeValueResolver(
+            JournalLastModifiedAttributeValueResolver resolver);
 
     @Binds
     @IntoSet
@@ -117,17 +124,9 @@ abstract class RabobankNotesCuratorModule
     }
 
     @Provides
-    static ProjectListSettings projectListSettings()
+    static ProjectSettings projectSettings()
     {
-        return new ProjectListSettings(
-                PROJECT_FOLDER,
-                ACTIVITIES_SECTION,
-                "Prio",
-                "Last&nbsp;modified",
-                "Project",
-                "Lead",
-                "Status"
-        );
+        return new ProjectSettings(PROJECT_FOLDER);
     }
 
     @Provides

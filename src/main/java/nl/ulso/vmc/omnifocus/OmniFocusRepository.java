@@ -1,12 +1,12 @@
 package nl.ulso.vmc.omnifocus;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.json.JsonValue;
 import nl.ulso.markdown_curator.vault.VaultRefresher;
 import nl.ulso.vmc.jxa.JxaRunner;
 import org.slf4j.*;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;

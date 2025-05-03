@@ -4,7 +4,7 @@ import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Dictionary;
 import nl.ulso.markdown_curator.vault.*;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;

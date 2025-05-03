@@ -3,7 +3,7 @@ package nl.ulso.vmc.rabobank;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Map;
 
 public class ChapterQuery

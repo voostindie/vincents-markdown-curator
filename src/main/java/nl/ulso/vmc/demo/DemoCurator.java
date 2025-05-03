@@ -3,7 +3,7 @@ package nl.ulso.vmc.demo;
 import dagger.Component;
 import nl.ulso.markdown_curator.Curator;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 @Component(modules = DemoCuratorModule.class)

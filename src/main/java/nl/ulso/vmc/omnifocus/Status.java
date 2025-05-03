@@ -19,4 +19,18 @@ public enum Status
             default -> throw new IllegalStateException("Unexpected value: " + status);
         };
     }
+
+
+    @Override
+    public String toString()
+    {
+        return switch (this)
+        {
+            case ACTIVE -> "▶️";
+            case ON_HOLD -> "⛔️";
+            case DONE -> "✅";
+            case DROPPED -> "🗑️";
+            case UNKNOWN -> "⚪️";
+        };
+    }
 }

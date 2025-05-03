@@ -1,11 +1,9 @@
-package nl.ulso.vmc.project;
+package nl.ulso.vmc.rabobank;
 
 import nl.ulso.vmc.graph.DefaultNodeClassifier;
 import nl.ulso.vmc.graph.Node;
 
 import java.util.*;
-
-import static nl.ulso.vmc.project.Status.fromString;
 
 public class ProjectNodeClassifier
         extends DefaultNodeClassifier
@@ -24,11 +22,23 @@ public class ProjectNodeClassifier
     @Override
     public Optional<String> classify(Node node)
     {
-        return super.classify(node).or(() ->
-                Optional.of(fromString(
-                        node.document()
-                                .frontMatter()
-                                .string("status", "unknown"))
-                        .toMermaid()));
+        return super.classify(node).or(() -> {
+            var status = node.document().frontMatter().string("status", "unknown");
+            return Optional.of(toMermaid(status));
+
+        });
     }
+
+    private String toMermaid(String status)
+    {
+        return switch (status) {
+            case "🟢" -> "green";
+            case "🟠" -> "amber";
+            case "🔴" -> "red";
+            case "⭕️" -> "on-hold";
+            default -> "unknown";
+        };
+    }
+
+
 }
