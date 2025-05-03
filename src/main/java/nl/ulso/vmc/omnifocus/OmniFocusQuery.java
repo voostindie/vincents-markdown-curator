@@ -114,7 +114,7 @@ public class OmniFocusQuery
                 missingProjects.forEach(
                         document -> builder.append("- ")
                                 .append(document.link())
-                                .append(" [")
+                                .append(" - [")
                                 .append(bundle.getString("create.text"))
                                 .append("](omnifocus:///paste")
                                 .append("?index=1")
