@@ -3,6 +3,7 @@ package nl.ulso.vmc.projectjournal;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.project.AttributeValueResolver;
 import nl.ulso.markdown_curator.project.ProjectModule;
@@ -19,6 +20,20 @@ public abstract class ProjectJournalModule
 {
     @Binds
     @IntoSet
-    abstract AttributeValueResolver<?> binLastModifiedAttributeValueResolver(
+    abstract DataModel bindProjectJournal(ProjectJournal projectJournal);
+
+    @Binds
+    @IntoSet
+    abstract AttributeValueResolver<?> bindLastModifiedAttributeValueResolver(
             JournalLastModifiedAttributeValueResolver resolver);
+
+    @Binds
+    @IntoSet
+    abstract AttributeValueResolver<?> bindStatusAttributeValueResolver(
+            JournalStatusAttributeValueResolver resolver);
+
+    @Binds
+    @IntoSet
+    abstract AttributeValueResolver<?> bindLeadAttributeValueResolver(
+            JournalLeadAttributeValueResolver resolver);
 }
