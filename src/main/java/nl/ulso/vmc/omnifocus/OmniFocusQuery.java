@@ -1,39 +1,40 @@
 package nl.ulso.vmc.omnifocus;
 
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.Folder;
-import nl.ulso.markdown_curator.vault.Vault;
-
 import jakarta.inject.Inject;
+import nl.ulso.markdown_curator.project.Project;
+import nl.ulso.markdown_curator.project.ProjectRepository;
+import nl.ulso.markdown_curator.query.*;
+import nl.ulso.markdown_curator.vault.Document;
+
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
 import static java.net.URLEncoder.encode;
 import static java.util.Collections.emptyMap;
-import static java.util.ResourceBundle.getBundle;
 
+/**
+ * Reports on inconsistencies between OmniFocus and the projects in this vault.
+ */
 public class OmniFocusQuery
         implements Query
 {
     private final OmniFocusRepository omniFocusRepository;
-    private final Vault vault;
     private final OmniFocusSettings settings;
-    private final Locale locale;
-    private final QueryResultFactory resultFactory;
+    private final ProjectRepository projectRepository;
+    private final OmniFocusMessages messages;
 
     @Inject
     public OmniFocusQuery(
-            Vault vault, OmniFocusRepository omniFocusRepository, OmniFocusSettings settings,
-            Locale locale,
-            QueryResultFactory resultFactory)
+            OmniFocusRepository omniFocusRepository, OmniFocusSettings settings,
+            ProjectRepository projectRepository, OmniFocusMessages messages)
     {
-        this.resultFactory = resultFactory;
-        this.omniFocusRepository = omniFocusRepository;
-        this.vault = vault;
+        this.projectRepository = projectRepository;
         this.settings = settings;
-        this.locale = locale;
+        this.omniFocusRepository = omniFocusRepository;
+        this.messages = messages;
     }
 
     @Override
@@ -57,86 +58,113 @@ public class OmniFocusQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        return vault.folder(settings.projectFolder())
-                .map(folder ->
-                        (QueryResult) new OmniFocusQueryResult(folder))
-                .orElseGet(() -> resultFactory.error(
-                        "Project folder not found: '" + settings.projectFolder() + "'"));
+        var projectsWithoutDocuments = collectOmniFocusProjectsWithoutDocuments();
+        var documentsWithoutProjects = collectDocumentsWithoutOmniFocusProjects();
+        return new OmniFocusQueryResult(projectsWithoutDocuments, documentsWithoutProjects);
+    }
+
+    private List<OmniFocusProject> collectOmniFocusProjectsWithoutDocuments()
+    {
+        var documentNames = projectRepository.projectsByName().keySet();
+        var omniFocusProjects = omniFocusRepository.projects();
+        return omniFocusProjects.stream()
+                .filter(project -> settings.includePredicate().test(project.name()))
+                .filter(project -> !documentNames.contains(project.name()))
+                .toList();
+    }
+
+    private List<Document> collectDocumentsWithoutOmniFocusProjects()
+    {
+        var omniFocusProjects = omniFocusRepository.projects().stream()
+                .map(OmniFocusProject::name)
+                .collect(Collectors.toSet());
+        return projectRepository.projects().stream()
+                .filter(project -> !omniFocusProjects.contains(project.name()))
+                .map(Project::document)
+                .toList();
     }
 
     private class OmniFocusQueryResult
             implements QueryResult
     {
-        private final Folder projectFolder;
-        private final ResourceBundle bundle;
+        private final List<OmniFocusProject> projectsWithoutDocuments;
+        private final List<Document> documentsWithoutProjects;
 
-        OmniFocusQueryResult(Folder projectFolder)
+        OmniFocusQueryResult(
+                List<OmniFocusProject> projectsWithoutDocuments,
+                List<Document> documentsWithoutProjects)
         {
-            this.projectFolder = projectFolder;
-            this.bundle = getBundle("OmniFocus", locale);
+            this.projectsWithoutDocuments = projectsWithoutDocuments;
+            this.documentsWithoutProjects = documentsWithoutProjects;
         }
 
         @Override
         public String toMarkdown()
         {
             var builder = new StringBuilder();
-            var omniFocusProjects = omniFocusRepository.projects();
-            var missingPages = omniFocusProjects.stream()
-                    .map(OmniFocusProject::name)
-                    .filter(settings.includePredicate())
-                    .filter(name -> projectFolder.document(name).isEmpty())
-                    .toList();
-            if (!missingPages.isEmpty())
+            if (projectsWithoutDocuments.isEmpty() && documentsWithoutProjects.isEmpty())
             {
-                builder.append("### ")
-                        .append(bundle.getString("missingPages.title"))
-                        .append(lineSeparator())
-                        .append(lineSeparator());
-                missingPages.forEach(
-                        name -> builder.append("- [[")
-                                .append(name)
-                                .append("]]")
-                                .append(lineSeparator()));
-                builder.append(lineSeparator());
+                reportAllIsGood(builder);
             }
-            var projectSet = omniFocusProjects.stream()
-                    .map(OmniFocusProject::name)
-                    .collect(Collectors.toSet());
-            var missingProjects = projectFolder.documents().stream()
-                    .filter(document -> !projectSet.contains(document.name()))
-                    .toList();
-            if (!missingProjects.isEmpty())
+            else
             {
-                builder.append("### ")
-                        .append(bundle.getString("missingProjects.title"))
-                        .append(lineSeparator())
-                        .append(lineSeparator());
-                missingProjects.forEach(
-                        document -> builder.append("- ")
-                                .append(document.link())
-                                .append(" - [")
-                                .append(bundle.getString("create.text"))
-                                .append("](omnifocus:///paste")
-                                .append("?index=1")
-                                .append("&target=/folder/")
-                                .append(urlEncode(settings.omniFocusFolder()))
-                                .append("&content=")
-                                .append(urlEncode(document.name() + ":"))
-                                .append(")")
-                                .append(lineSeparator()));
-                builder.append(lineSeparator());
-            }
-            if (missingPages.isEmpty() && missingProjects.isEmpty())
-            {
-                builder.append("**")
-                        .append(bundle.getString("allGood.title"))
-                        .append("**")
-                        .append(lineSeparator())
-                        .append(lineSeparator())
-                        .append(bundle.getString("allGood.text"))
-                        .append(lineSeparator());
+                if (!projectsWithoutDocuments.isEmpty())
+                {
+                    reportProjectsWithoutDocuments(builder);
+                }
+                if (!documentsWithoutProjects.isEmpty())
+                {
+                    reportDocumentsWithoutProjects(builder);
+                }
             }
             return builder.toString().trim();
+        }
+
+        private void reportAllIsGood(StringBuilder builder)
+        {
+            builder.append("**")
+                    .append(messages.allGoodTitle())
+                    .append("**")
+                    .append(lineSeparator())
+                    .append(lineSeparator())
+                    .append(messages.allGoodText())
+                    .append(lineSeparator());
+        }
+
+        private void reportProjectsWithoutDocuments(StringBuilder builder)
+        {
+            builder.append("### ")
+                    .append(messages.projectsWithoutDocumentsTitle())
+                    .append(lineSeparator())
+                    .append(lineSeparator());
+            projectsWithoutDocuments.forEach(
+                    project -> builder.append("- [[")
+                            .append(project.name())
+                            .append("]]")
+                            .append(lineSeparator()));
+            builder.append(lineSeparator());
+        }
+
+        private void reportDocumentsWithoutProjects(StringBuilder builder)
+        {
+            builder.append("### ")
+                    .append(messages.documentsWithoutProjectsTitle())
+                    .append(lineSeparator())
+                    .append(lineSeparator());
+            documentsWithoutProjects.forEach(
+                    document -> builder.append("- ")
+                            .append(document.link())
+                            .append(" - [")
+                            .append(messages.createProjectInOmniFocus())
+                            .append("](omnifocus:///paste")
+                            .append("?index=1")
+                            .append("&target=/folder/")
+                            .append(urlEncode(settings.omniFocusFolder()))
+                            .append("&content=")
+                            .append(urlEncode(document.name() + ":"))
+                            .append(")")
+                            .append(lineSeparator()));
+            builder.append(lineSeparator());
         }
 
         private String urlEncode(String value)

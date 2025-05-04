@@ -1,6 +1,6 @@
 package nl.ulso.vmc.omnifocus;
 
-public enum Status
+enum Status
 {
     ACTIVE,
     ON_HOLD,
@@ -17,20 +17,6 @@ public enum Status
             case "done status" -> DONE;
             case "dropped status" -> DROPPED;
             default -> throw new IllegalStateException("Unexpected value: " + status);
-        };
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return switch (this)
-        {
-            case ACTIVE -> "▶️";
-            case ON_HOLD -> "⛔️";
-            case DONE -> "✅";
-            case DROPPED -> "🗑️";
-            case UNKNOWN -> "⚪️";
         };
     }
 }

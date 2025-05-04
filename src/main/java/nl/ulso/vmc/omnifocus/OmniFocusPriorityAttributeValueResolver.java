@@ -14,7 +14,7 @@ import static nl.ulso.markdown_curator.project.Attribute.PRIORITY;
  * This resolver takes precedence over the standard front matter attribute resolver.
  */
 @Singleton
-public class OmniFocusPriorityAttributeValueResolver
+final class OmniFocusPriorityAttributeValueResolver
         implements AttributeValueResolver<Integer>
 {
     private final OmniFocusRepository omniFocusRepository;

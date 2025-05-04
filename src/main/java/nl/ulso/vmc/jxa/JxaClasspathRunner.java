@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.joining;
  * complexity in code. In the end the same script will be executed over and over again.
  */
 @Singleton
-public class JxaClasspathRunner
+final class JxaClasspathRunner
         implements JxaRunner
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JxaClasspathRunner.class);

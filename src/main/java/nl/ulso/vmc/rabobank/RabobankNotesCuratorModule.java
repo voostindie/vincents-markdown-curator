@@ -7,14 +7,14 @@ import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
-import nl.ulso.markdown_curator.links.LinksModule;
-import nl.ulso.markdown_curator.project.*;
+import nl.ulso.markdown_curator.project.ProjectModule;
+import nl.ulso.markdown_curator.project.ProjectSettings;
 import nl.ulso.markdown_curator.query.Query;
 import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
-import nl.ulso.vmc.jxa.JxaClasspathRunner;
-import nl.ulso.vmc.jxa.JxaRunner;
-import nl.ulso.vmc.omnifocus.*;
+import nl.ulso.vmc.omnifocus.OmniFocusModule;
+import nl.ulso.vmc.omnifocus.OmniFocusSettings;
+import nl.ulso.vmc.projectjournal.ProjectJournalModule;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -28,10 +28,12 @@ import static nl.ulso.vmc.graph.Shape.STADIUM;
 
 @Module(includes = {
         CuratorModule.class,
-        JournalModule.class,
         ProjectModule.class,
-        MermaidGraphModule.class,
-        LinksModule.class})
+        JournalModule.class,
+        ProjectJournalModule.class,
+        OmniFocusModule.class,
+        MermaidGraphModule.class
+})
 abstract class RabobankNotesCuratorModule
 {
     private static final String PROJECT_FOLDER = "Projects";
@@ -42,19 +44,16 @@ abstract class RabobankNotesCuratorModule
     private static final String ACTIVITIES_SECTION = "Activities";
 
     @Provides
-    static Path vaultPath()
+    static Path provideVaultPath()
     {
         return pathInUserHome("Notes", "Rabobank");
     }
 
     @Provides
-    static Locale locale()
+    static Locale provideLocale()
     {
         return ENGLISH;
     }
-
-    @Binds
-    abstract JxaRunner bindJxaRunner(JxaClasspathRunner jxaClasspathRunner);
 
     @Binds
     @IntoSet
@@ -62,26 +61,7 @@ abstract class RabobankNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract AttributeValueResolver<?> priorityAttributeValueResolver(
-            OmniFocusPriorityAttributeValueResolver resolver);
-
-    @Binds
-    @IntoSet
-    abstract AttributeValueResolver<?> statusAttributeValueResolver(
-            OmniFocusStatusAttributeValueResolver resolver);
-
-    @Binds
-    @IntoSet
-    abstract AttributeValueResolver<?> lastModifiedAttributeValueResolver(
-            JournalLastModifiedAttributeValueResolver resolver);
-
-    @Binds
-    @IntoSet
     abstract Query bindArticlesQuery(ArticlesQuery articlesQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindOmniFocusQuery(OmniFocusQuery omniFocusQuery);
 
     @Binds
     @IntoSet
@@ -113,7 +93,7 @@ abstract class RabobankNotesCuratorModule
     abstract Query bindHooksQuery(HooksQuery systemsQuery);
 
     @Provides
-    static JournalSettings journalSettings()
+    static JournalSettings provideJournalSettings()
     {
         return new JournalSettings(
                 JOURNAL_FOLDER,
@@ -124,13 +104,13 @@ abstract class RabobankNotesCuratorModule
     }
 
     @Provides
-    static ProjectSettings projectSettings()
+    static ProjectSettings provideProjectSettings()
     {
         return new ProjectSettings(PROJECT_FOLDER);
     }
 
     @Provides
-    static OmniFocusSettings omniFocusSettings()
+    static OmniFocusSettings provideOmniFocusSettings()
     {
         return new OmniFocusSettings(PROJECT_FOLDER, "💼 Rabobank",
                 (name) -> !name.startsWith("⚡️") &&
@@ -143,7 +123,7 @@ abstract class RabobankNotesCuratorModule
     }
 
     @Provides
-    static MermaidGraphSettings mermaidGraphSettings()
+    static MermaidGraphSettings provideMermaidGraphSettings()
     {
         return new MermaidGraphSettings(Set.of(
                 new Type("project", PROJECT_FOLDER, RECTANGLE, new ProjectNodeClassifier()),

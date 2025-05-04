@@ -15,15 +15,18 @@ import static nl.ulso.markdown_curator.project.Attribute.STATUS;
  * only if the project is on hold in OmniFocus.
  */
 @Singleton
-public class OmniFocusStatusAttributeValueResolver
+final class OmniFocusStatusAttributeValueResolver
         implements AttributeValueResolver<String>
 {
     private final OmniFocusRepository omniFocusRepository;
+    private final OmniFocusMessages messages;
 
     @Inject
-    OmniFocusStatusAttributeValueResolver(OmniFocusRepository omnifocusRepository)
+    OmniFocusStatusAttributeValueResolver(
+            OmniFocusRepository omnifocusRepository, OmniFocusMessages messages)
     {
         this.omniFocusRepository = omnifocusRepository;
+        this.messages = messages;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class OmniFocusStatusAttributeValueResolver
         var status = omniFocusRepository.statusOf(project.document().name());
         if (status == Status.ON_HOLD)
         {
-            return Optional.of(status.toString());
+            return Optional.of(messages.projectOnHold());
         }
         return Optional.empty();
     }
