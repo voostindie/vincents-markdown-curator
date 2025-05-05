@@ -122,11 +122,15 @@ abstract class RabobankNotesCuratorModule
                                   "💬 Reminders").contains(name));
     }
 
+    @Binds
+    abstract MermaidNodeClassifier bindProjectNodeClassifier(
+            ProjectNodeClassifier projectNodeClassifier);
+
     @Provides
-    static MermaidGraphSettings provideMermaidGraphSettings()
+    static MermaidGraphSettings provideMermaidGraphSettings(MermaidNodeClassifier projectNodeClassifier)
     {
         return new MermaidGraphSettings(Set.of(
-                new Type("project", PROJECT_FOLDER, RECTANGLE, new ProjectNodeClassifier()),
+                new Type("project", PROJECT_FOLDER, RECTANGLE, projectNodeClassifier),
                 new Type("contact", CONTACS_FOLDER, STADIUM),
                 new Type("team", TEAMS_FOLDER, HEXAGON)
         ));
