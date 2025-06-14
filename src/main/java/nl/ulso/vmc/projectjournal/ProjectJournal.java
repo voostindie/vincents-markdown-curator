@@ -271,7 +271,7 @@ class ProjectJournal
         }
         if (links.size() > 1)
         {
-            LOGGER.warn("Found more than internal link in line '{}'. Results can be unpredictable!",
+            LOGGER.warn("Found more than one internal link in line '{}'. Results can be unpredictable!",
                     line);
         }
         return links.iterator().next();
