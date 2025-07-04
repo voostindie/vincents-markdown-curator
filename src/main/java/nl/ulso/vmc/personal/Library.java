@@ -1,11 +1,11 @@
 package nl.ulso.vmc.personal;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -117,7 +117,9 @@ public class Library
     {
         var stillReading = now();
         return readingSessions.stream()
-                .filter(session -> session.fromDate().getYear() == year)
+                .filter(session -> session.fromDate().getYear() <= year
+                                   && session.toDate().map(date -> date.getYear() >= year)
+                                           .orElse(true))
                 .sorted(comparing(ReadingSession::fromDate)
                         .thenComparing(s -> s.toDate().orElse(stillReading))
                         .thenComparing(s -> s.book().name()))
