@@ -20,4 +20,4 @@ echo "Compiling and packaging vmc..."
 mvn -q -B package
 
 echo "Executing vmc..."
-java -Xmx128m -jar target/vmc-1.0.0-SNAPSHOT.jar
+java -Xmx128m -jar target/vmc-1.0.0-SNAPSHOT.jar "$@"
