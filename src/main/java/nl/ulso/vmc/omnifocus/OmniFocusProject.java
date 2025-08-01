@@ -1,5 +1,9 @@
 package nl.ulso.vmc.omnifocus;
 
-record OmniFocusProject(String id, String name, Status status, int priority)
+public record OmniFocusProject(String id, String name, Status status, int priority)
 {
+    public String link()
+    {
+        return "omnifocus:///task/" + id;
+    }
 }

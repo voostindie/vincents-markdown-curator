@@ -92,6 +92,10 @@ abstract class RabobankNotesCuratorModule
     @IntoSet
     abstract Query bindHooksQuery(HooksQuery systemsQuery);
 
+    @Binds
+    @IntoSet
+    abstract Query bindProjectDetailsQuery(ProjectDetailsQuery projectDetailsQuery);
+
     @Provides
     static JournalSettings provideJournalSettings()
     {

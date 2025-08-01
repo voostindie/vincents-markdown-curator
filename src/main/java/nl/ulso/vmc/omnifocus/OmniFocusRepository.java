@@ -116,6 +116,10 @@ public class OmniFocusRepository
         return cache.get().values();
     }
 
+    public OmniFocusProject project(String name) {
+        return cache.get().getOrDefault(name, NULL_PROJECT);
+    }
+
     public int priorityOf(String name)
     {
         return cache.get().getOrDefault(name, NULL_PROJECT).priority();
