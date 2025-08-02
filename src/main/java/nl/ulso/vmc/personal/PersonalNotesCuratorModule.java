@@ -39,7 +39,7 @@ abstract class PersonalNotesCuratorModule
     @Provides
     static Path provideVaultPath()
     {
-        return pathInUserHome("Notes", "Personal");
+        return pathInUserHome("Personal", "Notes");
     }
 
     @Provides

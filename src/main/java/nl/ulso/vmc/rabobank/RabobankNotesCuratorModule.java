@@ -46,7 +46,7 @@ abstract class RabobankNotesCuratorModule
     @Provides
     static Path provideVaultPath()
     {
-        return pathInUserHome("Notes", "Rabobank");
+        return pathInUserHome("Rabobank", "Notes");
     }
 
     @Provides

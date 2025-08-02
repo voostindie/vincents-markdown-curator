@@ -38,7 +38,7 @@ abstract class TweevvNotesCuratorModule
     @Provides
     static Path provideVaultPath()
     {
-        return pathInUserHome("Notes", "TweeVV");
+        return pathInUserHome("TweeVV", "Notes");
     }
 
     @Provides
