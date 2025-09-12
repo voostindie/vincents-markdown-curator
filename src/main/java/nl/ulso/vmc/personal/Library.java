@@ -3,6 +3,7 @@ package nl.ulso.vmc.personal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.FrontMatterUpdateCollector;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
@@ -31,11 +32,13 @@ public class Library
     private final Map<String, Author> authors;
     private final Map<String, Book> books;
     private final Set<ReadingSession> readingSessions;
+    private final FrontMatterUpdateCollector frontMatterUpdateCollector;
 
     @Inject
-    public Library(Vault vault)
+    public Library(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
     {
         this.vault = vault;
+        this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.authors = new HashMap<>();
         this.books = new HashMap<>();
         this.readingSessions = new HashSet<>();
@@ -45,6 +48,9 @@ public class Library
     public void fullRefresh()
     {
         authors.clear();
+        books.forEach(
+                (name, book) -> frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                        dictionary -> dictionary.removeProperty("rating")));
         books.clear();
         readingSessions.clear();
         vault.folder(AUTHORS_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
@@ -162,30 +168,55 @@ public class Library
             book = new Book(document);
             books.put(book.name(), book);
             super.visit(document);
+            frontMatterUpdateCollector.updateFrontMatterFor(document, dictionary ->
+            {
+                book.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
+                book.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));
+                var authors = book.authors().stream().map(Author::link).toList();
+                dictionary.setProperty("authors", authors);
+            });
         }
 
         @Override
         public void visit(TextBlock textBlock)
         {
-            textBlock.parentSection().ifPresent(section ->
+            textBlock.parentSection().ifPresentOrElse(section ->
+                    {
+                        if (section.level() != 2)
+                        {
+                            return;
+                        }
+                        if (section.title().startsWith("Author"))
+                        {
+                            extractAuthors(textBlock);
+                        }
+                        if (section.title().startsWith("Rating"))
+                        {
+                            extractRating(textBlock);
+                        }
+                        if (section.title().startsWith("Reading"))
+                        {
+                            extractSessions(textBlock);
+                        }
+                    },
+                    () -> extractCover(textBlock));
+        }
+
+        private void extractCover(TextBlock block)
+        {
+            var markdown = block.markdown();
+            var start = markdown.indexOf("![[");
+            if (start == -1)
             {
-                if (section.level() != 2)
-                {
-                    return;
-                }
-                if (section.title().startsWith("Author"))
-                {
-                    extractAuthors(textBlock);
-                }
-                if (section.title().startsWith("Rating"))
-                {
-                    extractRating(textBlock);
-                }
-                if (section.title().startsWith("Reading"))
-                {
-                    extractSessions(textBlock);
-                }
-            });
+                return;
+            }
+            var end = markdown.indexOf("]]", start);
+            if (end == -1)
+            {
+                return;
+            }
+            var cover = markdown.substring(start + 1, end + 2);
+            book.setCover(cover);
         }
 
         private void extractAuthors(TextBlock block)

@@ -32,10 +32,10 @@ class ProjectJournal
         extends DataModelTemplate
 {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(JournalStatusAttributeValueResolver.class);
+            LoggerFactory.getLogger(JournalStatusProjectPropertyResolver.class);
 
-    private static final String PROJECT_STATUSES_PROPERTY = "project-statuses";
-    private static final String PROJECT_LEADS_PROPERTY = "project-leads";
+    private static final String PROJECT_STATUSES_MARKER_PROPERTY = "project-statuses";
+    private static final String PROJECT_LEADS_MARKER_PROPERTY = "project-leads";
 
     private final Journal journal;
     private final ProjectRepository projectRepository;
@@ -175,8 +175,8 @@ class ProjectJournal
     {
         for (var document : journal.markers().values())
         {
-            processFrontMatter(document, PROJECT_STATUSES_PROPERTY, statusMarkers, linkToStatusMap);
-            processFrontMatter(document, PROJECT_LEADS_PROPERTY, leadMarkers, linkToLeadMap);
+            processFrontMatter(document, PROJECT_STATUSES_MARKER_PROPERTY, statusMarkers, linkToStatusMap);
+            processFrontMatter(document, PROJECT_LEADS_MARKER_PROPERTY, leadMarkers, linkToLeadMap);
         }
     }
 

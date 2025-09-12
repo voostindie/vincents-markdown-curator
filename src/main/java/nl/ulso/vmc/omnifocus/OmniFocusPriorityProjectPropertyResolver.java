@@ -4,35 +4,40 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.project.*;
 
+import java.util.Map;
 import java.util.Optional;
 
-import static nl.ulso.markdown_curator.project.Attribute.PRIORITY;
+import static nl.ulso.markdown_curator.project.ProjectProperty.PRIORITY;
 
 /**
  * Resolves the priority of a project from OmniFocus.
  * <p/>
- * This resolver takes precedence over the standard front matter attribute resolver.
+ * This resolver takes the highest precedence.
  */
 @Singleton
-final class OmniFocusPriorityAttributeValueResolver
-        implements AttributeValueResolver<Integer>
+final class OmniFocusPriorityProjectPropertyResolver
+        implements ProjectPropertyResolver
 {
     private final OmniFocusRepository omniFocusRepository;
+    private final ProjectProperty priorityProperty;
 
     @Inject
-    OmniFocusPriorityAttributeValueResolver(OmniFocusRepository omnifocusRepository)
+    OmniFocusPriorityProjectPropertyResolver(
+            OmniFocusRepository omnifocusRepository,
+            Map<String, ProjectProperty> projectProperties)
     {
         this.omniFocusRepository = omnifocusRepository;
+        this.priorityProperty = projectProperties.get(PRIORITY);
     }
 
     @Override
-    public Attribute<Integer> attribute()
+    public ProjectProperty projectProperty()
     {
-        return PRIORITY;
+        return priorityProperty;
     }
 
     @Override
-    public Optional<Integer> resolveValue(Project project)
+    public Optional<?> resolveValue(Project project)
     {
         var priority = omniFocusRepository.priorityOf(project.document().name());
         if (priority >= 0)

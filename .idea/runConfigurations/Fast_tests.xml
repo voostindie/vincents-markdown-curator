@@ -6,7 +6,7 @@
         <option name="ENABLED" value="true" />
       </pattern>
       <pattern>
-        <option name="PATTERN" value="nl.ulso.markdown_curator.*" />
+        <option name="PATTERN" value="nl.ulso.markdown_curator.vault.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

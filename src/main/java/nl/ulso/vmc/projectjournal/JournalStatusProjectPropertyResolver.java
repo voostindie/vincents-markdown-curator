@@ -4,9 +4,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.project.*;
 
+import java.util.Map;
 import java.util.Optional;
 
-import static nl.ulso.markdown_curator.project.Attribute.STATUS;
+import static nl.ulso.markdown_curator.project.ProjectProperty.STATUS;
 
 /**
  * Resolves the status of projects from the journal by looking at the most recent use of a status
@@ -15,25 +16,28 @@ import static nl.ulso.markdown_curator.project.Attribute.STATUS;
  * This resolver takes precedence over the standard front matter attribute resolver.
  */
 @Singleton
-public class JournalStatusAttributeValueResolver
-        implements AttributeValueResolver<String>
+public class JournalStatusProjectPropertyResolver
+        implements ProjectPropertyResolver
 {
     private final ProjectJournal projectJournal;
+    private final ProjectProperty statusProperty;
 
     @Inject
-    JournalStatusAttributeValueResolver(ProjectJournal projectJournal)
+    JournalStatusProjectPropertyResolver(
+            ProjectJournal projectJournal, Map<String, ProjectProperty> projectProperties)
     {
         this.projectJournal = projectJournal;
+        this.statusProperty = projectProperties.get(STATUS);
     }
 
     @Override
-    public Attribute<String> attribute()
+    public ProjectProperty projectProperty()
     {
-        return STATUS;
+        return statusProperty;
     }
 
     @Override
-    public Optional<String> resolveValue(Project project)
+    public Optional<?> resolveValue(Project project)
     {
         return projectJournal.statusOf(project);
     }

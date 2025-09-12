@@ -14,7 +14,6 @@ import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.projectjournal.ProjectJournalModule;
-import nl.ulso.vmc.rabobank.ProjectDetailsQuery;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -63,10 +62,6 @@ abstract class TweevvNotesCuratorModule
     @Binds
     @IntoSet
     abstract Query bindHooksQuery(HooksQuery hooksQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindProjectDetailsQuery(ProjectDetailsQuery projectDetailsQuery);
 
     @Provides
     static JournalSettings provideJournalSettings()

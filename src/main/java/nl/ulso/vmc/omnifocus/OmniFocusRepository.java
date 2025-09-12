@@ -113,20 +113,33 @@ public class OmniFocusRepository
 
     public Collection<OmniFocusProject> projects()
     {
-        return cache.get().values();
+        return spinWaitForCache().values();
     }
 
-    public OmniFocusProject project(String name) {
-        return cache.get().getOrDefault(name, NULL_PROJECT);
+    public OmniFocusProject project(String name)
+    {
+        return spinWaitForCache().getOrDefault(name, NULL_PROJECT);
     }
 
     public int priorityOf(String name)
     {
-        return cache.get().getOrDefault(name, NULL_PROJECT).priority();
+        return spinWaitForCache().getOrDefault(name, NULL_PROJECT).priority();
     }
 
     public Status statusOf(String name)
     {
-        return cache.get().getOrDefault(name, NULL_PROJECT).status();
+        return spinWaitForCache().getOrDefault(name, NULL_PROJECT).status();
+    }
+
+    // If, at system start, the request for data comes before the data from OmniFocus
+    // is available the system spins and waits.
+    private Map<String, OmniFocusProject> spinWaitForCache()
+    {
+        Map<String, OmniFocusProject> result = null;
+        while (result == null)
+        {
+            result = cache.get();
+        }
+        return result;
     }
 }

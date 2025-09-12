@@ -5,10 +5,10 @@ import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.project.*;
 
-import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
-import static nl.ulso.markdown_curator.project.Attribute.LAST_MODIFIED;
+import static nl.ulso.markdown_curator.project.ProjectProperty.LAST_MODIFIED;
 
 /**
  * Resolves the last modification date of projects from the journal by looking at the most recent
@@ -17,25 +17,29 @@ import static nl.ulso.markdown_curator.project.Attribute.LAST_MODIFIED;
  * This resolver takes precedence over the standard front matter attribute resolver.
  */
 @Singleton
-public class JournalLastModifiedAttributeValueResolver
-        implements AttributeValueResolver<LocalDate>
+public class JournalLastModifiedProjectPropertyResolver
+        implements ProjectPropertyResolver
 {
     private final Journal journal;
+    private final ProjectProperty lastModifiedProperty;
 
     @Inject
-    JournalLastModifiedAttributeValueResolver(Journal journal)
+    JournalLastModifiedProjectPropertyResolver(
+            Journal journal,
+            Map<String, ProjectProperty> projectProperties)
     {
         this.journal = journal;
+        this.lastModifiedProperty = projectProperties.get(LAST_MODIFIED);
     }
 
     @Override
-    public Attribute<LocalDate> attribute()
+    public ProjectProperty projectProperty()
     {
-        return LAST_MODIFIED;
+        return lastModifiedProperty;
     }
 
     @Override
-    public Optional<LocalDate> resolveValue(Project project)
+    public Optional<?> resolveValue(Project project)
     {
         return journal.mostRecentMentionOf(project.document().name());
     }

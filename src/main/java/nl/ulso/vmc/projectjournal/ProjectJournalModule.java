@@ -5,7 +5,7 @@ import dagger.Module;
 import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
-import nl.ulso.markdown_curator.project.AttributeValueResolver;
+import nl.ulso.markdown_curator.project.ProjectPropertyResolver;
 import nl.ulso.markdown_curator.project.ProjectModule;
 
 /**
@@ -24,16 +24,16 @@ public abstract class ProjectJournalModule
 
     @Binds
     @IntoSet
-    abstract AttributeValueResolver<?> bindLastModifiedAttributeValueResolver(
-            JournalLastModifiedAttributeValueResolver resolver);
+    abstract ProjectPropertyResolver bindLastModifiedAttributeValueResolver(
+            JournalLastModifiedProjectPropertyResolver resolver);
 
     @Binds
     @IntoSet
-    abstract AttributeValueResolver<?> bindStatusAttributeValueResolver(
-            JournalStatusAttributeValueResolver resolver);
+    abstract ProjectPropertyResolver bindStatusAttributeValueResolver(
+            JournalStatusProjectPropertyResolver resolver);
 
     @Binds
     @IntoSet
-    abstract AttributeValueResolver<?> bindLeadAttributeValueResolver(
-            JournalLeadAttributeValueResolver resolver);
+    abstract ProjectPropertyResolver bindLeadAttributeValueResolver(
+            JournalLeadProjectPropertyResolver resolver);
 }

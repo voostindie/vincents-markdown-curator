@@ -1,6 +1,6 @@
 package nl.ulso.vmc.omnifocus;
 
-enum Status
+public enum Status
 {
     ACTIVE,
     ON_HOLD,

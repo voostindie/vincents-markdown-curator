@@ -8,4 +8,9 @@ public record Author(Document document)
     {
         return document.name();
     }
+
+    public String link()
+    {
+        return document.link();
+    }
 }
