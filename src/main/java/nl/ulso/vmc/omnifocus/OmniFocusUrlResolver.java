@@ -1,9 +1,13 @@
 package nl.ulso.vmc.omnifocus;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.project.*;
 
+import java.util.Map;
 import java.util.Optional;
 
+@Singleton
 public class OmniFocusUrlResolver
         implements ProjectPropertyResolver
 {
@@ -11,9 +15,11 @@ public class OmniFocusUrlResolver
     private final ProjectProperty property;
     private final OmniFocusRepository repository;
 
-    public OmniFocusUrlResolver(ProjectProperty property, OmniFocusRepository repository)
+    @Inject
+    public OmniFocusUrlResolver(
+            Map<String, ProjectProperty> properties, OmniFocusRepository repository)
     {
-        this.property = property;
+        this.property = properties.get(OMNIFOCUS_URL);
         this.repository = repository;
     }
 

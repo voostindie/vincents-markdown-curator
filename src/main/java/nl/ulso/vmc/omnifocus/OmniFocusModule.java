@@ -8,8 +8,6 @@ import nl.ulso.markdown_curator.project.*;
 import nl.ulso.markdown_curator.query.Query;
 import nl.ulso.vmc.jxa.JxaModule;
 
-import java.util.Map;
-
 import static nl.ulso.markdown_curator.project.ProjectProperty.newProperty;
 import static nl.ulso.vmc.omnifocus.OmniFocusUrlResolver.OMNIFOCUS_URL;
 
@@ -24,13 +22,19 @@ public abstract class OmniFocusModule
 
     @Binds
     @IntoSet
-    abstract ProjectPropertyResolver bindPriorityProjectPropertyValueResolver(
-            OmniFocusPriorityProjectPropertyResolver resolver);
+    abstract ProjectPropertyResolver bindOmniFocusPriorityResolver(
+            OmniFocusPriorityResolver resolver);
 
     @Binds
     @IntoSet
-    abstract ProjectPropertyResolver bindStatusProjectPropertyValueResolver(
-            OmniFocusStatusProjectPropertyResolver resolver);
+    abstract ProjectPropertyResolver bindOmniFocusStatusResolver(
+            OmniFocusStatusResolver resolver);
+
+    @Binds
+    @IntoSet
+    abstract ProjectPropertyResolver bindOmniFocusUrlResolver(
+            OmniFocusUrlResolver resolver);
+
 
     @Provides
     @Singleton
@@ -39,14 +43,6 @@ public abstract class OmniFocusModule
     static ProjectProperty provideOmniFocusUrlProperty()
     {
         return newProperty(String.class, "omnifocus");
-    }
-
-    @Provides
-    @IntoSet
-    static ProjectPropertyResolver provideOmniFocusUrlResolver(
-            Map<String, ProjectProperty> properties, OmniFocusRepository repository)
-    {
-        return new OmniFocusUrlResolver(properties.get(OMNIFOCUS_URL), repository);
     }
 
     @Binds

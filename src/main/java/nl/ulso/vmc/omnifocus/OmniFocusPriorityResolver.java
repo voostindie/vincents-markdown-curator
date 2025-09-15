@@ -15,14 +15,14 @@ import static nl.ulso.markdown_curator.project.ProjectProperty.PRIORITY;
  * This resolver takes the highest precedence.
  */
 @Singleton
-final class OmniFocusPriorityProjectPropertyResolver
+final class OmniFocusPriorityResolver
         implements ProjectPropertyResolver
 {
     private final OmniFocusRepository omniFocusRepository;
     private final ProjectProperty priorityProperty;
 
     @Inject
-    OmniFocusPriorityProjectPropertyResolver(
+    OmniFocusPriorityResolver(
             OmniFocusRepository omnifocusRepository,
             Map<String, ProjectProperty> projectProperties)
     {

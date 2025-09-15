@@ -15,7 +15,7 @@ import static nl.ulso.markdown_curator.project.ProjectProperty.STATUS;
  * only if the project is on hold in OmniFocus.
  */
 @Singleton
-final class OmniFocusStatusProjectPropertyResolver
+final class OmniFocusStatusResolver
         implements ProjectPropertyResolver
 {
     private final OmniFocusRepository omniFocusRepository;
@@ -23,7 +23,7 @@ final class OmniFocusStatusProjectPropertyResolver
     private final OmniFocusMessages messages;
 
     @Inject
-    OmniFocusStatusProjectPropertyResolver(
+    OmniFocusStatusResolver(
             OmniFocusRepository omnifocusRepository,
             Map<String, ProjectProperty> projectProperties,
             OmniFocusMessages messages)
