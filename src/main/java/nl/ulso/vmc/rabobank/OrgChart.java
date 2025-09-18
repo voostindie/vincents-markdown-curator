@@ -7,6 +7,7 @@ import nl.ulso.markdown_curator.vault.event.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
@@ -28,7 +29,7 @@ public class OrgChart
     public OrgChart(Vault vault)
     {
         this.vault = vault;
-        this.orgUnits = new HashSet<>();
+        this.orgUnits = ConcurrentHashMap.newKeySet();
     }
 
     @Override
@@ -195,7 +196,7 @@ public class OrgChart
                         .map(Optional::get)
                         .findFirst().orElse(null);
             }
-            roles = new HashMap<>();
+            roles = new ConcurrentHashMap<>();
             super.visit(document);
             orgUnits.add(new OrgUnit(document, Optional.ofNullable(parent), roles));
         }
@@ -223,7 +224,7 @@ public class OrgChart
                         {
                             var role = matcher.group(1);
                             var contact = contactsFolder.document(link.targetDocument());
-                            contact.ifPresent(c -> roles.computeIfAbsent(role, r -> new HashMap<>())
+                            contact.ifPresent(c -> roles.computeIfAbsent(role, r -> new ConcurrentHashMap<>())
                                     .put(c.name(), c));
                         }
                     });
