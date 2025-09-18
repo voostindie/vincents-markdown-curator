@@ -17,9 +17,9 @@ import java.util.function.Function;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.stream.Collectors.toMap;
+import static nl.ulso.vmc.omnifocus.OmniFocusProject.NULL_PROJECT;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
-import static nl.ulso.vmc.omnifocus.Status.UNKNOWN;
 
 /**
  * Fetches projects from a folder in <a href="https://www.omnigroup.com/omnifocus">OmniFocus</a>.
@@ -40,8 +40,6 @@ public class OmniFocusRepository
                     "com.omnigroup.OmniFocus4", "Data", "Library", "Application Support",
                     "OmniFocus", "OmniFocus.ofocus").toFile();
     private static final String JXA_SCRIPT = "omnifocus-projects";
-    private static final OmniFocusProject NULL_PROJECT =
-            new OmniFocusProject("null", "null", UNKNOWN, -1);
     private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
     private static final int REFRESH_DELAY_MINUTES = 5;
 

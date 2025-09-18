@@ -39,10 +39,10 @@ public class OmniFocusUrlResolver
     public Optional<?> resolveValue(Project project)
     {
         var omniFocusProject = repository.project(project.name());
-        if (omniFocusProject == null)
+        if (omniFocusProject.exists())
         {
-            return Optional.empty();
+            return Optional.of(omniFocusProject.link());
         }
-        return Optional.of(omniFocusProject.link());
+        return Optional.empty();
     }
 }

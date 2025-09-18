@@ -72,7 +72,7 @@ public class MermaidGraph
 
     public int order()
     {
-        return journal.order() + 1;
+        return ORDER_LAST;
     }
 
     @Override
