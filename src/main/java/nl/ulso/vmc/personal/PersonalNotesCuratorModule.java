@@ -64,6 +64,10 @@ abstract class PersonalNotesCuratorModule
     @IntoSet
     abstract Query bindHooksQuery(HooksQuery HooksQuery);
 
+    @Binds
+    @IntoSet
+    abstract DataModel bindCollection(Collection collection);
+
     @Provides
     static JournalSettings provideJournalSettings()
     {

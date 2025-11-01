@@ -49,8 +49,12 @@ public class Library
     {
         authors.clear();
         books.forEach(
-                (name, book) -> frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
-                        dictionary -> dictionary.removeProperty("rating")));
+                (name, book) -> {
+                    frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                            dictionary -> dictionary.removeProperty("rating"));
+                    frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                            dictionary -> dictionary.removeProperty("cover"));
+                });
         books.clear();
         readingSessions.clear();
         vault.folder(AUTHORS_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
