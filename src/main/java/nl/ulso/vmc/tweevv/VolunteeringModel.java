@@ -9,6 +9,8 @@ import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Character.isDigit;
+import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
@@ -171,16 +173,39 @@ public class VolunteeringModel
             return CACHE.computeIfAbsent(startYear, year -> new Season(startYear));
         }
 
+        /*
+         * Seasons should be strings of the format "<year>-<year + 1>", but we're lenient about it.
+         * We just look for the first 4 digits in the string and interpret them as the first year,
+         * and then go from there.
+         * <p/>
+         * As of December 2025, seasons have their own documents, to support the trainer
+         * compensations. This method is compatible with that. The two systems co-exist, for
+         * backwards compatibility reasons. How the two will be merged into one, if ever, is not yet
+         * clear.
+         */
         public static Optional<Season> fromString(String seasonString)
         {
             Objects.requireNonNull(seasonString);
-            if (seasonString.length() != 9)
+            var length = seasonString.length();
+            // Find the first digit
+            var start = 0;
+            while (start < length)
+            {
+                if (isDigit(seasonString.charAt(start)))
+                {
+                    break;
+                }
+                start++;
+            }
+            // Ensure there are at least 4 characters from the first digit
+            if (start + 4 > length)
             {
                 return Optional.empty();
             }
+            // Parse 4 specific characters as an integer and make a Season out of it.
             try
             {
-                int startYear = Integer.parseInt(seasonString.substring(0, 4));
+                int startYear = parseInt(seasonString.substring(start, start + 4));
                 return Optional.of(forStartYear(startYear));
             }
             catch (NumberFormatException e)

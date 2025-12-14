@@ -14,6 +14,7 @@ import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.projectjournal.ProjectJournalModule;
+import nl.ulso.vmc.tweevv.trainers.*;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -53,6 +54,10 @@ abstract class TweevvNotesCuratorModule
 
     @Binds
     @IntoSet
+    abstract DataModel bindTrainerModel(TrainerModel trainerModel);
+
+    @Binds
+    @IntoSet
     abstract Query bindVolunteersQuery(VolunteersQuery volunteersQuery);
 
     @Binds
@@ -62,6 +67,23 @@ abstract class TweevvNotesCuratorModule
     @Binds
     @IntoSet
     abstract Query bindHooksQuery(HooksQuery hooksQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindQualificationQuery(QualificationQuery qualificationQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindTariffGroupQuery(TariffGroupQuery tariffGroupQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindTrainingGroupQuery(TrainingGroupQuery trainingGroupQuery);
+
+    @Binds
+    @IntoSet
+    abstract Query bindTrainerQuery(TrainerQuery trainerQuery);
+
 
     @Provides
     static JournalSettings provideJournalSettings()
