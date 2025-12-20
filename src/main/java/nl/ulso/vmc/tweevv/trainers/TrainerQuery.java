@@ -16,6 +16,11 @@ import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 public class TrainerQuery
         extends SeasonQueryTemplate
 {
+    private static final String TRAINER_COLUMN = "Trainer";
+    private static final String TEAM_COLUMN = "Team(s)";
+    private static final String QUALIFICATION_COLUMN = "Kwalificatie(s)";
+    private static final String COMPENSATION_COLUMN = "Vergoeding";
+
     @Inject
     TrainerQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)
     {
@@ -38,13 +43,13 @@ public class TrainerQuery
     protected QueryResult runFor(Season season, QueryDefinition definition)
     {
         return queryResultFactory().table(
-                List.of("Trainer", "Team(s)", "Kwalificatie(s)", "Vergoeding"),
+                List.of(TRAINER_COLUMN, TEAM_COLUMN, QUALIFICATION_COLUMN, COMPENSATION_COLUMN),
                 List.of(LEFT, LEFT, LEFT, RIGHT),
                 season.trainers()
                         .sorted(comparing(Trainer::name))
                         .map(trainer -> Map.of(
-                                "Trainer", trainer.link(),
-                                "Team(s)", trainer.assignments()
+                                TRAINER_COLUMN, trainer.link(),
+                                TEAM_COLUMN, trainer.assignments()
                                         .sorted(comparing(
                                                 assignment -> assignment.trainingGroup().name()))
                                         .map(assignment -> {
@@ -57,10 +62,10 @@ public class TrainerQuery
                                                    toPercentageString(factor) + ")";
                                         })
                                         .collect(joining(", ")),
-                                "Kwalificatie(s)", trainer.qualifications()
+                                QUALIFICATION_COLUMN, trainer.qualifications()
                                         .map(Qualification::link)
                                         .collect(joining(", ")),
-                                "Vergoeding", toEuroString(trainer.computeCompensation())))
+                                COMPENSATION_COLUMN, toEuroString(trainer.computeCompensation())))
                         .toList()
         );
 

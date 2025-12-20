@@ -16,6 +16,10 @@ import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 public class QualificationQuery
         extends SeasonQueryTemplate
 {
+    private static final String QUALIFICATION_COLUMN = "Kwalificatie";
+    private static final String ALLOWANCE_COLUMN = "Toeslag";
+    private static final String TRAINER_COLUMN = "Trainer(s)";
+
     @Inject
     QualificationQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)
     {
@@ -38,15 +42,15 @@ public class QualificationQuery
     public QueryResult runFor(Season season, QueryDefinition definition)
     {
         return queryResultFactory().table(
-                List.of("Kwalificatie", "Toeslag", "Trainer(s)"),
+                List.of(QUALIFICATION_COLUMN, ALLOWANCE_COLUMN, TRAINER_COLUMN),
                 List.of(LEFT, RIGHT, LEFT),
                 season.qualifications()
                         .sorted(comparing(Qualification::allowance)
                                 .thenComparing(Qualification::name))
                         .map(qualification -> Map.of(
-                                "Kwalificatie", qualification.link(),
-                                "Toeslag", toEuroString(qualification.allowance()),
-                                "Trainer(s)", season.trainersWith(qualification)
+                                QUALIFICATION_COLUMN, qualification.link(),
+                                ALLOWANCE_COLUMN, toEuroString(qualification.allowance()),
+                                TRAINER_COLUMN, season.trainersWith(qualification)
                                         .sorted(comparing(Trainer::name))
                                         .map(Trainer::link)
                                         .collect(joining(", "))
