@@ -1,20 +1,44 @@
 package nl.ulso.vmc.tweevv.trainers;
 
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.markdown_curator.vault.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+
+/**
+ * Represents a trainer in a specific season.
+ * <p/>
+ * A better name would maybe be "TrainerInSeason", but, ah well...
+ * <p/>
+ * There's some waste in processing here: if the same trainer is present in multiple seasons,
+ * then the processing of the personal data takes place multiple times, and the same data is
+ * stored several times. I don't see this as a big problem, however, given the limited amount of
+ * data to process, all in memory. Maybe in the next decade or so... It's also not hard to solve,
+ * but the code would be more complex. So, for later. Maybe.
+ */
 public final class Trainer
 {
     private final Document document;
     private final Set<Qualification> qualifications;
     private final Set<Assignment> assignments;
+    private final String email;
+    private final String iban;
+    private final LocalDate certificateOfConductDate;
+    private final boolean under16;
 
     public Trainer(Document document)
     {
         this.document = document;
+        var finder = new PersonalDataFinder();
+        document.accept(finder);
+        this.email = finder.email;
+        this.iban = finder.iban;
+        this.certificateOfConductDate = finder.certificateOfConductDate;
+        this.under16 = finder.under16;
         this.qualifications = new HashSet<>();
         this.assignments = new HashSet<>();
     }
@@ -32,6 +56,26 @@ public final class Trainer
     public Document document()
     {
         return document;
+    }
+
+    public Optional<String> iban()
+    {
+        return Optional.ofNullable(iban);
+    }
+
+    public Optional<String> email()
+    {
+        return Optional.ofNullable(email);
+    }
+
+    public Optional<LocalDate> certificateOfConductDate()
+    {
+        return Optional.ofNullable(certificateOfConductDate);
+    }
+
+    public boolean isUnder16()
+    {
+        return under16;
     }
 
     @Override
@@ -110,5 +154,77 @@ public final class Trainer
                 .findFirst()
                 .map(Assignment::factor)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    private static class PersonalDataFinder
+            extends BreadthFirstVaultVisitor
+    {
+        private static final String PERSONAL_DATA_SECTION = "Persoonsgegevens";
+        private static final String IBAN_DOCUMENT = "IBAN";
+        private static final String EMAIL_DOCUMENT = "E-mail";
+        private static final String COC_DOCUMENT = "VOG";
+        private static final String UNDER_16_DOCUMENT = "Onder 16";
+
+        private String email;
+        private String iban;
+        private LocalDate certificateOfConductDate;
+        private boolean under16 = false;
+
+        @Override
+        public void visit(Section section)
+        {
+            if (section.level() == 1)
+            {
+                super.visit(section);
+            }
+            if (section.level() == 2 &&
+                section.sortableTitle().contentEquals(PERSONAL_DATA_SECTION))
+            {
+                super.visit(section);
+            }
+        }
+
+        @Override
+        public void visit(TextBlock textBlock)
+        {
+            textBlock.markdown().trim().lines().forEach(line ->
+            {
+                if (!line.startsWith("- "))
+                {
+                    return;
+                }
+                var colon = line.indexOf(": ");
+                if (colon == -1)
+                {
+                    // This is just a marker, might be "under 16"
+                    var links = parseInternalLinkTargetNames(line.substring(2));
+                    if (links.size() == 1 && links.contains(UNDER_16_DOCUMENT))
+                    {
+                        under16 = true;
+                        return;
+                    }
+                }
+                // This line holds an attribute value
+                var links = parseInternalLinkTargetNames(line.substring(2, colon));
+                if (links.size() != 1)
+                {
+                    return;
+                }
+                var attribute = links.iterator().next();
+                var value = line.substring(colon + 1).trim();
+                if (attribute.contentEquals(IBAN_DOCUMENT))
+                {
+                    this.iban = value;
+                }
+                else if (attribute.contentEquals(EMAIL_DOCUMENT))
+                {
+                    this.email = value;
+                }
+                else if (attribute.contentEquals(COC_DOCUMENT))
+                {
+                    this.certificateOfConductDate = LocalDates.parseDateOrNull(value);
+                }
+            });
+        }
     }
 }

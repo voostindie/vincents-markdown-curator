@@ -3,6 +3,7 @@ package nl.ulso.vmc.tweevv.trainers;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.FrontMatterUpdateCollector;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
@@ -19,6 +20,7 @@ public final class TrainerModel
         extends DataModelTemplate
 
 {
+    public static final String UNDER_16_PROPERTY = "under16";
     // For now all names of folders and sections are hardcoded.
     private static final String MODEL_FOLDER = "Trainersvergoedingen";
     private static final String SEASON_FOLDER = "Seizoenen";
@@ -46,14 +48,19 @@ public final class TrainerModel
     // "[[Trainer]] [[Training group]]", "[[Trainer]] [[Training group]] (50%)"
     private static final Pattern TRAINER_PATTERN = Pattern.compile(
             "^(\\[\\[.*]]) (\\[\\[.*]])( \\((\\d+)%\\))?$");
+    public static final String IBAN_PROPERTY = "iban";
+    public static final String EMAIL_PROPERTY = "email";
+    public static final String COC_PROPERTY = "vog";
 
     private final Vault vault;
+    private final FrontMatterUpdateCollector frontMatterUpdateCollector;
     private final Map<String, Season> seasons;
 
     @Inject
-    public TrainerModel(Vault vault)
+    public TrainerModel(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
     {
         this.vault = vault;
+        this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.seasons = new HashMap<>();
     }
 
@@ -68,6 +75,7 @@ public final class TrainerModel
             modelFolder.folder(TRAINING_GROUP_FOLDER).ifPresent(this::importTrainingGroups);
         });
         vault.folder(TRAINER_FOLDER).ifPresent(this::importTrainers);
+        vault.folder(TRAINER_FOLDER).ifPresent(this::updateTrainerFrontMatter);
     }
 
     @Override
@@ -104,6 +112,7 @@ public final class TrainerModel
      * Do a full refresh if the event is in the main #{MODEL_FOLDER} or in the #{TRAINER_FOLDER},
      * otherwise ignore the event.
      */
+
     void processEventInFolder(Folder folder)
     {
         if (isFolderInPath(folder, MODEL_FOLDER) || isFolderInPath(folder, TRAINER_FOLDER))
@@ -220,6 +229,41 @@ public final class TrainerModel
         );
     }
 
+    private void updateTrainerFrontMatter(Folder folder)
+    {
+        for (Document document : folder.documents())
+        {
+            frontMatterUpdateCollector.updateFrontMatterFor(document, dictionary -> {
+                dictionary.removeProperty(IBAN_PROPERTY);
+                dictionary.removeProperty(EMAIL_PROPERTY);
+                dictionary.removeProperty(COC_PROPERTY);
+                dictionary.removeProperty(UNDER_16_PROPERTY);
+                var matched = new HashSet<String>();
+                for (Season season : seasons.values())
+                {
+                    season.trainerFor(document).ifPresent(trainer ->
+                    {
+                        if (matched.contains(trainer.name()))
+                        {
+                            return;
+                        }
+                        trainer.iban().ifPresent(iban ->
+                                dictionary.setProperty(IBAN_PROPERTY, iban));
+                        trainer.email().ifPresent(email ->
+                                dictionary.setProperty(EMAIL_PROPERTY, email));
+                        trainer.certificateOfConductDate().ifPresent(date ->
+                                dictionary.setProperty(COC_PROPERTY, date.toString()));
+                        if (trainer.isUnder16())
+                        {
+                            dictionary.setProperty(UNDER_16_PROPERTY, true);
+                        }
+                        matched.add(trainer.name());
+                    });
+                }
+            });
+        }
+    }
+
     private Optional<BigDecimal> parseAmount(String text)
     {
         var matcher = AMOUNT_PATTERN.matcher(text);
@@ -284,6 +328,10 @@ public final class TrainerModel
         @Override
         public void visit(Section section)
         {
+            if (section.level() == 1)
+            {
+                super.visit(section);
+            }
             if (section.level() == 2 && section.sortableTitle().contentEquals(sectionName))
             {
                 super.visit(section);

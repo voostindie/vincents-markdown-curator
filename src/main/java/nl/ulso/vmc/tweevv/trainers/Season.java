@@ -3,10 +3,15 @@ package nl.ulso.vmc.tweevv.trainers;
 import nl.ulso.markdown_curator.vault.Document;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * Represents a single season and holds all trainer (related) data for a season.
+ * <p/>
+ * Almost all logic applies to a single season. By having all data on trainers and reference data
+ * already grouped per season, this logic is straightforward to implement.
+ */
 public final class Season
 {
     private final Document document;
@@ -101,6 +106,11 @@ public final class Season
                 key -> new Trainer(trainerDocument));
     }
 
+    public Optional<Trainer> trainerFor(Document document)
+    {
+        return Optional.ofNullable(trainers.get(document.name()));
+    }
+
     public Stream<Trainer> trainersWith(Qualification qualification)
     {
         return trainers.values().stream()
@@ -113,7 +123,7 @@ public final class Season
                 .filter(trainer -> trainer.isAssignedTo(trainingGroup));
     }
 
-    Stream<TrainingGroup> trainingGroupsFor(TariffGroup tariffGroup)
+    public Stream<TrainingGroup> trainingGroupsFor(TariffGroup tariffGroup)
     {
         return trainingGroups.values().stream()
                 .filter(trainingGroup -> trainingGroup.tariffGroup().equals(tariffGroup));
