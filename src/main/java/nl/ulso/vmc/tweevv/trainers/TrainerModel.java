@@ -30,43 +30,44 @@ public final class TrainerModel
     extends DataModelTemplate
 {
     // For now all names of folders and sections are hardcoded.
-    private static final String MODEL_FOLDER = "Trainersvergoedingen";
-    private static final String SEASON_FOLDER = "Seizoenen";
-    private static final String TARIFF_GROUP_FOLDER = "Tariefgroepen";
+    private static final String MODEL_FOLDER          = "Trainersvergoedingen";
+    private static final String SEASON_FOLDER         = "Seizoenen";
+    private static final String TARIFF_GROUP_FOLDER   = "Tariefgroepen";
     private static final String TRAINING_GROUP_FOLDER = "Trainingsgroepen";
-    private static final String QUALIFICATION_FOLDER = "Kwalificatietoeslagen";
-    private static final String TRAINER_FOLDER = "Contacten";
-    private static final String TARIFF_SECTION = "Tarieven";
-    private static final String PRACTICE_SECTION = "Trainingen";
-    private static final String ACTIVITY_SECTION = "Taken";
+    private static final String QUALIFICATION_FOLDER  = "Kwalificatietoeslagen";
+    private static final String TRAINER_FOLDER        = "Contacten";
+    private static final String TARIFF_SECTION        = "Tarieven";
+    private static final String PRACTICE_SECTION      = "Trainingen";
+    private static final String ACTIVITY_SECTION      = "Taken";
     private static final String QUALIFICATION_SECTION = "Kwalificaties";
-    private static final String TRAINER_DOCUMENT = "Trainer";
+    private static final String TRAINER_DOCUMENT      = "Trainer";
 
     // Season: "2025-2026"
-    private static final Predicate<String> SEASON_PREDICATE =
+    private static final Predicate<String> SEASON_PREDICATE        =
         Pattern.compile("^\\d{4}-\\d{4}$").asMatchPredicate();
     // Amount: "€250,-", "€125,50", "€ 240,-"
-    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^€ ?(\\d+),(\\d{2}+|-)$");
+    private static final Pattern           AMOUNT_PATTERN          =
+        Pattern.compile("^€ ?(\\d+),(\\d{2}+|-)$");
     // Practice, option 1: "[[Tariff group]] 1 keer per week", "[[Tariff group]] 2 keer per week"
-    private static final Pattern SINGLE_PRACTICE_PATTERN = Pattern.compile(
+    private static final Pattern           SINGLE_PRACTICE_PATTERN = Pattern.compile(
         "^\\[\\[.*]] (\\d+) keer per week$");
     // // Practice, option 2: "[[Tariff group]] 3 keer per 2 weken"
-    private static final Pattern MULTI_PRACTICE_PATTERN = Pattern.compile(
+    private static final Pattern           MULTI_PRACTICE_PATTERN  = Pattern.compile(
         "^\\[\\[.*]] (\\d+) keer per (\\d+) weken$");
     // Trainer: "[[Trainer]] [[Training group]]", "[[Trainer]] [[Training group]] (50%)"
-    private static final Pattern TRAINER_PATTERN = Pattern.compile(
+    private static final Pattern           TRAINER_PATTERN         = Pattern.compile(
         "^(\\[\\[.*]]) (\\[\\[.*]])( \\((\\d+)%\\))?$");
 
-    private static final String IBAN_PROPERTY = "iban";
-    private static final String EMAIL_PROPERTY = "email";
+    private static final String IBAN_PROPERTY      = "iban";
+    private static final String EMAIL_PROPERTY     = "email";
     private static final String RESIDENCY_PROPERTY = "woonplaats";
-    private static final String COC_PROPERTY = "vog";
-    private static final String UNDER_16_PROPERTY = "onder16";
-    private static final String COACH_PROPERTY = "coach";
+    private static final String COC_PROPERTY       = "vog";
+    private static final String UNDER_16_PROPERTY  = "onder16";
+    private static final String COACH_PROPERTY     = "coach";
 
-    private final Vault vault;
+    private final Vault                      vault;
     private final FrontMatterUpdateCollector frontMatterUpdateCollector;
-    private final Map<String, Season> seasons;
+    private final Map<String, Season>        seasons;
 
     @Inject
     public TrainerModel(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
@@ -160,7 +161,8 @@ public final class TrainerModel
             document.accept(new SectionVisitor(TARIFF_SECTION, (season, text) ->
                 parseAmount(text).ifPresent(amount ->
                     season.addTariffGroup(document, amount)
-                )))
+                )
+            ))
         );
     }
 
@@ -170,7 +172,8 @@ public final class TrainerModel
             document.accept(new SectionVisitor(TARIFF_SECTION, (season, text) ->
                 parseAmount(text).ifPresent(amount ->
                     season.addQualification(document, amount)
-                )))
+                )
+            ))
         );
     }
 
@@ -199,7 +202,8 @@ public final class TrainerModel
                 }
                 var practicesPerWeek = BigDecimal.valueOf(((double) count) / weeks);
                 season.addTrainingGroup(document, tariffGroup, practicesPerWeek);
-            }))
+            }
+            ))
         );
     }
 
@@ -208,40 +212,43 @@ public final class TrainerModel
         folder.documents().forEach(document ->
             {
                 document.accept(new SectionVisitor(ACTIVITY_SECTION,
-                    (season, text) ->
-                    {
-                        var matcher = TRAINER_PATTERN.matcher(text);
-                        if (!matcher.find())
+                        (season, text) ->
                         {
-                            return;
+                            var matcher = TRAINER_PATTERN.matcher(text);
+                            if (!matcher.find())
+                            {
+                                return;
+                            }
+                            var trainer =
+                                parseInternalLinkTargetNames(matcher.group(1)).iterator().next();
+                            if (!trainer.contentEquals(TRAINER_DOCUMENT))
+                            {
+                                return;
+                            }
+                            var trainingGroupName =
+                                parseInternalLinkTargetNames(matcher.group(2)).iterator().next();
+                            var percentageString = matcher.group(4);
+                            var percentage = percentageString != null
+                                             ? parseInt(percentageString)
+                                             : 100;
+                            season.addAssignment(document, trainingGroupName,
+                                BigDecimal.valueOf(((double) percentage) / 100)
+                            );
                         }
-                        var trainer =
-                            parseInternalLinkTargetNames(matcher.group(1)).iterator().next();
-                        if (!trainer.contentEquals(TRAINER_DOCUMENT))
-                        {
-                            return;
-                        }
-                        var trainingGroupName =
-                            parseInternalLinkTargetNames(matcher.group(2)).iterator().next();
-                        var percentageString = matcher.group(4);
-                        var percentage = percentageString != null
-                                         ? parseInt(percentageString)
-                                         : 100;
-                        season.addAssignment(document, trainingGroupName,
-                            BigDecimal.valueOf(((double) percentage) / 100));
-                    })
+                    )
                 );
                 document.accept(new SectionVisitor(QUALIFICATION_SECTION,
-                    (season, text) ->
-                    {
-                        var links = parseInternalLinkTargetNames(text);
-                        if (links.isEmpty())
+                        (season, text) ->
                         {
-                            return;
+                            var links = parseInternalLinkTargetNames(text);
+                            if (links.isEmpty())
+                            {
+                                return;
+                            }
+                            var qualification = links.iterator().next();
+                            season.addQualification(document, qualification);
                         }
-                        var qualification = links.iterator().next();
-                        season.addQualification(document, qualification);
-                    })
+                    )
                 );
             }
         );
@@ -262,10 +269,12 @@ public final class TrainerModel
                                 dictionary.setProperty(IBAN_PROPERTY, trainer.iban().orElse(""));
                                 dictionary.setProperty(EMAIL_PROPERTY, trainer.email().orElse(""));
                                 dictionary.setProperty(RESIDENCY_PROPERTY,
-                                    trainer.residency().orElse(""));
+                                    trainer.residency().orElse("")
+                                );
                                 dictionary.setProperty(COC_PROPERTY,
                                     trainer.certificateOfConductDate().map(
-                                        LocalDate::toString).orElse(""));
+                                        LocalDate::toString).orElse("")
+                                );
                                 dictionary.setProperty(UNDER_16_PROPERTY, trainer.isUnder16());
                                 dictionary.setProperty(COACH_PROPERTY, trainer.isCoach());
                             },
@@ -309,15 +318,15 @@ public final class TrainerModel
 
     /**
      * Visitor that pulls data from a specific section in a document, where the section is expected
-     * to contain an unordered list of items, with each item a reference to a season, a colon, and
-     * a description, e.g. "{@code - [[<season>]]: <description>}"; the processing of each
-     * description is left to a {@link SeasonLineProcessor}. Lines that do not match the pattern are
-     * simply skipped.
+     * to contain an unordered list of items, with each item a reference to a season, a colon, and a
+     * description, e.g. "{@code - [[<season>]]: <description>}"; the processing of each description
+     * is left to a {@link SeasonLineProcessor}. Lines that do not match the pattern are simply
+     * skipped.
      */
     private final class SectionVisitor
         extends BreadthFirstVaultVisitor
     {
-        private final String sectionName;
+        private final String              sectionName;
         private final SeasonLineProcessor processor;
 
         public SectionVisitor(String sectionName, SeasonLineProcessor processor)

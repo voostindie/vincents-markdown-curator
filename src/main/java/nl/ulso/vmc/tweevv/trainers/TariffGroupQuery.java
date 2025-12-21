@@ -20,8 +20,8 @@ import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 public class TariffGroupQuery
     extends SeasonQueryTemplate
 {
-    private static final String TARIFF_GROUP_COLUMN = "Tariefgroep";
-    private static final String TARIFF_COLUMN = "Tarief";
+    private static final String TARIFF_GROUP_COLUMN   = "Tariefgroep";
+    private static final String TARIFF_COLUMN         = "Tarief";
     private static final String TRAINING_GROUP_COLUMN = "Trainingsgroepen";
 
     @Inject
@@ -49,16 +49,17 @@ public class TariffGroupQuery
             List.of(TARIFF_GROUP_COLUMN, TARIFF_COLUMN, TRAINING_GROUP_COLUMN),
             List.of(LEFT, RIGHT, LEFT),
             season.tariffGroups()
-                .sorted(comparing(TariffGroup::tariff)
-                    .thenComparing(TariffGroup::name))
-                .map(tariffGroup -> Map.of(
-                    TARIFF_GROUP_COLUMN, tariffGroup.link(),
-                    TARIFF_COLUMN, toEuroString(tariffGroup.tariff()),
-                    TRAINING_GROUP_COLUMN, season.trainingGroupsFor(tariffGroup)
-                        .sorted(comparing(TrainingGroup::name))
-                        .map(TrainingGroup::link)
-                        .collect(joining(", "))
-                ))
+                .sorted(comparing(TariffGroup::tariff).thenComparing(TariffGroup::name))
+                .map(tariffGroup ->
+                    Map.of(
+                        TARIFF_GROUP_COLUMN, tariffGroup.link(),
+                        TARIFF_COLUMN, toEuroString(tariffGroup.tariff()),
+                        TRAINING_GROUP_COLUMN, season.trainingGroupsFor(tariffGroup)
+                            .sorted(comparing(TrainingGroup::name))
+                            .map(TrainingGroup::link)
+                            .collect(joining(", "))
+                    )
+                )
                 .toList()
         );
     }

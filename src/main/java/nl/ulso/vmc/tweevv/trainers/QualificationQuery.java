@@ -20,8 +20,8 @@ public class QualificationQuery
     extends SeasonQueryTemplate
 {
     private static final String QUALIFICATION_COLUMN = "Kwalificatie";
-    private static final String ALLOWANCE_COLUMN = "Toeslag";
-    private static final String TRAINER_COLUMN = "Trainer(s)";
+    private static final String ALLOWANCE_COLUMN     = "Toeslag";
+    private static final String TRAINER_COLUMN       = "Trainer(s)";
 
     @Inject
     QualificationQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)
@@ -48,16 +48,17 @@ public class QualificationQuery
             List.of(QUALIFICATION_COLUMN, ALLOWANCE_COLUMN, TRAINER_COLUMN),
             List.of(LEFT, RIGHT, LEFT),
             season.qualifications()
-                .sorted(comparing(Qualification::allowance)
-                    .thenComparing(Qualification::name))
-                .map(qualification -> Map.of(
-                    QUALIFICATION_COLUMN, qualification.link(),
-                    ALLOWANCE_COLUMN, toEuroString(qualification.allowance()),
-                    TRAINER_COLUMN, season.trainersWith(qualification)
-                        .sorted(comparing(Trainer::name))
-                        .map(Trainer::link)
-                        .collect(joining(", "))
-                ))
+                .sorted(comparing(Qualification::allowance).thenComparing(Qualification::name))
+                .map(qualification ->
+                    Map.of(
+                        QUALIFICATION_COLUMN, qualification.link(),
+                        ALLOWANCE_COLUMN, toEuroString(qualification.allowance()),
+                        TRAINER_COLUMN, season.trainersWith(qualification)
+                            .sorted(comparing(Trainer::name))
+                            .map(Trainer::link)
+                            .collect(joining(", "))
+                    )
+                )
                 .toList()
         );
     }

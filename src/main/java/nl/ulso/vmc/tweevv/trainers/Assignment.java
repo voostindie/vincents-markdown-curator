@@ -6,7 +6,8 @@ import java.math.BigDecimal;
  * Assignment of a {@link Trainer} to a {@link TrainingGroup} in a specific season.
  *
  * @param trainingGroup Group the trainer is assigned to.
- * @param factor        Assignment factor; 1.0 if the trainer is doing it alone.
+ * @param factor        Assignment factor; should be 1.0 if the trainer is the sole assignee,
+ *                      otherwise it should be a fraction, e.g. 0.5 for 50%.
  */
 public record Assignment(TrainingGroup trainingGroup, BigDecimal factor)
 {

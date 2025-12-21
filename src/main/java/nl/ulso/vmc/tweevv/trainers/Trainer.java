@@ -14,25 +14,25 @@ import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLin
  * <p/>
  * A better name would maybe be "TrainerInSeason", but, ah well...
  * <p/>
- * There's some waste in processing here: if the same trainer is present in multiple seasons,
- * then the processing of the personal data takes place multiple times, and the same data is
- * stored several times. I don't see this as a big problem, however, given the limited amount of
- * data to process, all in memory. Maybe in the next decade or so... It's also not hard to solve,
- * but the code would be more complex. So, for later. Maybe.
+ * There's some waste in processing here: if the same trainer is present in multiple seasons, then
+ * the processing of the personal data takes place multiple times, and the same data is stored
+ * several times. I don't see this as a big problem, however, given the limited amount of data to
+ * process, all in memory. Maybe in the next decade or so... It's also not hard to solve, but the
+ * code would be more complex. So, for later. Maybe.
  * <p/>
  * A trainer is considered to be read-only, except for the {@link TrainerModel} that manages it.
  */
 public final class Trainer
 {
-    private final Document document;
+    private final Document           document;
     private final Set<Qualification> qualifications;
-    private final Set<Assignment> assignments;
-    private final String email;
-    private final String iban;
-    private final LocalDate certificateOfConductDate;
-    private final String residency;
-    private final boolean under16;
-    private final boolean coach;
+    private final Set<Assignment>    assignments;
+    private final String             email;
+    private final String             iban;
+    private final LocalDate          certificateOfConductDate;
+    private final String             residency;
+    private final boolean            under16;
+    private final boolean            coach;
 
     public Trainer(Document document)
     {
@@ -83,7 +83,6 @@ public final class Trainer
     {
         return Optional.ofNullable(residency);
     }
-
 
     public boolean isUnder16()
     {
@@ -187,19 +186,19 @@ public final class Trainer
         extends BreadthFirstVaultVisitor
     {
         private static final String PERSONAL_DATA_SECTION = "Persoonsgegevens";
-        private static final String IBAN_DOCUMENT = "IBAN";
-        private static final String EMAIL_DOCUMENT = "E-mail";
-        private static final String COC_DOCUMENT = "VOG";
-        private static final String RESIDENCY_DOCUMENT = "Woonplaats";
-        private static final String UNDER_16_DOCUMENT = "Onder 16";
-        private static final String COACH_DOCUMENT = "Coach";
+        private static final String IBAN_DOCUMENT         = "IBAN";
+        private static final String EMAIL_DOCUMENT        = "E-mail";
+        private static final String COC_DOCUMENT          = "VOG";
+        private static final String RESIDENCY_DOCUMENT    = "Woonplaats";
+        private static final String UNDER_16_DOCUMENT     = "Onder 16";
+        private static final String COACH_DOCUMENT        = "Coach";
 
-        private String email;
-        private String iban;
+        private String    email;
+        private String    iban;
         private LocalDate certificateOfConductDate;
-        private String residency;
-        private boolean under16 = false;
-        private boolean coach = false;
+        private String    residency;
+        private boolean   under16 = false;
+        private boolean   coach   = false;
 
         @Override
         public void visit(Section section)

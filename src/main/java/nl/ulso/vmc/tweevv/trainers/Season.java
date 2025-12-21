@@ -17,11 +17,11 @@ import java.util.stream.Stream;
  */
 public final class Season
 {
-    private final Document document;
-    private final Map<String, TariffGroup> tariffGroups;
+    private final Document                   document;
+    private final Map<String, TariffGroup>   tariffGroups;
     private final Map<String, Qualification> qualifications;
     private final Map<String, TrainingGroup> trainingGroups;
-    private final Map<String, Trainer> trainers;
+    private final Map<String, Trainer>       trainers;
 
     Season(Document document)
     {
@@ -106,7 +106,8 @@ public final class Season
     private Trainer resolveTrainer(Document trainerDocument)
     {
         return trainers.computeIfAbsent(trainerDocument.name(),
-            key -> new Trainer(trainerDocument));
+            key -> new Trainer(trainerDocument)
+        );
     }
 
     public Optional<Trainer> trainerFor(Document document)

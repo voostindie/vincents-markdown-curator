@@ -5,9 +5,8 @@ import nl.ulso.markdown_curator.vault.Document;
 import java.math.BigDecimal;
 
 /**
- * Represents a qualification a trainer can have in a specific season; The allowance is rewarded
- * to the
- * trainer no matter what.
+ * Represents a qualification a trainer can have in a specific season; the allowance is rewarded to
+ * the trainer no matter what.
  *
  * @param document  Document representing the qualification.
  * @param allowance The allowance, in Euros, for the qualification in the active season.

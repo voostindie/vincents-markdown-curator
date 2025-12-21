@@ -23,10 +23,10 @@ import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 public class TrainerQuery
     extends SeasonQueryTemplate
 {
-    private static final String TRAINER_COLUMN = "Trainer";
-    private static final String TEAM_COLUMN = "Team(s)";
+    private static final String TRAINER_COLUMN       = "Trainer";
+    private static final String TEAM_COLUMN          = "Team(s)";
     private static final String QUALIFICATION_COLUMN = "Kwalificatie(s)";
-    private static final String COMPENSATION_COLUMN = "Vergoeding";
+    private static final String COMPENSATION_COLUMN  = "Vergoeding";
 
     @Inject
     TrainerQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)
@@ -72,7 +72,8 @@ public class TrainerQuery
                     QUALIFICATION_COLUMN, trainer.qualifications()
                         .map(Qualification::link)
                         .collect(joining(", ")),
-                    COMPENSATION_COLUMN, toEuroString(trainer.computeCompensation())))
+                    COMPENSATION_COLUMN, toEuroString(trainer.computeCompensation())
+                ))
                 .toList()
         );
 
