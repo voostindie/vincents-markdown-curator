@@ -28,7 +28,9 @@ public final class Trainer
     private final String email;
     private final String iban;
     private final LocalDate certificateOfConductDate;
+    private final String residency;
     private final boolean under16;
+    private final boolean coach;
 
     public Trainer(Document document)
     {
@@ -38,7 +40,9 @@ public final class Trainer
         this.email = finder.email;
         this.iban = finder.iban;
         this.certificateOfConductDate = finder.certificateOfConductDate;
+        this.residency = finder.residency;
         this.under16 = finder.under16;
+        this.coach = finder.coach;
         this.qualifications = new HashSet<>();
         this.assignments = new HashSet<>();
     }
@@ -73,9 +77,20 @@ public final class Trainer
         return Optional.ofNullable(certificateOfConductDate);
     }
 
+    public Optional<String> residency()
+    {
+        return Optional.ofNullable(residency);
+    }
+
+
     public boolean isUnder16()
     {
         return under16;
+    }
+
+    public boolean isCoach()
+    {
+        return coach;
     }
 
     @Override
@@ -163,12 +178,16 @@ public final class Trainer
         private static final String IBAN_DOCUMENT = "IBAN";
         private static final String EMAIL_DOCUMENT = "E-mail";
         private static final String COC_DOCUMENT = "VOG";
+        private static final String RESIDENCY_DOCUMENT = "Woonplaats";
         private static final String UNDER_16_DOCUMENT = "Onder 16";
+        private static final String COACH_DOCUMENT = "Coach";
 
         private String email;
         private String iban;
         private LocalDate certificateOfConductDate;
+        private String residency;
         private boolean under16 = false;
+        private boolean coach = false;
 
         @Override
         public void visit(Section section)
@@ -196,13 +215,21 @@ public final class Trainer
                 var colon = line.indexOf(": ");
                 if (colon == -1)
                 {
-                    // This is just a marker, might be "under 16"
+                    // This is just a marker
                     var links = parseInternalLinkTargetNames(line.substring(2));
-                    if (links.size() == 1 && links.contains(UNDER_16_DOCUMENT))
+                    if (links.size() != 1)
                     {
-                        under16 = true;
                         return;
                     }
+                    else if (links.contains(UNDER_16_DOCUMENT))
+                    {
+                        under16 = true;
+                    }
+                    else if (links.contains(COACH_DOCUMENT))
+                    {
+                        coach = true;
+                    }
+                    return;
                 }
                 // This line holds an attribute value
                 var links = parseInternalLinkTargetNames(line.substring(2, colon));
@@ -223,6 +250,10 @@ public final class Trainer
                 else if (attribute.contentEquals(COC_DOCUMENT))
                 {
                     this.certificateOfConductDate = LocalDates.parseDateOrNull(value);
+                }
+                else if (attribute.contentEquals(RESIDENCY_DOCUMENT))
+                {
+                    this.residency = value;
                 }
             });
         }

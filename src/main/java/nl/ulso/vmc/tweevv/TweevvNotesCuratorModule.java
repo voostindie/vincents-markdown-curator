@@ -84,6 +84,9 @@ abstract class TweevvNotesCuratorModule
     @IntoSet
     abstract Query bindTrainerQuery(TrainerQuery trainerQuery);
 
+    @Binds
+    @IntoSet
+    abstract Query bindTrainerCsvQuery(TrainerCsvQuery trainerCsvQuery);
 
     @Provides
     static JournalSettings provideJournalSettings()
