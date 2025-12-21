@@ -15,9 +15,22 @@ import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 
+/**
+ * Generates CSV data for trainers in a season; the CSV contains everything needed to later generate
+ * and send out trainer agreements (by the secretary), pay out trainer compensations (by the
+ * treasurer), and do the yearly verification of the certificates of conduct (by the general board
+ * member).
+ * <p/>
+ * The CSV is generated as query output and therefore ends up in the Markdown document. That's the
+ * easiest way to do it; it's what the Markdown Curator is created for. Writing CSV to a separate
+ * file sounds easy enough, but is actually difficult to do efficiently. Any existing CSV file
+ * should only be overwritten if the contents changed. How do we know? Within Markdown content, this
+ * is exactly what the curator takes care of. And copy-pasting the CSV to a separate file, or into
+ * Numbers or Excel, is easy enough as it is.
+ */
 @Singleton
 public class TrainerCsvQuery
-        extends SeasonQueryTemplate
+    extends SeasonQueryTemplate
 {
     private static final String TRAINER_COLUMN = "Trainer";
     private static final String EMAIL_COLUMN = "E-mail";
@@ -51,52 +64,53 @@ public class TrainerCsvQuery
     @Override
     protected QueryResult runFor(Season season, QueryDefinition definition)
     {
-        var stringWriter = new StringWriter();
-        stringWriter.write("```csv");
-        stringWriter.write(lineSeparator());
-        var csvWriter = CsvWriter.builder()
-                .lineDelimiter(PLATFORM)
-                .build(stringWriter);
-        csvWriter.writeRecord(List.of(TRAINER_COLUMN, EMAIL_COLUMN, RESIDENCY_COLUMN, IBAN_COLUMN,
-                COC_COLUMN, UNDER_16_COLUMN, COACH_COLUMN, TEAM_COLUMN, QUALIFICATION_COLUMN,
-                COMPENSATION_COLUMN));
-        season.trainers().sorted(comparing(Trainer::name)).forEach(trainer ->
-                csvWriter.writeRecord(
-                        trainer.name(),
-                        trainer.email().orElse(null),
-                        trainer.residency().orElse(null),
-                        trainer.iban().orElse(null),
-                        trainer.certificateOfConductDate().map(LocalDate::toString).orElse(null),
-                        trainer.isUnder16() ? "true" : "false",
-                        trainer.isCoach() ? "true" : "false",
-                        trainer.assignments()
-                                .sorted(comparing(
-                                        assignment -> assignment.trainingGroup().name()))
-                                .map(assignment -> {
-                                    var factor = assignment.factor();
-                                    if (factor.doubleValue() == 1.0)
-                                    {
-                                        return assignment.trainingGroup().name();
-                                    }
-                                    return assignment.trainingGroup().name() + " (" +
-                                           toPercentageString(factor) + ")";
-                                })
-                                .collect(joining(", ")),
-                        trainer.qualifications()
-                                .map(Qualification::name)
-                                .collect(joining(", ")),
-                        toEuroString(trainer.computeCompensation())
-                ));
-        try
+        try (var stringWriter = new StringWriter();
+             var csvWriter = CsvWriter.builder().lineDelimiter(PLATFORM).build(stringWriter))
         {
+            stringWriter.write("```csv");
+            stringWriter.write(lineSeparator());
+            csvWriter.writeRecord(
+                List.of(TRAINER_COLUMN, EMAIL_COLUMN, RESIDENCY_COLUMN, IBAN_COLUMN,
+                    COC_COLUMN, UNDER_16_COLUMN, COACH_COLUMN, TEAM_COLUMN,
+                    QUALIFICATION_COLUMN,
+                    COMPENSATION_COLUMN));
+            season.trainers().sorted(comparing(Trainer::name)).forEach(trainer ->
+                csvWriter.writeRecord(
+                    trainer.name(),
+                    trainer.email().orElse(null),
+                    trainer.residency().orElse(null),
+                    trainer.iban().orElse(null),
+                    trainer.certificateOfConductDate().map(LocalDate::toString)
+                        .orElse(null),
+                    trainer.isUnder16() ? "true" : "false",
+                    trainer.isCoach() ? "true" : "false",
+                    trainer.assignments()
+                        .sorted(comparing(
+                            assignment -> assignment.trainingGroup().name()))
+                        .map(assignment -> {
+                            var factor = assignment.factor();
+                            if (factor.doubleValue() == 1.0)
+                            {
+                                return assignment.trainingGroup().name();
+                            }
+                            return assignment.trainingGroup().name() + " (" +
+                                   toPercentageString(factor) + ")";
+                        })
+                        .collect(joining(", ")),
+                    trainer.qualifications()
+                        .map(Qualification::name)
+                        .collect(joining(", ")),
+                    toEuroString(trainer.computeCompensation())
+                ));
             csvWriter.flush();
+            stringWriter.write("```");
+            stringWriter.write(lineSeparator());
+            return queryResultFactory().string(stringWriter.toString());
         }
         catch (IOException e)
         {
             // This won't fail, as the underlying writer is string; there's no I/O.
+            throw new IllegalStateException("Unexpected IOException while writing to a string", e);
         }
-        stringWriter.write("```");
-        stringWriter.write(lineSeparator());
-        return queryResultFactory().string(stringWriter.toString());
     }
 }

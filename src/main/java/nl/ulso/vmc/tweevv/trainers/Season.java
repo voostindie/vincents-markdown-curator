@@ -7,10 +7,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * Represents a single season and holds all trainer (related) data for a season.
+ * Represents a single season and holds all trainer and related data for that season.
  * <p/>
  * Almost all logic applies to a single season. By having all data on trainers and reference data
  * already grouped per season, this logic is straightforward to implement.
+ * <p/>
+ * Changes to a season are meant to be applied by the {@link TrainerModel} only. For all others
+ * seasons are meant to be read-only.
  */
 public final class Season
 {
@@ -47,7 +50,7 @@ public final class Season
     }
 
     void addTrainingGroup(
-            Document trainingGroupDocument, String tariffGroupName, BigDecimal practicesPerWeek)
+        Document trainingGroupDocument, String tariffGroupName, BigDecimal practicesPerWeek)
     {
         var tariffGroup = tariffGroups.get(tariffGroupName);
         if (tariffGroup == null)
@@ -103,7 +106,7 @@ public final class Season
     private Trainer resolveTrainer(Document trainerDocument)
     {
         return trainers.computeIfAbsent(trainerDocument.name(),
-                key -> new Trainer(trainerDocument));
+            key -> new Trainer(trainerDocument));
     }
 
     public Optional<Trainer> trainerFor(Document document)
@@ -114,18 +117,18 @@ public final class Season
     public Stream<Trainer> trainersWith(Qualification qualification)
     {
         return trainers.values().stream()
-                .filter(trainer -> trainer.hasQualification(qualification));
+            .filter(trainer -> trainer.hasQualification(qualification));
     }
 
     public Stream<Trainer> trainersFor(TrainingGroup trainingGroup)
     {
         return trainers.values().stream()
-                .filter(trainer -> trainer.isAssignedTo(trainingGroup));
+            .filter(trainer -> trainer.isAssignedTo(trainingGroup));
     }
 
     public Stream<TrainingGroup> trainingGroupsFor(TariffGroup tariffGroup)
     {
         return trainingGroups.values().stream()
-                .filter(trainingGroup -> trainingGroup.tariffGroup().equals(tariffGroup));
+            .filter(trainingGroup -> trainingGroup.tariffGroup().equals(tariffGroup));
     }
 }

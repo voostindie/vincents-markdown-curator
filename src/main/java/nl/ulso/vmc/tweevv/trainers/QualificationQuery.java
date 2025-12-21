@@ -12,9 +12,12 @@ import static java.util.stream.Collectors.joining;
 import static nl.ulso.markdown_curator.query.TableResult.Alignment.LEFT;
 import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 
+/**
+ * Generates a table of all qualifications in a season, including the trainers who qualify for it.
+ */
 @Singleton
 public class QualificationQuery
-        extends SeasonQueryTemplate
+    extends SeasonQueryTemplate
 {
     private static final String QUALIFICATION_COLUMN = "Kwalificatie";
     private static final String ALLOWANCE_COLUMN = "Toeslag";
@@ -42,20 +45,20 @@ public class QualificationQuery
     public QueryResult runFor(Season season, QueryDefinition definition)
     {
         return queryResultFactory().table(
-                List.of(QUALIFICATION_COLUMN, ALLOWANCE_COLUMN, TRAINER_COLUMN),
-                List.of(LEFT, RIGHT, LEFT),
-                season.qualifications()
-                        .sorted(comparing(Qualification::allowance)
-                                .thenComparing(Qualification::name))
-                        .map(qualification -> Map.of(
-                                QUALIFICATION_COLUMN, qualification.link(),
-                                ALLOWANCE_COLUMN, toEuroString(qualification.allowance()),
-                                TRAINER_COLUMN, season.trainersWith(qualification)
-                                        .sorted(comparing(Trainer::name))
-                                        .map(Trainer::link)
-                                        .collect(joining(", "))
-                        ))
-                        .toList()
+            List.of(QUALIFICATION_COLUMN, ALLOWANCE_COLUMN, TRAINER_COLUMN),
+            List.of(LEFT, RIGHT, LEFT),
+            season.qualifications()
+                .sorted(comparing(Qualification::allowance)
+                    .thenComparing(Qualification::name))
+                .map(qualification -> Map.of(
+                    QUALIFICATION_COLUMN, qualification.link(),
+                    ALLOWANCE_COLUMN, toEuroString(qualification.allowance()),
+                    TRAINER_COLUMN, season.trainersWith(qualification)
+                        .sorted(comparing(Trainer::name))
+                        .map(Trainer::link)
+                        .collect(joining(", "))
+                ))
+                .toList()
         );
     }
 }

@@ -3,14 +3,20 @@ package nl.ulso.vmc.tweevv.trainers;
 import nl.ulso.markdown_curator.query.*;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-import java.util.Map;
+import java.text.NumberFormat;
+import java.util.*;
 
+/**
+ * Base class for queries that act on a specific season; the season is pre-selected, either pulled
+ * from the document name if it matches the name of a season, and otherwise pulled from the
+ * configuration parameter {@code season}.
+ */
 abstract class SeasonQueryTemplate
-        implements Query
+    implements Query
 {
+    private static final String LANGUAGE = "NL";
+    private static final String CURRENCY = "EUR";
+
     private final TrainerModel trainerModel;
     private final QueryResultFactory queryResultFactory;
 
@@ -23,7 +29,7 @@ abstract class SeasonQueryTemplate
     @Override
     public Map<String, String> supportedConfiguration()
     {
-        return Map.of("season", "Season to get information for. Defaults to the current document.");
+        return Map.of("season", "Season to get data for. Defaults to the current document.");
     }
 
     @Override
@@ -45,22 +51,32 @@ abstract class SeasonQueryTemplate
         return queryResultFactory;
     }
 
+    /**
+     * @param amount Amount to format in Euros
+     * @return The amount as a string in Euros, using the Dutch locale.
+     */
     protected String toEuroString(BigDecimal amount)
     {
-        return new DecimalFormat("'€'#,##0.00",
-                DecimalFormatSymbols.getInstance(Locale.of("NL")))
-                .format(amount.doubleValue());
+        var formatter = NumberFormat.getCurrencyInstance(Locale.of(LANGUAGE));
+        formatter.setCurrency(Currency.getInstance(CURRENCY));
+        return formatter.format(amount.doubleValue());
     }
 
+    /**
+     * @param number Number to format.
+     * @return The number as a string in Euros, using the Dutch locale.
+     */
     protected String toNumberString(BigDecimal number)
     {
-        return new DecimalFormat("#,###.##",
-                DecimalFormatSymbols.getInstance(Locale.of("NL")))
-                .format(number.doubleValue());
+        return NumberFormat.getInstance(Locale.of(LANGUAGE)).format(number.doubleValue());
     }
 
+    /**
+     * @param factor Factor to format.
+     * @return The factor as a percentage, using the Dutch locale.
+     */
     protected String toPercentageString(BigDecimal factor)
     {
-        return toNumberString(factor.multiply(BigDecimal.valueOf(100))) + "%";
+        return NumberFormat.getPercentInstance(Locale.of(LANGUAGE)).format(factor.doubleValue());
     }
 }

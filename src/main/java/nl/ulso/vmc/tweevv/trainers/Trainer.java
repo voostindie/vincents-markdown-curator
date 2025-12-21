@@ -19,6 +19,8 @@ import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLin
  * stored several times. I don't see this as a big problem, however, given the limited amount of
  * data to process, all in memory. Maybe in the next decade or so... It's also not hard to solve,
  * but the code would be more complex. So, for later. Maybe.
+ * <p/>
+ * A trainer is considered to be read-only, except for the {@link TrainerModel} that manages it.
  */
 public final class Trainer
 {
@@ -124,15 +126,17 @@ public final class Trainer
         qualifications.add(qualification);
     }
 
+    /**
+     * Computes the trainer's compensation.
+     *
+     * @return The total compensation for a trainer in a season.
+     */
     public BigDecimal computeCompensation()
     {
         var total = BigDecimal.ZERO;
         for (Assignment assignment : assignments)
         {
-            var singleTariff = assignment.trainingGroup().tariffGroup().tariff();
-            var totalTariff = singleTariff.multiply(assignment.trainingGroup().practicesPerWeek());
-            var compensation = totalTariff.multiply(assignment.factor());
-            total = total.add(compensation);
+            total = total.add(assignment.computeCompensation());
         }
         for (Qualification qualification : qualifications)
         {
@@ -159,20 +163,28 @@ public final class Trainer
     public boolean isAssignedTo(TrainingGroup trainingGroup)
     {
         return assignments.stream()
-                .anyMatch(assignment -> assignment.trainingGroup().equals(trainingGroup));
+            .anyMatch(assignment -> assignment.trainingGroup().equals(trainingGroup));
     }
 
     public BigDecimal factorFor(TrainingGroup trainingGroup)
     {
         return assignments.stream()
-                .filter(assignment -> assignment.trainingGroup().equals(trainingGroup))
-                .findFirst()
-                .map(Assignment::factor)
-                .orElse(BigDecimal.ZERO);
+            .filter(assignment -> assignment.trainingGroup().equals(trainingGroup))
+            .findFirst()
+            .map(Assignment::factor)
+            .orElse(BigDecimal.ZERO);
     }
 
+    /**
+     * Extracts personal data for a trainer from a document; the data is expected to be in an
+     * unordered list in a section with the name {@link #PERSONAL_DATA_SECTION}.
+     * <p/>
+     * In the wiki, every personal data field is actually a reference to a document representing
+     * that field. This ensures that typos can't be made, and that for each field there's room for a
+     * bit of explanation as to why we're administering it.
+     */
     private static class PersonalDataFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private static final String PERSONAL_DATA_SECTION = "Persoonsgegevens";
         private static final String IBAN_DOCUMENT = "IBAN";
@@ -215,7 +227,7 @@ public final class Trainer
                 var colon = line.indexOf(": ");
                 if (colon == -1)
                 {
-                    // This is just a marker
+                    // This is just a marker; there's no data attached to the field
                     var links = parseInternalLinkTargetNames(line.substring(2));
                     if (links.size() != 1)
                     {
@@ -231,7 +243,7 @@ public final class Trainer
                     }
                     return;
                 }
-                // This line holds an attribute value
+                // This is a field with data attached to it, after the colon
                 var links = parseInternalLinkTargetNames(line.substring(2, colon));
                 if (links.size() != 1)
                 {
