@@ -1,7 +1,6 @@
 package nl.ulso.vmc.tweevv.trainers;
 
 import de.siegmar.fastcsv.writer.CsvWriter;
-import de.siegmar.fastcsv.writer.LineDelimiter;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.query.*;
@@ -10,14 +9,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static de.siegmar.fastcsv.writer.LineDelimiter.PLATFORM;
 import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.markdown_curator.query.TableResult.Alignment.LEFT;
-import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 
 @Singleton
 public class TrainerCsvQuery
@@ -65,34 +61,32 @@ public class TrainerCsvQuery
                 COC_COLUMN, UNDER_16_COLUMN, COACH_COLUMN, TEAM_COLUMN, QUALIFICATION_COLUMN,
                 COMPENSATION_COLUMN));
         season.trainers().sorted(comparing(Trainer::name)).forEach(trainer ->
-        {
-            csvWriter.writeRecord(
-                    trainer.name(),
-                    trainer.email().orElse(null),
-                    trainer.residency().orElse(null),
-                    trainer.iban().orElse(null),
-                    trainer.certificateOfConductDate().map(LocalDate::toString).orElse(null),
-                    trainer.isUnder16() ? "true" : "false",
-                    trainer.isCoach() ? "true" : "false",
-                    trainer.assignments()
-                            .sorted(comparing(
-                                    assignment -> assignment.trainingGroup().name()))
-                            .map(assignment -> {
-                                var factor = assignment.factor();
-                                if (factor.doubleValue() == 1.0)
-                                {
-                                    return assignment.trainingGroup().name();
-                                }
-                                return assignment.trainingGroup().name() + " (" +
-                                       toPercentageString(factor) + ")";
-                            })
-                            .collect(joining(", ")),
-                    trainer.qualifications()
-                            .map(Qualification::name)
-                            .collect(joining(", ")),
-                    toEuroString(trainer.computeCompensation())
-            );
-        });
+                csvWriter.writeRecord(
+                        trainer.name(),
+                        trainer.email().orElse(null),
+                        trainer.residency().orElse(null),
+                        trainer.iban().orElse(null),
+                        trainer.certificateOfConductDate().map(LocalDate::toString).orElse(null),
+                        trainer.isUnder16() ? "true" : "false",
+                        trainer.isCoach() ? "true" : "false",
+                        trainer.assignments()
+                                .sorted(comparing(
+                                        assignment -> assignment.trainingGroup().name()))
+                                .map(assignment -> {
+                                    var factor = assignment.factor();
+                                    if (factor.doubleValue() == 1.0)
+                                    {
+                                        return assignment.trainingGroup().name();
+                                    }
+                                    return assignment.trainingGroup().name() + " (" +
+                                           toPercentageString(factor) + ")";
+                                })
+                                .collect(joining(", ")),
+                        trainer.qualifications()
+                                .map(Qualification::name)
+                                .collect(joining(", ")),
+                        toEuroString(trainer.computeCompensation())
+                ));
         try
         {
             csvWriter.flush();
