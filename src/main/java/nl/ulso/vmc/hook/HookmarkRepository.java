@@ -1,7 +1,7 @@
 package nl.ulso.vmc.hook;
 
 import jakarta.json.JsonValue;
-import nl.ulso.vmc.jxa.JavaScriptForAutomation;
+import nl.ulso.jxa.JavaScriptForAutomation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

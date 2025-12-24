@@ -6,7 +6,7 @@ import dagger.multibindings.*;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.project.*;
 import nl.ulso.markdown_curator.query.Query;
-import nl.ulso.vmc.jxa.JavaScriptForAutomationModule;
+import nl.ulso.jxa.JavaScriptForAutomationModule;
 
 import static nl.ulso.markdown_curator.project.ProjectProperty.newProperty;
 import static nl.ulso.vmc.omnifocus.OmniFocusUrlResolver.OMNIFOCUS_URL;
