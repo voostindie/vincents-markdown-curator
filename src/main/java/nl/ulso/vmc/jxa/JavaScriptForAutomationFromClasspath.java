@@ -1,36 +1,50 @@
 package nl.ulso.vmc.jxa;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.json.*;
 import jakarta.json.stream.JsonParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import static java.lang.System.lineSeparator;
+import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.joining;
 
-/**
- * Runs JXA scripts located on the classpath.
- * <p/>
- * Scripts are resolved from the classpath in the "/jxa" folder. To load and execute scripts
- * efficiently, the sources are first compiled. The compiled script is then reused.
- * <p/>
- * Because queries are executed in parallel, the same script might be compiled a few times; the
- * code in this class doesn't protect against that. It's a bit of a waste, but not worth the
- * complexity in code. In the end the same script will be executed over and over again.
- */
+/// Runs JavaScript for Automation scripts located on the classpath.
+///
+/// Source scripts are resolved from the classpath in the `/jxa` folder. To load and execute scripts
+/// efficiently, the sources are first compiled. Compilation only happens when the compiled script
+/// is somehow no longer available in the temporary directory where compiled scripts are stored.
+///
+/// This code can safely run in a multithreaded environment, *but* under high load the same script
+/// may be compiled more than once; the code in this class doesn't protect against that. It's a bit
+/// of a waste, bot not harmful otherwise, and not worth the extra complexity in code IMHO. In the
+/// end exactly one compiled script will "win" and be reused for all executions of the same script.
+///
+/// Script compilation may take some time, and I've experienced cases where it just never finished
+/// (I think...). To protect against that the compiler is not allowed to run for longer than
+/// `MAX_COMPILATION_TIME_SECONDS`.
+///
+/// Running external scripts is inherently insecure. The code in this class aims to protect against
+/// abuse by only running scripts from a save location: the application bundle. However, compiled
+/// scripts are stored in the user's temporary directory. These scripts could be replaced. The code
+/// does not protect against that.
 @Singleton
-final class JxaClasspathRunner
-        implements JxaRunner
+final class JavaScriptForAutomationFromClasspath
+    implements JavaScriptForAutomation
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JxaClasspathRunner.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(JavaScriptForAutomationFromClasspath.class);
     private static final String SOURCE_PACKAGE = "/jxa/";
     private static final String SOURCE_EXTENSION = ".js";
     private static final String COMPILED_SCRIPT_EXTENSION = ".scpt";
@@ -41,7 +55,7 @@ final class JxaClasspathRunner
     private final ConcurrentMap<String, Path> scriptCache = new ConcurrentHashMap<>();
 
     @Inject
-    JxaClasspathRunner()
+    JavaScriptForAutomationFromClasspath()
     {
     }
 
@@ -58,13 +72,15 @@ final class JxaClasspathRunner
     }
 
     private <J extends JsonStructure> J runScript(
-            String name, String[] arguments, Function<JsonReader, J> jsonProcessor)
+        String name,
+        String[] arguments,
+        Function<JsonReader, J> jsonProcessor)
     {
         var path = resolveCompiledScript(name);
         var command = new ArrayList<>(List.of(EXECUTE, path.toString()));
         if (arguments != null)
         {
-            command.addAll(Arrays.asList(arguments));
+            command.addAll(asList(arguments));
         }
         try
         {
@@ -72,7 +88,7 @@ final class JxaClasspathRunner
             var process = new ProcessBuilder(command).start();
             try (var reader = process.inputReader())
             {
-                var output = reader.lines().collect(joining(System.lineSeparator()));
+                var output = reader.lines().collect(joining(lineSeparator()));
                 var jsonReader = Json.createReader(new StringReader(output));
                 return jsonProcessor.apply(jsonReader);
             }
@@ -97,7 +113,8 @@ final class JxaClasspathRunner
         }
         scriptCache.remove(scriptName);
         return scriptCache.computeIfAbsent(scriptName,
-                name -> compileScript(name, loadScriptSource(scriptName)));
+            name -> compileScript(name, loadScriptSource(scriptName))
+        );
     }
 
     private List<String> loadScriptSource(String scriptName)
@@ -129,10 +146,11 @@ final class JxaClasspathRunner
             var outputPath = outputFile.toPath();
             LOGGER.debug("Compiling script '{}' to path: {}", scriptName, outputPath);
             var process = new ProcessBuilder(
-                    COMPILE,
-                    "-l", "JavaScript",
-                    "-o", outputPath.toString(),
-                    "-").start();
+                COMPILE,
+                "-l", "JavaScript",
+                "-o", outputPath.toString(),
+                "-"
+            ).start();
             try (var writer = process.outputWriter())
             {
                 for (String line : source)
@@ -142,7 +160,7 @@ final class JxaClasspathRunner
                 }
                 writer.flush();
             }
-            process.waitFor(MAX_COMPILATION_TIME_SECONDS, TimeUnit.SECONDS);
+            process.waitFor(MAX_COMPILATION_TIME_SECONDS, SECONDS);
             return outputPath;
         }
         catch (IOException | InterruptedException e)

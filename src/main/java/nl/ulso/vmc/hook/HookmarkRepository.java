@@ -1,7 +1,7 @@
 package nl.ulso.vmc.hook;
 
 import jakarta.json.JsonValue;
-import nl.ulso.vmc.jxa.JxaRunner;
+import nl.ulso.vmc.jxa.JavaScriptForAutomation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,18 +20,18 @@ public class HookmarkRepository
     private static final Logger LOGGER = LoggerFactory.getLogger(HookmarkRepository.class);
     private static final String SCRIPT = "hookmark-bookmarks";
 
-    private final JxaRunner jxaRunner;
+    private final JavaScriptForAutomation jxa;
 
     @Inject
-    public HookmarkRepository(JxaRunner jxaRunner)
+    public HookmarkRepository(JavaScriptForAutomation jxa)
     {
-        this.jxaRunner = jxaRunner;
+        this.jxa = jxa;
     }
 
     public List<Hook> listHooks(String documentUri)
     {
         LOGGER.debug("Loading hooks for URI: {}", documentUri);
-        var array = jxaRunner.runScriptForArray(SCRIPT, documentUri);
+        var array = jxa.runScriptForArray(SCRIPT, documentUri);
         return array.stream()
                 .map(JsonValue::asJsonObject)
                 .map(object -> new Hook(

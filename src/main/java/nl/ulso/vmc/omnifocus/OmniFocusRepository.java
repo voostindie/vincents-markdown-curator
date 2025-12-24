@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.JsonValue;
 import nl.ulso.markdown_curator.vault.VaultRefresher;
-import nl.ulso.vmc.jxa.JxaRunner;
+import nl.ulso.vmc.jxa.JavaScriptForAutomation;
 import org.slf4j.*;
 
 import java.io.File;
@@ -54,18 +54,18 @@ public class OmniFocusRepository
 
     @Inject
     public OmniFocusRepository(
-            VaultRefresher refresher, JxaRunner jxaRunner, OmniFocusSettings settings)
+            VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         if (!DATABASE_PATH.canRead())
         {
             throw new IllegalStateException("OmniFocus database is inaccessible: " + DATABASE_PATH);
         }
         this.cache = new AtomicReference<>();
-        scheduleBackgroundRefresh(refresher, jxaRunner, settings);
+        scheduleBackgroundRefresh(refresher, jxa, settings);
     }
 
     private void scheduleBackgroundRefresh(
-            VaultRefresher refresher, JxaRunner jxaRunner, OmniFocusSettings settings)
+            VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         var curatorName = MDC.get("curator");
         REFRESH_EXECUTOR.scheduleAtFixedRate(() -> {
@@ -75,7 +75,7 @@ public class OmniFocusRepository
                 LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
                 return;
             }
-            var newProjects = fetchProjects(jxaRunner, settings);
+            var newProjects = fetchProjects(jxa, settings);
             var oldProjects = cache.getAndSet(newProjects);
             lastModified = DATABASE_PATH.lastModified();
             if (oldProjects == null)
@@ -94,10 +94,10 @@ public class OmniFocusRepository
     }
 
     private Map<String, OmniFocusProject> fetchProjects(
-            JxaRunner jxaRunner, OmniFocusSettings settings)
+            JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         LOGGER.debug("Fetching OmniFocus projects in folder: {}", settings.omniFocusFolder());
-        var array = jxaRunner.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
+        var array = jxa.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
         return array.stream()
                 .map(JsonValue::asJsonObject)
                 .map(object -> new OmniFocusProject(
