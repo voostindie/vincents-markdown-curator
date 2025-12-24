@@ -5,7 +5,7 @@ import nl.ulso.markdown_curator.vault.Document;
 import java.time.LocalDate;
 import java.util.*;
 
-import static nl.ulso.hash.Hasher.shortSignatureOf;
+import static nl.ulso.hash.ShortHasher.shortHashOf;
 
 /**
  * Represents a single node in the graph.
@@ -25,7 +25,7 @@ public final class Node
 
     Node(Document document, Type type, boolean isArchived)
     {
-        this.id = shortSignatureOf(document.name());
+        this.id = shortHashOf(document.name());
         this.type = type;
         this.isArchived = isArchived;
         this.edges = new TreeMap<>();
