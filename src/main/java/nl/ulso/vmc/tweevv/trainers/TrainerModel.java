@@ -30,44 +30,44 @@ public final class TrainerModel
     extends DataModelTemplate
 {
     // For now all names of folders and sections are hardcoded.
-    private static final String MODEL_FOLDER          = "Trainersvergoedingen";
-    private static final String SEASON_FOLDER         = "Seizoenen";
-    private static final String TARIFF_GROUP_FOLDER   = "Tariefgroepen";
+    private static final String MODEL_FOLDER = "Trainersvergoedingen";
+    private static final String SEASON_FOLDER = "Seizoenen";
+    private static final String TARIFF_GROUP_FOLDER = "Tariefgroepen";
     private static final String TRAINING_GROUP_FOLDER = "Trainingsgroepen";
-    private static final String QUALIFICATION_FOLDER  = "Kwalificatietoeslagen";
-    private static final String TRAINER_FOLDER        = "Contacten";
-    private static final String TARIFF_SECTION        = "Tarieven";
-    private static final String PRACTICE_SECTION      = "Trainingen";
-    private static final String ACTIVITY_SECTION      = "Taken";
+    private static final String QUALIFICATION_FOLDER = "Kwalificatietoeslagen";
+    private static final String TRAINER_FOLDER = "Contacten";
+    private static final String TARIFF_SECTION = "Tarieven";
+    private static final String PRACTICE_SECTION = "Trainingen";
+    private static final String ACTIVITY_SECTION = "Taken";
     private static final String QUALIFICATION_SECTION = "Kwalificaties";
-    private static final String TRAINER_DOCUMENT      = "Trainer";
+    private static final String TRAINER_DOCUMENT = "Trainer";
 
     // Season: "2025-2026"
-    private static final Predicate<String> SEASON_PREDICATE        =
+    private static final Predicate<String> SEASON_PREDICATE =
         Pattern.compile("^\\d{4}-\\d{4}$").asMatchPredicate();
     // Amount: "€250,-", "€125,50", "€ 240,-"
-    private static final Pattern           AMOUNT_PATTERN          =
+    private static final Pattern AMOUNT_PATTERN =
         Pattern.compile("^€ ?(\\d+),(\\d{2}+|-)$");
     // Practice, option 1: "[[Tariff group]] 1 keer per week", "[[Tariff group]] 2 keer per week"
-    private static final Pattern           SINGLE_PRACTICE_PATTERN = Pattern.compile(
+    private static final Pattern SINGLE_PRACTICE_PATTERN = Pattern.compile(
         "^\\[\\[.*]] (\\d+) keer per week$");
     // // Practice, option 2: "[[Tariff group]] 3 keer per 2 weken"
-    private static final Pattern           MULTI_PRACTICE_PATTERN  = Pattern.compile(
+    private static final Pattern MULTI_PRACTICE_PATTERN = Pattern.compile(
         "^\\[\\[.*]] (\\d+) keer per (\\d+) weken$");
     // Trainer: "[[Trainer]] [[Training group]]", "[[Trainer]] [[Training group]] (50%)"
-    private static final Pattern           TRAINER_PATTERN         = Pattern.compile(
+    private static final Pattern TRAINER_PATTERN = Pattern.compile(
         "^(\\[\\[.*]]) (\\[\\[.*]])( \\((\\d+)%\\))?$");
 
-    private static final String IBAN_PROPERTY      = "iban";
-    private static final String EMAIL_PROPERTY     = "email";
+    private static final String IBAN_PROPERTY = "iban";
+    private static final String EMAIL_PROPERTY = "email";
     private static final String RESIDENCY_PROPERTY = "woonplaats";
-    private static final String COC_PROPERTY       = "vog";
-    private static final String UNDER_16_PROPERTY  = "onder16";
-    private static final String COACH_PROPERTY     = "coach";
+    private static final String COC_PROPERTY = "vog";
+    private static final String UNDER_16_PROPERTY = "onder16";
+    private static final String COACH_PROPERTY = "coach";
 
-    private final Vault                      vault;
+    private final Vault vault;
     private final FrontMatterUpdateCollector frontMatterUpdateCollector;
-    private final Map<String, Season>        seasons;
+    private final Map<String, Season> seasons;
 
     @Inject
     public TrainerModel(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
@@ -326,7 +326,7 @@ public final class TrainerModel
     private final class SectionVisitor
         extends BreadthFirstVaultVisitor
     {
-        private final String              sectionName;
+        private final String sectionName;
         private final SeasonLineProcessor processor;
 
         public SectionVisitor(String sectionName, SeasonLineProcessor processor)

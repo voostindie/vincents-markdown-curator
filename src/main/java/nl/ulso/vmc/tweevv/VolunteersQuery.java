@@ -1,8 +1,8 @@
 package nl.ulso.vmc.tweevv;
 
+import jakarta.inject.Inject;
 import nl.ulso.markdown_curator.query.*;
 
-import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.comparing;
 
 public class VolunteersQuery
-        implements Query
+    implements Query
 {
-    private final VolunteeringModel model;
+    private final VolunteeringModel  model;
     private final QueryResultFactory resultFactory;
 
     @Inject
@@ -49,13 +49,16 @@ public class VolunteersQuery
             return resultFactory.error("Property 'season' is not specified");
         }
         var list = model.volunteersFor(season).entrySet().stream()
-                .map(entry -> Map.of("Vrijwilliger", entry.getKey().link(),
-                        "Taak", entry.getValue().stream()
-                                .sorted(comparing(VolunteeringModel.ContactActivity::description))
-                                .map(VolunteeringModel.ContactActivity::description)
-                                .collect(Collectors.joining(", "))))
-                .sorted(comparing(map -> map.get("Vrijwilliger")))
-                .toList();
+            .map(entry -> Map.of(
+                    "Vrijwilliger", entry.getKey().link(),
+                    "Taak", entry.getValue().stream()
+                        .sorted(comparing(VolunteeringModel.ContactActivity::description))
+                        .map(VolunteeringModel.ContactActivity::description)
+                        .collect(Collectors.joining(", "))
+                )
+            )
+            .sorted(comparing(map -> map.get("Vrijwilliger")))
+            .toList();
         return resultFactory.table(List.of("Vrijwilliger", "Taak"), list);
     }
 }

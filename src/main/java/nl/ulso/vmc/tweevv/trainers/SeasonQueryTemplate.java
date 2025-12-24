@@ -17,7 +17,7 @@ abstract class SeasonQueryTemplate
     private static final String LANGUAGE = "NL";
     private static final String CURRENCY = "EUR";
 
-    private final TrainerModel       trainerModel;
+    private final TrainerModel trainerModel;
     private final QueryResultFactory queryResultFactory;
 
     protected SeasonQueryTemplate(TrainerModel model, QueryResultFactory factory)

@@ -20,8 +20,8 @@ import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
 public class TariffGroupQuery
     extends SeasonQueryTemplate
 {
-    private static final String TARIFF_GROUP_COLUMN   = "Tariefgroep";
-    private static final String TARIFF_COLUMN         = "Tarief";
+    private static final String TARIFF_GROUP_COLUMN = "Tariefgroep";
+    private static final String TARIFF_COLUMN = "Tarief";
     private static final String TRAINING_GROUP_COLUMN = "Trainingsgroepen";
 
     @Inject

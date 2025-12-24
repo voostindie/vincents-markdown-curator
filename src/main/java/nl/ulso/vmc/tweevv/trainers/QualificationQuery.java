@@ -20,8 +20,8 @@ public class QualificationQuery
     extends SeasonQueryTemplate
 {
     private static final String QUALIFICATION_COLUMN = "Kwalificatie";
-    private static final String ALLOWANCE_COLUMN     = "Toeslag";
-    private static final String TRAINER_COLUMN       = "Trainer(s)";
+    private static final String ALLOWANCE_COLUMN = "Toeslag";
+    private static final String TRAINER_COLUMN = "Trainer(s)";
 
     @Inject
     QualificationQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)

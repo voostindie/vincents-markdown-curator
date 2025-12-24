@@ -20,9 +20,9 @@ public final class TrainingGroupQuery
     extends SeasonQueryTemplate
 {
     private static final String TRAINING_GROUP_COLUMN = "Trainingsgroep";
-    private static final String TARIFF_GROEP_COLUMN   = "Tariefgroep";
-    private static final String PRACTICES_COLUMN      = "Trainingen";
-    private static final String TRAINER_COLUMN        = "Trainer(s)";
+    private static final String TARIFF_GROEP_COLUMN = "Tariefgroep";
+    private static final String PRACTICES_COLUMN = "Trainingen";
+    private static final String TRAINER_COLUMN = "Trainer(s)";
 
     @Inject
     TrainingGroupQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)

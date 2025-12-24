@@ -1,11 +1,11 @@
 package nl.ulso.vmc.tweevv;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,10 +21,11 @@ import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded
 
 @Singleton
 public class VolunteeringModel
-        extends DataModelTemplate
+    extends DataModelTemplate
 {
     private static final String TEAMS_FOLDER = "Teams";
     private static final String CONTACTS_FOLDER = "Contacten";
+
     private final Vault vault;
     private final Map<String, Activity> activities;
     private final Map<String, Contact> contacts;
@@ -126,13 +127,13 @@ public class VolunteeringModel
         {
             var contact = contacts.remove(document.name());
             volunteering.values().forEach(set ->
-                    set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));
+                set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));
         }
         else if (parentFolderName.equals(TEAMS_FOLDER))
         {
             var activity = activities.remove(document.name());
             volunteering.values().forEach(set ->
-                    set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
+                set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
         }
     }
 
@@ -142,7 +143,7 @@ public class VolunteeringModel
     }
 
     public Map<Contact, List<ContactActivity>> volunteersFor(
-            String seasonString, String activityName)
+        String seasonString, String activityName)
     {
         Activity selectedActivity = activityName != null ? activities.get(activityName) : null;
         if (activityName != null && selectedActivity == null)
@@ -150,12 +151,12 @@ public class VolunteeringModel
             return emptyMap();
         }
         return Season.fromString(seasonString)
-                .map(season -> unmodifiableSet(volunteering.getOrDefault(season, emptySet())))
-                .orElse(emptySet())
-                .stream()
-                .filter(ca -> selectedActivity == null || ca.activity == selectedActivity)
-                .sorted(comparing(contactActivity -> contactActivity.contact.name()))
-                .collect(Collectors.groupingBy(ContactActivity::contact));
+            .map(season -> unmodifiableSet(volunteering.getOrDefault(season, emptySet())))
+            .orElse(emptySet())
+            .stream()
+            .filter(ca -> selectedActivity == null || ca.activity == selectedActivity)
+            .sorted(comparing(contactActivity -> contactActivity.contact.name()))
+            .collect(Collectors.groupingBy(ContactActivity::contact));
     }
 
     public static class Season
@@ -285,7 +286,7 @@ public class VolunteeringModel
     }
 
     public class ActivityProcessor
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private final Contact contact;
         private boolean inSection;
@@ -333,11 +334,12 @@ public class VolunteeringModel
                 var seasonString = line.substring(2, colon).trim();
                 var activityText = line.substring(colon + 1).trim();
                 Season.fromString(seasonString).ifPresent(season ->
-                        volunteering.computeIfAbsent(season, s -> new HashSet<>()).add(
-                                new ContactActivity(
-                                        contact,
-                                        resolveActivity(activityText),
-                                        activityText)));
+                    volunteering.computeIfAbsent(season, s -> new HashSet<>()).add(
+                        new ContactActivity(
+                            contact,
+                            resolveActivity(activityText),
+                            activityText
+                        )));
 
             });
         }

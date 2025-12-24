@@ -32,16 +32,16 @@ import static java.util.stream.Collectors.joining;
 public class TrainerCsvQuery
     extends SeasonQueryTemplate
 {
-    private static final String TRAINER_COLUMN       = "Trainer";
-    private static final String EMAIL_COLUMN         = "E-mail";
-    private static final String RESIDENCY_COLUMN     = "Woonplaats";
-    private static final String IBAN_COLUMN          = "IBAN";
-    private static final String COC_COLUMN           = "VOG";
-    private static final String UNDER_16_COLUMN      = "Onder 16";
-    private static final String COACH_COLUMN         = "Coach";
-    private static final String TEAM_COLUMN          = "Teams";
+    private static final String TRAINER_COLUMN = "Trainer";
+    private static final String EMAIL_COLUMN = "E-mail";
+    private static final String RESIDENCY_COLUMN = "Woonplaats";
+    private static final String IBAN_COLUMN = "IBAN";
+    private static final String COC_COLUMN = "VOG";
+    private static final String UNDER_16_COLUMN = "Onder 16";
+    private static final String COACH_COLUMN = "Coach";
+    private static final String TEAM_COLUMN = "Teams";
     private static final String QUALIFICATION_COLUMN = "Kwalificaties";
-    private static final String COMPENSATION_COLUMN  = "Vergoeding";
+    private static final String COMPENSATION_COLUMN = "Vergoeding";
 
     @Inject
     TrainerCsvQuery(TrainerModel trainerModel, QueryResultFactory queryResultFactory)

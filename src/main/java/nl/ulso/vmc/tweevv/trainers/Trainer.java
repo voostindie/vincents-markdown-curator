@@ -24,15 +24,15 @@ import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLin
  */
 public final class Trainer
 {
-    private final Document           document;
+    private final Document document;
     private final Set<Qualification> qualifications;
-    private final Set<Assignment>    assignments;
-    private final String             email;
-    private final String             iban;
-    private final LocalDate          certificateOfConductDate;
-    private final String             residency;
-    private final boolean            under16;
-    private final boolean            coach;
+    private final Set<Assignment> assignments;
+    private final String email;
+    private final String iban;
+    private final LocalDate certificateOfConductDate;
+    private final String residency;
+    private final boolean under16;
+    private final boolean coach;
 
     public Trainer(Document document)
     {
@@ -186,19 +186,19 @@ public final class Trainer
         extends BreadthFirstVaultVisitor
     {
         private static final String PERSONAL_DATA_SECTION = "Persoonsgegevens";
-        private static final String IBAN_DOCUMENT         = "IBAN";
-        private static final String EMAIL_DOCUMENT        = "E-mail";
-        private static final String COC_DOCUMENT          = "VOG";
-        private static final String RESIDENCY_DOCUMENT    = "Woonplaats";
-        private static final String UNDER_16_DOCUMENT     = "Onder 16";
-        private static final String COACH_DOCUMENT        = "Coach";
+        private static final String IBAN_DOCUMENT = "IBAN";
+        private static final String EMAIL_DOCUMENT = "E-mail";
+        private static final String COC_DOCUMENT = "VOG";
+        private static final String RESIDENCY_DOCUMENT = "Woonplaats";
+        private static final String UNDER_16_DOCUMENT = "Onder 16";
+        private static final String COACH_DOCUMENT = "Coach";
 
-        private String    email;
-        private String    iban;
+        private String email;
+        private String iban;
         private LocalDate certificateOfConductDate;
-        private String    residency;
-        private boolean   under16 = false;
-        private boolean   coach   = false;
+        private String residency;
+        private boolean under16 = false;
+        private boolean coach = false;
 
         @Override
         public void visit(Section section)
