@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Singleton
 public class OmniFocusUrlResolver
-        implements ProjectPropertyResolver
+        implements ValueResolver
 {
     public static final String OMNIFOCUS_URL = "omnifocus";
     private final ProjectProperty property;
@@ -30,13 +30,13 @@ public class OmniFocusUrlResolver
     }
 
     @Override
-    public ProjectProperty projectProperty()
+    public ProjectProperty property()
     {
         return property;
     }
 
     @Override
-    public Optional<?> resolveValue(Project project)
+    public Optional<?> from(Project project)
     {
         var omniFocusProject = repository.project(project.name());
         if (omniFocusProject.exists())

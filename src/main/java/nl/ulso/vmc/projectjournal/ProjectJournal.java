@@ -18,21 +18,18 @@ import java.util.*;
 
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
-/**
- * Keeps track of project attributes - status and lead - in the journal.
- * <p/>
- * The achievement of the day (May 4, 2025) is that this functionality now works. I've had it on
- * my wishlist for a long time, but before I could start the implementation, I had to refactor the
- * complete code base to accommodate for it. I did that yesterday. Today this functionality works.
- * It will need further refactoring, optimization and test cases before I can bring it to the core
- * curator. That's an adventure for another day.
- */
+/// Keeps track of project attributes - status and lead - in the journal.
+///
+/// The achievement of the day (May 4, 2025) is that this functionality now works. I've had it on my
+/// wishlist for a long time, but before I could start the implementation, I had to refactor the
+/// complete code base to accommodate for it. I did that yesterday. Today this functionality works.
+/// It will need further refactoring, optimization and test cases before I can bring it to the core
+/// curator. That's an adventure for another day.
 @Singleton
-class ProjectJournal
-        extends DataModelTemplate
+final class ProjectJournal
+    extends DataModelTemplate
 {
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(JournalStatusProjectPropertyResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectJournal.class);
 
     private static final String PROJECT_STATUSES_MARKER_PROPERTY = "project-statuses";
     private static final String PROJECT_LEADS_MARKER_PROPERTY = "project-leads";
@@ -125,7 +122,8 @@ class ProjectJournal
             journal.toDaily(document).ifPresent(daily ->
             {
                 LOGGER.debug("Processing journal entry '{}' for project attributes",
-                        document.name());
+                    document.name()
+                );
                 removeAttributesForDate(daily.date(), projectStatuses);
                 removeAttributesForDate(daily.date(), projectLeads);
                 for (Project project : projectRepository.projects())
@@ -175,14 +173,18 @@ class ProjectJournal
     {
         for (var document : journal.markers().values())
         {
-            processFrontMatter(document, PROJECT_STATUSES_MARKER_PROPERTY, statusMarkers, linkToStatusMap);
+            processFrontMatter(document, PROJECT_STATUSES_MARKER_PROPERTY, statusMarkers,
+                linkToStatusMap
+            );
             processFrontMatter(document, PROJECT_LEADS_MARKER_PROPERTY, leadMarkers, linkToLeadMap);
         }
     }
 
     private void processFrontMatter(
-            Document document, String propertyName, Set<String> markers,
-            Map<String, String> linkToAliases)
+        Document document,
+        String propertyName,
+        Set<String> markers,
+        Map<String, String> linkToAliases)
     {
         var frontMatter = document.frontMatter();
         if (frontMatter.hasProperty(propertyName))
@@ -210,7 +212,8 @@ class ProjectJournal
         }
     }
 
-    private void updateProjectAttributes(String projectName, Map<String, List<MarkedLine>> entries)
+    private void updateProjectAttributes(
+        String projectName, Map<String, List<MarkedLine>> entries)
     {
         LOGGER.debug("Extracting attributes of project '{}' from the journal", projectName);
         for (Map.Entry<String, List<MarkedLine>> entry : entries.entrySet())
@@ -219,19 +222,21 @@ class ProjectJournal
             for (MarkedLine markedLine : markedLines)
             {
                 processMarkedLineFor(projectName, markedLine, linkToStatusMap, projectStatuses,
-                        this::extractProjectStatus);
+                    this::extractProjectStatus
+                );
                 processMarkedLineFor(projectName, markedLine, linkToLeadMap, projectLeads,
-                        this::extractProjectLead);
+                    this::extractProjectLead
+                );
             }
         }
     }
 
     private void processMarkedLineFor(
-            String projectName,
-            MarkedLine markedLine,
-            Map<String, String> linkToAliasMap,
-            Map<String, NavigableMap<LocalDate, String>> attributes,
-            LineProcessor lineProcessor)
+        String projectName,
+        MarkedLine markedLine,
+        Map<String, String> linkToAliasMap,
+        Map<String, NavigableMap<LocalDate, String>> attributes,
+        LineProcessor lineProcessor)
     {
         for (Map.Entry<String, String> linkToAlias : linkToAliasMap.entrySet())
         {
@@ -247,8 +252,8 @@ class ProjectJournal
                     // most recent one. The fair assumption here is that the journal is written in
                     // chronological order.
                     attributes
-                            .computeIfAbsent(projectName, k -> new TreeMap<>())
-                            .put(markedLine.date(), value);
+                        .computeIfAbsent(projectName, k -> new TreeMap<>())
+                        .put(markedLine.date(), value);
                 }
             }
         }
@@ -271,14 +276,16 @@ class ProjectJournal
         }
         if (links.size() > 1)
         {
-            LOGGER.warn("Found more than one internal link in line '{}'. Results can be unpredictable!",
-                    line);
+            LOGGER.warn(
+                "Found more than one internal link in line '{}'. Results can be unpredictable!",
+                line
+            );
         }
         return links.iterator().next();
     }
 
     private void removeAttributesForDate(
-            LocalDate date, Map<String, NavigableMap<LocalDate, String>> attributes)
+        LocalDate date, Map<String, NavigableMap<LocalDate, String>> attributes)
     {
         attributes.values().forEach(entries -> entries.remove(date));
     }
@@ -291,11 +298,11 @@ class ProjectJournal
     Optional<Document> leadOf(Project project)
     {
         return valueOf(project, projectLeads)
-                .flatMap(lead -> journal.vault().findDocument(lead));
+            .flatMap(lead -> journal.vault().findDocument(lead));
     }
 
     private <T> Optional<T> valueOf(
-            Project project, Map<String, NavigableMap<LocalDate, T>> entries)
+        Project project, Map<String, NavigableMap<LocalDate, T>> entries)
     {
         var entry = entries.get(project.name());
         if (entry == null)

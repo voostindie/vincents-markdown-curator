@@ -16,7 +16,7 @@ import static nl.ulso.markdown_curator.project.ProjectProperty.STATUS;
  */
 @Singleton
 final class OmniFocusStatusResolver
-        implements ProjectPropertyResolver
+        implements ValueResolver
 {
     private final OmniFocusRepository omniFocusRepository;
     private final ProjectProperty statusProperty;
@@ -34,13 +34,13 @@ final class OmniFocusStatusResolver
     }
 
     @Override
-    public ProjectProperty projectProperty()
+    public ProjectProperty property()
     {
         return statusProperty;
     }
 
     @Override
-    public Optional<?> resolveValue(Project project)
+    public Optional<?> from(Project project)
     {
         var status = omniFocusRepository.statusOf(project.document().name());
         if (status == Status.ON_HOLD)

@@ -22,17 +22,17 @@ public abstract class OmniFocusModule
 
     @Binds
     @IntoSet
-    abstract ProjectPropertyResolver bindOmniFocusPriorityResolver(
+    abstract ValueResolver bindOmniFocusPriorityResolver(
             OmniFocusPriorityResolver resolver);
 
     @Binds
     @IntoSet
-    abstract ProjectPropertyResolver bindOmniFocusStatusResolver(
+    abstract ValueResolver bindOmniFocusStatusResolver(
             OmniFocusStatusResolver resolver);
 
     @Binds
     @IntoSet
-    abstract ProjectPropertyResolver bindOmniFocusUrlResolver(
+    abstract ValueResolver bindOmniFocusUrlResolver(
             OmniFocusUrlResolver resolver);
 
 

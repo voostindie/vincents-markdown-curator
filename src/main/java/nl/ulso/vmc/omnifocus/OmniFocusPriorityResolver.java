@@ -16,7 +16,7 @@ import static nl.ulso.markdown_curator.project.ProjectProperty.PRIORITY;
  */
 @Singleton
 final class OmniFocusPriorityResolver
-        implements ProjectPropertyResolver
+        implements ValueResolver
 {
     private final OmniFocusRepository omniFocusRepository;
     private final ProjectProperty priorityProperty;
@@ -31,13 +31,13 @@ final class OmniFocusPriorityResolver
     }
 
     @Override
-    public ProjectProperty projectProperty()
+    public ProjectProperty property()
     {
         return priorityProperty;
     }
 
     @Override
-    public Optional<?> resolveValue(Project project)
+    public Optional<?> from(Project project)
     {
         var priority = omniFocusRepository.priorityOf(project.document().name());
         if (priority >= 0)
