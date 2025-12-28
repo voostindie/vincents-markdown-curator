@@ -62,6 +62,10 @@ abstract class TweevvNotesCuratorModule
 
     @Binds
     @IntoSet
+    abstract Query bindRetiredVolunteersQuery(RetiredVolunteersQuery retiredVolunteersQuery);
+
+    @Binds
+    @IntoSet
     abstract Query bindGroupQuery(GroupQuery groupQuery);
 
     @Binds

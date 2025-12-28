@@ -15,6 +15,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toSet;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentRemoved;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
@@ -157,6 +158,22 @@ public class VolunteeringModel
             .filter(ca -> selectedActivity == null || ca.activity == selectedActivity)
             .sorted(comparing(contactActivity -> contactActivity.contact.name()))
             .collect(Collectors.groupingBy(ContactActivity::contact));
+    }
+
+    public Map<Contact, List<ContactActivity>> retiredVolunteersFor(String seasonString)
+    {
+        return Season.fromString(seasonString)
+            .map(activeSeason ->
+            {
+                var activeVolunteers = volunteering.getOrDefault(activeSeason, emptySet()).stream()
+                    .map(ContactActivity::contact).collect(toSet());
+                var priorSeason = Season.forStartYear(activeSeason.startYear - 1);
+                return volunteering.getOrDefault(priorSeason, emptySet()).stream()
+                    .filter(ca -> !activeVolunteers.contains(ca.contact()))
+                    .sorted(comparing(activity -> activity.contact.name()))
+                    .collect(Collectors.groupingBy(ContactActivity::contact));
+            })
+            .orElse(emptyMap());
     }
 
     public static class Season
