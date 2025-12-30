@@ -1,5 +1,6 @@
 package nl.ulso.vmc.graph;
 
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.journal.MarkedLine;
@@ -70,10 +71,12 @@ public class MermaidGraph
         this.nodes = new HashMap<>();
     }
 
-    public int order()
+    @Override
+    public Set<DataModel> dependentModels()
     {
-        return ORDER_LAST;
+        return Set.of(journal);
     }
+
 
     @Override
     public void fullRefresh()

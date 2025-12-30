@@ -2,6 +2,7 @@ package nl.ulso.vmc.projectjournal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.journal.MarkedLine;
@@ -252,7 +253,7 @@ final class ProjectJournal
                     // most recent one. The fair assumption here is that the journal is written in
                     // chronological order.
                     attributes
-                        .computeIfAbsent(projectName, k -> new TreeMap<>())
+                        .computeIfAbsent(projectName, _ -> new TreeMap<>())
                         .put(markedLine.date(), value);
                 }
             }
@@ -318,9 +319,9 @@ final class ProjectJournal
     }
 
     @Override
-    public int order()
+    public Set<DataModel> dependentModels()
     {
-        return Math.max(journal.order(), projectRepository.order()) + 1;
+        return Set.of(journal, projectRepository);
     }
 
     private interface LineProcessor
