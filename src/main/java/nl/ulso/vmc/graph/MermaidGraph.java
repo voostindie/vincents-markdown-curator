@@ -1,7 +1,6 @@
 package nl.ulso.vmc.graph;
 
-import nl.ulso.markdown_curator.DataModel;
-import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.journal.MarkedLine;
 import nl.ulso.markdown_curator.vault.*;
@@ -15,6 +14,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 import static nl.ulso.markdown_curator.vault.LocalDates.parseDateOrNull;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -77,52 +77,54 @@ public class MermaidGraph
         return Set.of(journal);
     }
 
-
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         refreshSelectedMarkers();
         refreshNodes();
         refreshEdges();
         LOGGER.debug("Constructed a graph with {} nodes", nodes.size());
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
-        processDocumentUpdate(event.document());
+        processDocumentUpdate(event.document(), changelog);
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
-        processDocumentUpdate(event.document());
+        return processDocumentUpdate(event.document(), changelog);
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
-        processDocumentUpdate(event.document());
+        return processDocumentUpdate(event.document(), changelog);
     }
 
-    private void processDocumentUpdate(Document document)
+    private Changelog processDocumentUpdate(Document document, Changelog changelog)
     {
         if (journal.isMarkerDocument(document))
         {
             // A marker may have been added or removed, or an existing one updated. Both can affect
             // the `include-in-graph` setting, and therefore the graph as a whole. A full refresh
             // is the easiest thing to do. Also, this doesn't happen much. Markers are stable.
-            fullRefresh();
+            return fullRefresh(changelog);
         }
         else if (journal.isJournalEntry(document))
         {
             var date = parseDateOrNull(document.name());
-            if (date != null)
+            if (date == null)
             {
-                // The document refers to a daily log. That means all node edges for that day need
-                // to be refreshed.
-                refreshGraphForJournalEntryOn(date);
+                return emptyChangelog();
             }
+            // The document refers to a daily log. That means all node edges for that day need
+            // to be refreshed.
+            return refreshGraphForJournalEntryOn(date, changelog);
         }
         else if (isNodeEntry(document)) // Document represents a node
         {
@@ -133,14 +135,16 @@ public class MermaidGraph
                 // A node already exists. All we need to do is replace the underlying document
                 // reference.
                 node.replaceDocumentWith(document);
+                return emptyChangelog();
             }
             else
             {
                 // This is a new node. It might refer to other nodes already, and other nodes
                 // might refer to it. So, a full refresh is all we can do.
-                fullRefresh();
+                return fullRefresh(changelog);
             }
         }
+        return emptyChangelog();
     }
 
     private boolean isNodeEntry(Document document)
@@ -157,7 +161,7 @@ public class MermaidGraph
         return false;
     }
 
-    private void refreshGraphForJournalEntryOn(LocalDate date)
+    private Changelog refreshGraphForJournalEntryOn(LocalDate date, Changelog changelog)
     {
         // First remove all edges from the graph for the given date
         nodes.values().forEach(node -> node.removeEdgesFor(date));
@@ -165,6 +169,7 @@ public class MermaidGraph
         nodes.values().forEach(node -> processMarkedLines(
                 journal.markedLinesFor(node.document().name(), selectedMarkerNames, date),
                 node));
+        return emptyChangelog();
     }
 
     private void refreshSelectedMarkers()

@@ -2,8 +2,7 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.FrontMatterUpdateCollector;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
@@ -13,13 +12,14 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.regex.Pattern.compile;
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 /**
  * My collection of console (PS4/PS5) games.
  */
 @Singleton
 public class Collection
-        extends DataModelTemplate
+    extends DataModelTemplate
 {
     private static final String GAMES_FOLDER = "Games";
     private final Vault vault;
@@ -35,62 +35,70 @@ public class Collection
     }
 
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         games.forEach(
-                (name, game) -> {
-                    frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
-                            dictionary -> dictionary.removeProperty("rating"));
-                    frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
-                            dictionary -> dictionary.removeProperty("cover"));
-                });
+            (name, game) -> {
+                frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
+                    dictionary -> dictionary.removeProperty("rating")
+                );
+                frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
+                    dictionary -> dictionary.removeProperty("cover")
+                );
+            });
         games.clear();
         vault.folder(GAMES_FOLDER).ifPresent(folder -> folder.accept(new GameFinder()));
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderAdded event)
+    public Changelog process(FolderAdded event, Changelog changelog)
     {
         if (isFolderInScope(event.folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderRemoved event)
+    public Changelog process(FolderRemoved event, Changelog changelog)
     {
         if (isFolderInScope(event.folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     private boolean isFolderInScope(Folder folder)
@@ -110,7 +118,7 @@ public class Collection
     }
 
     private class GameFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private static final Pattern DATE_PATTERN = compile("\\[\\[(\\d{4}-\\d{2}-\\d{2})]]");
         private Game game;
@@ -122,27 +130,29 @@ public class Collection
             games.put(document.name(), game);
             super.visit(document);
             frontMatterUpdateCollector.updateFrontMatterFor(document, dictionary ->
-            {
-                game.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
-                game.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));
-            });
+                {
+                    game.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
+                    game.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));
+                }
+            );
         }
 
         @Override
         public void visit(TextBlock textBlock)
         {
             textBlock.parentSection().ifPresentOrElse(section ->
+                {
+                    if (section.level() != 2)
                     {
-                        if (section.level() != 2)
-                        {
-                            return;
-                        }
-                        if (section.title().startsWith("Rating"))
-                        {
-                            extractRating(textBlock);
-                        }
-                    },
-                    () -> extractCover(textBlock));
+                        return;
+                    }
+                    if (section.title().startsWith("Rating"))
+                    {
+                        extractRating(textBlock);
+                    }
+                },
+                () -> extractCover(textBlock)
+            );
         }
 
         private void extractCover(TextBlock block)

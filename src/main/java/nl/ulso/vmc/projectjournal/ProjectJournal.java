@@ -2,8 +2,7 @@ package nl.ulso.vmc.projectjournal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.DataModel;
-import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.journal.Journal;
 import nl.ulso.markdown_curator.journal.MarkedLine;
 import nl.ulso.markdown_curator.project.Project;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.*;
 
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /// Keeps track of project attributes - status and lead - in the journal.
@@ -63,7 +63,7 @@ final class ProjectJournal
     }
 
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         this.projectStatuses.clear();
         this.statusMarkers.clear();
@@ -79,43 +79,46 @@ final class ProjectJournal
         {
             processJournal();
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderAdded event)
+    public Changelog process(FolderAdded event, Changelog changelog)
     {
         // There's nothing to do if a folder is added.
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderRemoved event)
+    public Changelog process(FolderRemoved event, Changelog changelog)
     {
         // If a folder is removed, we only care about that if it concerns the project repository.
         if (projectRepository.projects().isEmpty())
         {
-            super.process(event);
+            return super.process(event, changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
-        processDocumentChangeEvent(event.document());
+        return processDocumentChangeEvent(event.document(), changelog);
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
-        processDocumentChangeEvent(event.document());
+        return processDocumentChangeEvent(event.document(), changelog);
     }
 
-    private void processDocumentChangeEvent(Document document)
+    private Changelog processDocumentChangeEvent(Document document, Changelog changelog)
     {
         if (journal.isMarkerDocument(document))
         {
             // Every time a marker document is changed, we need to re-discover the markers and
             // process the complete journal again.
-            fullRefresh();
+            return fullRefresh(changelog);
         }
         else if (journal.isJournalEntry(document))
         {
@@ -138,17 +141,18 @@ final class ProjectJournal
                 }
             });
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
         var document = event.document();
         if (journal.isMarkerDocument(document))
         {
             // When a marker document is removed, we need to re-discover all markers and process
             // the complete journal again.
-            fullRefresh();
+            return fullRefresh(changelog);
         }
         else if (journal.isJournalEntry(document))
         {
@@ -156,7 +160,7 @@ final class ProjectJournal
             var date = LocalDates.parseDateOrNull(document.name());
             if (date == null)
             {
-                return;
+                return emptyChangelog();
             }
             removeAttributesForDate(date, projectStatuses);
             removeAttributesForDate(date, projectLeads);
@@ -168,6 +172,7 @@ final class ProjectJournal
             projectStatuses.remove(projectName);
             projectLeads.remove(projectName);
         }
+        return emptyChangelog();
     }
 
     private void discoverMarkers()

@@ -1,5 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 @Singleton
 public class OrgChart
@@ -33,7 +35,7 @@ public class OrgChart
     }
 
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         orgUnits.clear();
         var teams = vault.folder(TEAMS_FOLDER).orElse(null);
@@ -48,51 +50,57 @@ public class OrgChart
             thirdParties.documents().forEach(
                     thirdParty -> thirdParty.accept(new OrgUnitFinder(thirdParties, contacts)));
         }
+        return changelog;
     }
 
     @Override
-    public void process(FolderAdded event)
+    public Changelog process(FolderAdded event, Changelog changelog)
     {
         if (isFolderInScope(event.folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderRemoved event)
+    public Changelog process(FolderRemoved event, Changelog changelog)
     {
         if (isFolderInScope(event.folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     private boolean isFolderInScope(Folder folder)

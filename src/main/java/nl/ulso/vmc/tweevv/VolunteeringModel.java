@@ -2,6 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.DataModelTemplate;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
@@ -16,6 +17,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentRemoved;
 import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
@@ -42,7 +44,7 @@ public class VolunteeringModel
     }
 
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         activities.clear();
         contacts.clear();
@@ -61,6 +63,7 @@ public class VolunteeringModel
                 addContact(document);
             }
         });
+        return emptyChangelog();
     }
 
     private void addActivity(Document document)
@@ -77,23 +80,24 @@ public class VolunteeringModel
     }
 
     @Override
-    public void process(FolderAdded event)
+    public Changelog process(FolderAdded event, Changelog changelog)
     {
         var folderName = event.folder().name();
         if (folderName.equals(TEAMS_FOLDER) || folderName.equals(CONTACTS_FOLDER))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderRemoved event)
+    public Changelog process(FolderRemoved event, Changelog changelog)
     {
-        process(folderAdded(event.folder()));
+        return process(folderAdded(event.folder()), changelog);
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
         var document = event.document();
         var parentFolderName = document.folder().name();
@@ -110,17 +114,19 @@ public class VolunteeringModel
                 new ActivityProcessor(contact).process();
             }
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
-        process(documentRemoved(event.document()));
-        process(documentAdded(event.document()));
+        process(documentRemoved(event.document()), changelog);
+        process(documentAdded(event.document()), changelog);
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
         var document = event.document();
         var parentFolderName = document.folder().name();
@@ -136,6 +142,7 @@ public class VolunteeringModel
             volunteering.values().forEach(set ->
                 set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
         }
+        return emptyChangelog();
     }
 
     public Map<Contact, List<ContactActivity>> volunteersFor(String seasonString)

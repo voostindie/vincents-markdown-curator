@@ -2,8 +2,7 @@ package nl.ulso.vmc.tweevv.trainers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.FrontMatterUpdateCollector;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
@@ -14,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /**
@@ -78,7 +78,7 @@ public final class TrainerModel
     }
 
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         seasons.clear();
         vault.folder(MODEL_FOLDER).ifPresent(modelFolder -> {
@@ -89,48 +89,51 @@ public final class TrainerModel
         });
         vault.folder(TRAINER_FOLDER).ifPresent(this::importTrainers);
         vault.folder(TRAINER_FOLDER).ifPresent(this::updateTrainerFrontMatter);
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderAdded event)
+    public Changelog process(FolderAdded event, Changelog changelog)
     {
         // Do nothing
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderRemoved event)
+    public Changelog process(FolderRemoved event, Changelog changelog)
     {
-        processEventInFolder(event.folder());
+        return processEventInFolder(event.folder(), changelog);
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
-        processEventInFolder(event.document().folder());
+        return processEventInFolder(event.document().folder(), changelog);
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
-        processEventInFolder(event.document().folder());
+        return processEventInFolder(event.document().folder(), changelog);
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
-        processEventInFolder(event.document().folder());
+        return processEventInFolder(event.document().folder(), changelog);
     }
 
     /*
      * Do a full refresh if the event is in the main #{MODEL_FOLDER} or in the #{TRAINER_FOLDER},
      * otherwise ignore the event.
      */
-    void processEventInFolder(Folder folder)
+    Changelog processEventInFolder(Folder folder, Changelog changelog)
     {
         if (isFolderInPath(folder, MODEL_FOLDER) || isFolderInPath(folder, TRAINER_FOLDER))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     private boolean isFolderInPath(Folder folder, String folderName)

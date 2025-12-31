@@ -2,8 +2,7 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.FrontMatterUpdateCollector;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
@@ -17,6 +16,7 @@ import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
+import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 /**
  * This is the start of what will hopefully be a richer data model at some point. For example
@@ -45,65 +45,73 @@ public class Library
     }
 
     @Override
-    public void fullRefresh()
+    public Changelog fullRefresh(Changelog changelog)
     {
         authors.clear();
         books.forEach(
-                (name, book) -> {
-                    frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
-                            dictionary -> dictionary.removeProperty("rating"));
-                    frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
-                            dictionary -> dictionary.removeProperty("cover"));
-                });
+            (name, book) -> {
+                frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                    dictionary -> dictionary.removeProperty("rating")
+                );
+                frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                    dictionary -> dictionary.removeProperty("cover")
+                );
+            });
         books.clear();
         readingSessions.clear();
         vault.folder(AUTHORS_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
         vault.folder(BOOKS_FOLDER).ifPresent(folder -> folder.accept(new BookFinder()));
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderAdded event)
+    public Changelog process(FolderAdded event, Changelog changelog)
     {
         if (isFolderInScope(event.folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(FolderRemoved event)
+    public Changelog process(FolderRemoved event, Changelog changelog)
     {
         if (isFolderInScope(event.folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentAdded event)
+    public Changelog process(DocumentAdded event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentChanged event)
+    public Changelog process(DocumentChanged event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     @Override
-    public void process(DocumentRemoved event)
+    public Changelog process(DocumentRemoved event, Changelog changelog)
     {
         if (isFolderInScope(event.document().folder()))
         {
-            fullRefresh();
+            return fullRefresh(changelog);
         }
+        return emptyChangelog();
     }
 
     private boolean isFolderInScope(Folder folder)
