@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
+import static java.util.Collections.emptyList;
 import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
@@ -75,10 +76,11 @@ public final class TrainerModel
         this.vault = vault;
         this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.seasons = new HashMap<>();
+        registerChangeHandler(hasObjectType(Document.class).and(isFolderInScope()), fullRefreshHandler());
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         seasons.clear();
         vault.folder(MODEL_FOLDER).ifPresent(modelFolder -> {
@@ -89,51 +91,16 @@ public final class TrainerModel
         });
         vault.folder(TRAINER_FOLDER).ifPresent(this::importTrainers);
         vault.folder(TRAINER_FOLDER).ifPresent(this::updateTrainerFrontMatter);
-        return emptyChangelog();
+        return emptyList();
     }
 
-    @Override
-    public Changelog process(FolderAdded event, Changelog changelog)
+    private Predicate<? super Change<?>> isFolderInScope()
     {
-        // Do nothing
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderRemoved event, Changelog changelog)
-    {
-        return processEventInFolder(event.folder(), changelog);
-    }
-
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
-    {
-        return processEventInFolder(event.document().folder(), changelog);
-    }
-
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
-    {
-        return processEventInFolder(event.document().folder(), changelog);
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        return processEventInFolder(event.document().folder(), changelog);
-    }
-
-    /*
-     * Do a full refresh if the event is in the main #{MODEL_FOLDER} or in the #{TRAINER_FOLDER},
-     * otherwise ignore the event.
-     */
-    Changelog processEventInFolder(Folder folder, Changelog changelog)
-    {
-        if (isFolderInPath(folder, MODEL_FOLDER) || isFolderInPath(folder, TRAINER_FOLDER))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
+        return change -> {
+            var document = (Document) change.object();
+            var folder = document.folder();
+            return isFolderInPath(folder, MODEL_FOLDER) || isFolderInPath(folder, TRAINER_FOLDER);
+        };
     }
 
     private boolean isFolderInPath(Folder folder, String folderName)

@@ -3,20 +3,18 @@ package nl.ulso.vmc.projectjournal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.journal.Journal;
-import nl.ulso.markdown_curator.journal.MarkedLine;
+import nl.ulso.markdown_curator.journal.*;
 import nl.ulso.markdown_curator.project.Project;
 import nl.ulso.markdown_curator.project.ProjectRepository;
 import nl.ulso.markdown_curator.vault.Document;
-import nl.ulso.markdown_curator.vault.LocalDates;
-import nl.ulso.markdown_curator.vault.event.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.*;
 
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
+import static java.util.Collections.emptyList;
+import static nl.ulso.markdown_curator.Change.Kind.DELETION;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /// Keeps track of project attributes - status and lead - in the journal.
@@ -60,10 +58,16 @@ final class ProjectJournal
         this.leadMarkers = new HashSet<>();
         this.linkToLeadMap = new HashMap<>();
         this.allMarkers = new HashSet<>();
+        this.registerChangeHandler(hasObjectType(Daily.class), this::processDailyUpdate);
+        this.registerChangeHandler(
+            hasObjectType(Project.class).and(isDeletion()),
+            this::processProjectDeletion
+        );
+        this.registerChangeHandler(journal.isMarkerEntry(), fullRefreshHandler());
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         this.projectStatuses.clear();
         this.statusMarkers.clear();
@@ -79,100 +83,42 @@ final class ProjectJournal
         {
             processJournal();
         }
-        return emptyChangelog();
+        return emptyList();
     }
 
-    @Override
-    public Changelog process(FolderAdded event, Changelog changelog)
+    private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        // There's nothing to do if a folder is added.
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderRemoved event, Changelog changelog)
-    {
-        // If a folder is removed, we only care about that if it concerns the project repository.
-        if (projectRepository.projects().isEmpty())
-        {
-            return super.process(event, changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
-    {
-        return processDocumentChangeEvent(event.document(), changelog);
-    }
-
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
-    {
-        return processDocumentChangeEvent(event.document(), changelog);
-    }
-
-    private Changelog processDocumentChangeEvent(Document document, Changelog changelog)
-    {
-        if (journal.isMarkerDocument(document))
-        {
-            // Every time a marker document is changed, we need to re-discover the markers and
-            // process the complete journal again.
-            return fullRefresh(changelog);
-        }
-        else if (journal.isJournalEntry(document))
-        {
-            // Every time a journal entry is changed, we need to process it.
-            journal.toDaily(document).ifPresent(daily ->
-            {
-                LOGGER.debug("Processing journal entry '{}' for project attributes",
-                    document.name()
-                );
-                removeAttributesForDate(daily.date(), projectStatuses);
-                removeAttributesForDate(daily.date(), projectLeads);
-                for (Project project : projectRepository.projects())
-                {
-                    var projectName = project.name();
-                    if (daily.refersTo(projectName))
-                    {
-                        var entries = daily.markedLinesFor(projectName, allMarkers, false);
-                        updateProjectAttributes(projectName, entries);
-                    }
-                }
-            });
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        var document = event.document();
-        if (journal.isMarkerDocument(document))
-        {
-            // When a marker document is removed, we need to re-discover all markers and process
-            // the complete journal again.
-            return fullRefresh(changelog);
-        }
-        else if (journal.isJournalEntry(document))
+        var daily = (Daily) change.object();
+        if (change.kind() == DELETION)
         {
             // When a journal entry is removed, we need to remove all associated attributes.
-            var date = LocalDates.parseDateOrNull(document.name());
-            if (date == null)
-            {
-                return emptyChangelog();
-            }
-            removeAttributesForDate(date, projectStatuses);
-            removeAttributesForDate(date, projectLeads);
+            removeAttributesForDate(daily.date(), projectStatuses);
+            removeAttributesForDate(daily.date(), projectLeads);
         }
-        else if (projectRepository.isProjectDocument(document))
+        else
         {
-            // If a project is removed, we should also remove it from the caches.
-            var projectName = document.name();
-            projectStatuses.remove(projectName);
-            projectLeads.remove(projectName);
+            LOGGER.debug("Processing journal entry '{}' for project attributes", daily.date());
+            removeAttributesForDate(daily.date(), projectStatuses);
+            removeAttributesForDate(daily.date(), projectLeads);
+            for (Project project : projectRepository.projects())
+            {
+                var projectName = project.name();
+                if (daily.refersTo(projectName))
+                {
+                    var entries = daily.markedLinesFor(projectName, allMarkers, false);
+                    updateProjectAttributes(projectName, entries);
+                }
+            }
         }
-        return emptyChangelog();
+        return emptyList();
+    }
+
+    private Collection<Change<?>> processProjectDeletion(Change<?> change)
+    {
+        var project = (Project) change.object();
+        projectStatuses.remove(project.name());
+        projectLeads.remove(project.name());
+        return emptyList();
     }
 
     private void discoverMarkers()

@@ -5,9 +5,12 @@ import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
+import org.jspecify.annotations.NonNull;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +29,8 @@ import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 public class Library
         extends DataModelTemplate
 {
-    private static final String AUTHORS_FOLDER = "Authors";
-    private static final String BOOKS_FOLDER = "Books";
+    private static final String AUTHOR_FOLDER = "Authors";
+    private static final String BOOK_FOLDER = "Books";
     private final Vault vault;
     private final Map<String, Author> authors;
     private final Map<String, Book> books;
@@ -42,10 +45,51 @@ public class Library
         this.authors = new HashMap<>();
         this.books = new HashMap<>();
         this.readingSessions = new HashSet<>();
+        registerChangeHandler(isAuthorDocument().or(isBookDocument()), fullRefreshHandler());
+        registerChangeHandler(isLibraryFolder().and(isDeletion()), fullRefreshHandler());
+    }
+
+    private Predicate<Change<?>> isAuthorDocument()
+    {
+        return hasObjectType(Document.class).and(change ->
+        {
+            var document = (Document) change.object();
+            var folder = document.folder();
+            return isAuthorFolder(folder);
+        });
+    }
+
+    private Predicate<Change<?>> isBookDocument()
+    {
+        return hasObjectType(Document.class).and(change ->
+        {
+            var document = (Document) change.object();
+            var folder = document.folder();
+            return isBookFolder(folder);
+        });
+    }
+
+    private Predicate<Change<?>> isLibraryFolder()
+    {
+        return hasObjectType(Folder.class).and(change ->
+        {
+            var folder = (Folder) change.object();
+            return isAuthorFolder(folder) || isBookFolder(folder);
+        });
+    }
+
+    private boolean isAuthorFolder(Folder folder)
+    {
+        return folder.name().contentEquals(AUTHOR_FOLDER) && folder.parent() == vault;
+    }
+
+    private boolean isBookFolder(Folder folder)
+    {
+        return folder.name().contentEquals(BOOK_FOLDER) && folder.parent() == vault;
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         authors.clear();
         books.forEach(
@@ -59,76 +103,9 @@ public class Library
             });
         books.clear();
         readingSessions.clear();
-        vault.folder(AUTHORS_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
-        vault.folder(BOOKS_FOLDER).ifPresent(folder -> folder.accept(new BookFinder()));
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderAdded event, Changelog changelog)
-    {
-        if (isFolderInScope(event.folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderRemoved event, Changelog changelog)
-    {
-        if (isFolderInScope(event.folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    private boolean isFolderInScope(Folder folder)
-    {
-        var topLevelFolderName = toplevelFolder(folder).name();
-        return topLevelFolderName.contentEquals(AUTHORS_FOLDER) ||
-               topLevelFolderName.contentEquals(BOOKS_FOLDER);
-    }
-
-    private Folder toplevelFolder(Folder folder)
-    {
-        var toplevelFolder = folder;
-        while (toplevelFolder != vault && toplevelFolder.parent() != vault)
-        {
-            toplevelFolder = toplevelFolder.parent();
-        }
-        return toplevelFolder;
+        vault.folder(AUTHOR_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
+        vault.folder(BOOK_FOLDER).ifPresent(folder -> folder.accept(new BookFinder()));
+        return emptyList();
     }
 
     List<ReadingSession> readingFor(int year)

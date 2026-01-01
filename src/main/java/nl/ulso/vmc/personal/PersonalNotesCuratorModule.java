@@ -66,7 +66,7 @@ abstract class PersonalNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract DataModel bindCollection(Collection collection);
+    abstract DataModel bindGameCollection(GameCollection gameCollection);
 
     @Provides
     static JournalSettings provideJournalSettings()

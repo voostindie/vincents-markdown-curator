@@ -6,19 +6,21 @@ import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
 import nl.ulso.markdown_curator.vault.event.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
+import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
+import static nl.ulso.markdown_curator.Change.Kind.DELETION;
 import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 /**
  * My collection of console (PS4/PS5) games.
  */
 @Singleton
-public class Collection
+public class GameCollection
     extends DataModelTemplate
 {
     private static final String GAMES_FOLDER = "Games";
@@ -27,15 +29,41 @@ public class Collection
     private final Map<String, Game> games;
 
     @Inject
-    public Collection(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
+    public GameCollection(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
     {
         this.vault = vault;
         this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.games = new HashMap<>();
+        this.registerChangeHandler(isGameDocument(), this::processGameDocumentUpdate);
+        this.registerChangeHandler(isGameFolder().and(isDeletion()), fullRefreshHandler());
+    }
+
+    private Predicate<Change<?>> isGameDocument()
+    {
+        return hasObjectType(Document.class).and(change ->
+        {
+            var document = (Document) change.object();
+            var folder = document.folder();
+            return isGameFolder(folder);
+        });
+    }
+
+    private Predicate<Change<?>> isGameFolder()
+    {
+        return hasObjectType(Folder.class).and(change ->
+        {
+            var folder = (Folder) change.object();
+            return isGameFolder(folder);
+        });
+    }
+
+    private boolean isGameFolder(Folder folder)
+    {
+        return folder.name().contentEquals(GAMES_FOLDER) && folder.parent() == vault;
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         games.forEach(
             (name, game) -> {
@@ -48,73 +76,21 @@ public class Collection
             });
         games.clear();
         vault.folder(GAMES_FOLDER).ifPresent(folder -> folder.accept(new GameFinder()));
-        return emptyChangelog();
+        return emptyList();
     }
 
-    @Override
-    public Changelog process(FolderAdded event, Changelog changelog)
+    private Collection<Change<?>> processGameDocumentUpdate(Change<?> change)
     {
-        if (isFolderInScope(event.folder()))
+        var document = (Document) change.object();
+        if (change.kind() == DELETION)
         {
-            return fullRefresh(changelog);
+            games.remove(document.name());
         }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderRemoved event, Changelog changelog)
-    {
-        if (isFolderInScope(event.folder()))
+        else
         {
-            return fullRefresh(changelog);
+            document.accept(new GameFinder());
         }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    private boolean isFolderInScope(Folder folder)
-    {
-        var topLevelFolderName = toplevelFolder(folder).name();
-        return topLevelFolderName.contentEquals(GAMES_FOLDER);
-    }
-
-    private Folder toplevelFolder(Folder folder)
-    {
-        var toplevelFolder = folder;
-        while (toplevelFolder != vault && toplevelFolder.parent() != vault)
-        {
-            toplevelFolder = toplevelFolder.parent();
-        }
-        return toplevelFolder;
+        return null;
     }
 
     private class GameFinder

@@ -2,32 +2,30 @@ package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
-import nl.ulso.markdown_curator.vault.event.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.lang.Character.isDigit;
 import static java.lang.Integer.parseInt;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
-import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentAdded;
-import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.documentRemoved;
-import static nl.ulso.markdown_curator.vault.event.VaultChangedEvent.folderAdded;
+import static nl.ulso.markdown_curator.Change.Kind.CREATION;
+import static nl.ulso.markdown_curator.Change.Kind.MODIFICATION;
 
 @Singleton
 public class VolunteeringModel
     extends DataModelTemplate
 {
-    private static final String TEAMS_FOLDER = "Teams";
-    private static final String CONTACTS_FOLDER = "Contacten";
+    private static final String TEAM_FOLDER = "Teams";
+    private static final String CONTACT_FOLDER = "Contacten";
 
     private final Vault vault;
     private final Map<String, Activity> activities;
@@ -41,29 +39,80 @@ public class VolunteeringModel
         this.activities = new HashMap<>();
         this.contacts = new HashMap<>();
         this.volunteering = new HashMap<>();
+        registerChangeHandler(isTeamDocument(), this::processTeamUpdate);
+        registerChangeHandler(isContactDocument(), this::processContactUpdate);
+    }
+
+    private Predicate<Change<?>> isTeamDocument()
+    {
+        return hasObjectType(Document.class).and(change ->
+        {
+            var document = (Document) change.object();
+            return document.folder().name().equals(TEAM_FOLDER);
+        });
+    }
+
+    private Predicate<Change<?>> isContactDocument()
+    {
+        return hasObjectType(Document.class).and(change ->
+        {
+            var document = (Document) change.object();
+            return document.folder().name().equals(CONTACT_FOLDER);
+        });
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         activities.clear();
         contacts.clear();
         volunteering.clear();
-        vault.folder(TEAMS_FOLDER).ifPresent(folder ->
+        vault.folder(TEAM_FOLDER).ifPresent(folder ->
         {
             for (Document document : folder.documents())
             {
                 addActivity(document);
             }
         });
-        vault.folder(CONTACTS_FOLDER).ifPresent(folder ->
+        vault.folder(CONTACT_FOLDER).ifPresent(folder ->
         {
             for (Document document : folder.documents())
             {
                 addContact(document);
             }
         });
-        return emptyChangelog();
+        return emptyList();
+    }
+
+    private Collection<Change<?>> processTeamUpdate(Change<?> change)
+    {
+        var document = (Document) change.object();
+        var activity = activities.remove(document.name());
+        volunteering.values().forEach(set ->
+            set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
+        if (change.kind() == CREATION || change.kind() == MODIFICATION)
+        {
+            addActivity(document);
+            volunteering.clear();
+            for (Contact contact : contacts.values())
+            {
+                new ActivityProcessor(contact).process();
+            }
+        }
+        return emptyList();
+    }
+
+    private Collection<Change<?>> processContactUpdate(Change<?> change)
+    {
+        var document = (Document) change.object();
+        var contact = contacts.remove(document.name());
+        volunteering.values().forEach(set ->
+            set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));
+        if (change.kind() == CREATION || change.kind() == MODIFICATION)
+        {
+            addContact(document);
+        }
+        return emptyList();
     }
 
     private void addActivity(Document document)
@@ -77,72 +126,6 @@ public class VolunteeringModel
         var contact = new Contact(document);
         contacts.put(contact.name(), contact);
         new ActivityProcessor(contact).process();
-    }
-
-    @Override
-    public Changelog process(FolderAdded event, Changelog changelog)
-    {
-        var folderName = event.folder().name();
-        if (folderName.equals(TEAMS_FOLDER) || folderName.equals(CONTACTS_FOLDER))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderRemoved event, Changelog changelog)
-    {
-        return process(folderAdded(event.folder()), changelog);
-    }
-
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
-    {
-        var document = event.document();
-        var parentFolderName = document.folder().name();
-        if (parentFolderName.equals(CONTACTS_FOLDER))
-        {
-            addContact(document);
-        }
-        else if (parentFolderName.equals(TEAMS_FOLDER))
-        {
-            addActivity(document);
-            volunteering.clear();
-            for (Contact contact : contacts.values())
-            {
-                new ActivityProcessor(contact).process();
-            }
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
-    {
-        process(documentRemoved(event.document()), changelog);
-        process(documentAdded(event.document()), changelog);
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        var document = event.document();
-        var parentFolderName = document.folder().name();
-        if (parentFolderName.equals(CONTACTS_FOLDER))
-        {
-            var contact = contacts.remove(document.name());
-            volunteering.values().forEach(set ->
-                set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));
-        }
-        else if (parentFolderName.equals(TEAMS_FOLDER))
-        {
-            var activity = activities.remove(document.name());
-            volunteering.values().forEach(set ->
-                set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
-        }
-        return emptyChangelog();
     }
 
     public Map<Contact, List<ContactActivity>> volunteersFor(String seasonString)

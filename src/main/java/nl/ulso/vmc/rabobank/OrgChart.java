@@ -1,24 +1,24 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.DataModelTemplate;
-import nl.ulso.markdown_curator.vault.*;
-import nl.ulso.markdown_curator.vault.event.*;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.markdown_curator.Change;
+import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.vault.*;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 @Singleton
 public class OrgChart
-        extends DataModelTemplate
+    extends DataModelTemplate
 {
     public static final String TEAMS_FOLDER = "Teams";
     public static final String THIRD_PARTY_FOLDER = "3rd Parties";
@@ -32,10 +32,13 @@ public class OrgChart
     {
         this.vault = vault;
         this.orgUnits = ConcurrentHashMap.newKeySet();
+        registerChangeHandler(hasObjectType(Document.class).and(isFolderInScope()),
+            fullRefreshHandler()
+        );
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         orgUnits.clear();
         var teams = vault.folder(TEAMS_FOLDER).orElse(null);
@@ -48,59 +51,18 @@ public class OrgChart
         if (thirdParties != null && contacts != null)
         {
             thirdParties.documents().forEach(
-                    thirdParty -> thirdParty.accept(new OrgUnitFinder(thirdParties, contacts)));
+                thirdParty -> thirdParty.accept(new OrgUnitFinder(thirdParties, contacts)));
         }
-        return changelog;
+        return emptyList();
     }
 
-    @Override
-    public Changelog process(FolderAdded event, Changelog changelog)
+    private Predicate<? super Change<?>> isFolderInScope()
     {
-        if (isFolderInScope(event.folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(FolderRemoved event, Changelog changelog)
-    {
-        if (isFolderInScope(event.folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        if (isFolderInScope(event.document().folder()))
-        {
-            return fullRefresh(changelog);
-        }
-        return emptyChangelog();
+        return change -> {
+            var document = (Document) change.object();
+            var folder = document.folder();
+            return isFolderInScope(folder);
+        };
     }
 
     private boolean isFolderInScope(Folder folder)
@@ -124,13 +86,13 @@ public class OrgChart
     List<OrgUnit> forParent(String parentTeamName)
     {
         return orgUnits.stream().filter(orgUnit -> orgUnit.parent()
-                .map(parent -> parent.name().contentEquals(parentTeamName)).orElse(false)).toList();
+            .map(parent -> parent.name().contentEquals(parentTeamName)).orElse(false)).toList();
     }
 
     List<OrgUnit> forContact(String contactName)
     {
         return orgUnits.stream().filter(orgUnit -> orgUnit.roles().values().stream()
-                .anyMatch(roles -> roles.containsKey(contactName))).toList();
+            .anyMatch(roles -> roles.containsKey(contactName))).toList();
     }
 
     /**
@@ -147,14 +109,14 @@ public class OrgChart
         var unitNameSet = unitNames.stream().map(String::toLowerCase).collect(toSet());
         // TODO: protect against loops in the structure
         return orgUnits.stream()
-                .filter(orgUnit -> isInHierarchy(orgUnit, unitNameSet))
-                .flatMap(orgUnit -> orgUnit.roles().entrySet().stream()
-                        .filter(entry -> rolesSet.stream()
-                                .anyMatch(entry.getKey().toLowerCase()::contains))
-                        .flatMap(entry -> entry.getValue().values().stream()))
-                .sorted(Comparator.comparing(Document::name))
-                .distinct()
-                .toList();
+            .filter(orgUnit -> isInHierarchy(orgUnit, unitNameSet))
+            .flatMap(orgUnit -> orgUnit.roles().entrySet().stream()
+                .filter(entry -> rolesSet.stream()
+                    .anyMatch(entry.getKey().toLowerCase()::contains))
+                .flatMap(entry -> entry.getValue().values().stream()))
+            .sorted(Comparator.comparing(Document::name))
+            .distinct()
+            .toList();
     }
 
     private boolean isInHierarchy(OrgUnit unit, Set<String> unitNames)
@@ -165,17 +127,16 @@ public class OrgChart
             return true;
         }
         return unit.parent()
-                .map(parentDocument -> orgUnits.stream()
-                        .filter(orgUnit -> orgUnit.team() == parentDocument)
-                        .findFirst()
-                        .map(p -> isInHierarchy(p, unitNames))
-                        .orElse(false))
-                .orElse(false);
+            .map(parentDocument -> orgUnits.stream()
+                .filter(orgUnit -> orgUnit.team() == parentDocument)
+                .findFirst()
+                .map(p -> isInHierarchy(p, unitNames))
+                .orElse(false))
+            .orElse(false);
     }
 
-
     private class OrgUnitFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private static final String CONTACTS_SECTION = "Contacts";
         private static final String ROLE_PATTERN_START = "^- (.*?): ";
@@ -200,9 +161,9 @@ public class OrgChart
                 document.fragments().get(1) instanceof TextBlock textBlock)
             {
                 parent = textBlock.findInternalLinks().stream().map(InternalLink::targetDocument)
-                        .map(orgUnitsFolder::document).filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .findFirst().orElse(null);
+                    .map(orgUnitsFolder::document).filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst().orElse(null);
             }
             roles = new ConcurrentHashMap<>();
             super.visit(document);
@@ -223,19 +184,21 @@ public class OrgChart
         {
             String content = textBlock.markdown();
             textBlock.findInternalLinks().stream()
-                    .filter(link -> contactsFolder.document(link.targetDocument()).isPresent())
-                    .forEach(link -> {
-                        var regex = compile(ROLE_PATTERN_START + quote(link.toMarkdown()),
-                                Pattern.MULTILINE);
-                        var matcher = regex.matcher(content);
-                        if (matcher.find())
-                        {
-                            var role = matcher.group(1);
-                            var contact = contactsFolder.document(link.targetDocument());
-                            contact.ifPresent(c -> roles.computeIfAbsent(role, r -> new ConcurrentHashMap<>())
-                                    .put(c.name(), c));
-                        }
-                    });
+                .filter(link -> contactsFolder.document(link.targetDocument()).isPresent())
+                .forEach(link -> {
+                    var regex = compile(ROLE_PATTERN_START + quote(link.toMarkdown()),
+                        Pattern.MULTILINE
+                    );
+                    var matcher = regex.matcher(content);
+                    if (matcher.find())
+                    {
+                        var role = matcher.group(1);
+                        var contact = contactsFolder.document(link.targetDocument());
+                        contact.ifPresent(
+                            c -> roles.computeIfAbsent(role, r -> new ConcurrentHashMap<>())
+                                .put(c.name(), c));
+                    }
+                });
         }
     }
 }

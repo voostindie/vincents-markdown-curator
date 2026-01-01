@@ -1,30 +1,28 @@
 package nl.ulso.vmc.graph;
 
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.journal.Journal;
-import nl.ulso.markdown_curator.journal.MarkedLine;
-import nl.ulso.markdown_curator.vault.*;
-import nl.ulso.markdown_curator.vault.event.*;
-import org.slf4j.Logger;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.markdown_curator.*;
+import nl.ulso.markdown_curator.journal.*;
+import nl.ulso.markdown_curator.vault.*;
+import org.slf4j.Logger;
+
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Predicate;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
-import static nl.ulso.markdown_curator.vault.LocalDates.parseDateOrNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Builds a graph from notes in the repository.
  * <p/>
  * This graph is <strong>not</strong> built from all notes and the links between them. There are
- * several reasons for that, all relating to the fact that this curator uses queries to generate
- * new output within notes:
+ * several reasons for that, all relating to the fact that this curator uses queries to generate new
+ * output within notes:
  * <p/>
  * <ul>
  *     <li>Without query output, there often aren't many links, or any links at all. A note can be
@@ -49,7 +47,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @Singleton
 public class MermaidGraph
-        extends DataModelTemplate
+    extends DataModelTemplate
 {
     private static final Logger LOGGER = getLogger(MermaidGraph.class);
 
@@ -69,6 +67,18 @@ public class MermaidGraph
         this.settings = settings;
         this.selectedMarkerNames = new HashSet<>();
         this.nodes = new HashMap<>();
+        registerChangeHandler(journal.isMarkerEntry(), fullRefreshHandler());
+        registerChangeHandler(hasObjectType(Daily.class), this::processDailyUpdate);
+        registerChangeHandler(isNodeEntry(), this::processNodeUpdate);
+    }
+
+    private Predicate<Change<?>> isNodeEntry()
+    {
+        return hasObjectType(Document.class).and(change ->
+        {
+            var document = (Document) change.object();
+            return isNodeEntry(document);
+        });
     }
 
     @Override
@@ -78,73 +88,40 @@ public class MermaidGraph
     }
 
     @Override
-    public Changelog fullRefresh(Changelog changelog)
+    public Collection<Change<?>> fullRefresh()
     {
         refreshSelectedMarkers();
         refreshNodes();
         refreshEdges();
         LOGGER.debug("Constructed a graph with {} nodes", nodes.size());
-        return emptyChangelog();
+        return emptyList();
     }
 
-    @Override
-    public Changelog process(DocumentAdded event, Changelog changelog)
+    private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        processDocumentUpdate(event.document(), changelog);
-        return emptyChangelog();
+        var daily = (Daily) change.object();
+        refreshGraphForJournalEntryOn(daily.date());
+        return emptyList();
     }
 
-    @Override
-    public Changelog process(DocumentChanged event, Changelog changelog)
+    private Collection<Change<?>> processNodeUpdate(Change<?> change)
     {
-        return processDocumentUpdate(event.document(), changelog);
-    }
-
-    @Override
-    public Changelog process(DocumentRemoved event, Changelog changelog)
-    {
-        return processDocumentUpdate(event.document(), changelog);
-    }
-
-    private Changelog processDocumentUpdate(Document document, Changelog changelog)
-    {
-        if (journal.isMarkerDocument(document))
+        var document = (Document) change.object();
+        var name = document.name();
+        var node = nodes.get(name);
+        if (node != null)
         {
-            // A marker may have been added or removed, or an existing one updated. Both can affect
-            // the `include-in-graph` setting, and therefore the graph as a whole. A full refresh
-            // is the easiest thing to do. Also, this doesn't happen much. Markers are stable.
-            return fullRefresh(changelog);
+            // A node already exists. All we need to do is replace the underlying document
+            // reference.
+            node.replaceDocumentWith(document);
+            return emptyList();
         }
-        else if (journal.isJournalEntry(document))
+        else
         {
-            var date = parseDateOrNull(document.name());
-            if (date == null)
-            {
-                return emptyChangelog();
-            }
-            // The document refers to a daily log. That means all node edges for that day need
-            // to be refreshed.
-            return refreshGraphForJournalEntryOn(date, changelog);
+            // This is a new node. It might refer to other nodes already, and other nodes
+            // might refer to it. So, a full refresh is all we can do.
+            return fullRefresh();
         }
-        else if (isNodeEntry(document)) // Document represents a node
-        {
-            var name = document.name();
-            var node = nodes.get(name);
-            if (node != null)
-            {
-                // A node already exists. All we need to do is replace the underlying document
-                // reference.
-                node.replaceDocumentWith(document);
-                return emptyChangelog();
-            }
-            else
-            {
-                // This is a new node. It might refer to other nodes already, and other nodes
-                // might refer to it. So, a full refresh is all we can do.
-                return fullRefresh(changelog);
-            }
-        }
-        return emptyChangelog();
     }
 
     private boolean isNodeEntry(Document document)
@@ -161,26 +138,26 @@ public class MermaidGraph
         return false;
     }
 
-    private Changelog refreshGraphForJournalEntryOn(LocalDate date, Changelog changelog)
+    private void refreshGraphForJournalEntryOn(LocalDate date)
     {
         // First remove all edges from the graph for the given date
         nodes.values().forEach(node -> node.removeEdgesFor(date));
         // Then add them back in. These might be completely different!
         nodes.values().forEach(node -> processMarkedLines(
-                journal.markedLinesFor(node.document().name(), selectedMarkerNames, date),
-                node));
-        return emptyChangelog();
+            journal.markedLinesFor(node.document().name(), selectedMarkerNames, date),
+            node
+        ));
     }
 
     private void refreshSelectedMarkers()
     {
         selectedMarkerNames.clear();
         selectedMarkerNames.addAll(
-                journal.markers().values().stream()
-                        .filter(marker ->
-                                marker.frontMatter().bool(MARKER_PROPERTY_INCLUDE_IN_GRAPH, false))
-                        .map(Document::name)
-                        .collect(toSet())
+            journal.markers().values().stream()
+                .filter(marker ->
+                    marker.frontMatter().bool(MARKER_PROPERTY_INCLUDE_IN_GRAPH, false))
+                .map(Document::name)
+                .collect(toSet())
         );
     }
 
@@ -199,35 +176,36 @@ public class MermaidGraph
         for (Node sourceNode : nodes.values())
         {
             processMarkedLines(
-                    journal.markedLinesFor(sourceNode.document().name(), selectedMarkerNames),
-                    sourceNode);
+                journal.markedLinesFor(sourceNode.document().name(), selectedMarkerNames),
+                sourceNode
+            );
         }
     }
 
     private void processMarkedLines(Map<String, List<MarkedLine>> markedLines, Node sourceNode)
     {
         markedLines
-                .values().stream()
-                .flatMap(Collection::stream)
-                .forEach(markedLine ->
+            .values().stream()
+            .flatMap(Collection::stream)
+            .forEach(markedLine ->
+            {
+                var targetNames = parseInternalLinkTargetNames(markedLine.line());
+                for (String targetName : targetNames)
                 {
-                    var targetNames = parseInternalLinkTargetNames(markedLine.line());
-                    for (String targetName : targetNames)
+                    var targetNode = nodes.get(targetName);
+                    if (targetNode == null)
                     {
-                        var targetNode = nodes.get(targetName);
-                        if (targetNode == null)
-                        {
-                            continue;
-                        }
-                        var date = markedLine.date();
-                        sourceNode.addEdge(targetNode, date);
-                        targetNode.addEdge(sourceNode, date);
+                        continue;
                     }
-                });
+                    var date = markedLine.date();
+                    sourceNode.addEdge(targetNode, date);
+                    targetNode.addEdge(sourceNode, date);
+                }
+            });
     }
 
     public String mermaidGraphFor(
-            String seedDocumentName, int maximumDepth, Set<String> excludedTypeNames)
+        String seedDocumentName, int maximumDepth, Set<String> excludedTypeNames)
     {
         var seedNode = nodes.get(seedDocumentName);
         if (seedNode == null)
@@ -235,13 +213,13 @@ public class MermaidGraph
             return "";
         }
         var excludedTypes = settings.nodeTypes().stream()
-                .filter(t -> excludedTypeNames.contains(t.typeName()))
-                .collect(toSet());
+            .filter(t -> excludedTypeNames.contains(t.typeName()))
+            .collect(toSet());
         return mermaidGraphFor(Set.of(seedNode), maximumDepth, excludedTypes);
     }
 
     private String mermaidGraphFor(
-            Set<Node> selection, int maximumDepth, Set<Type> excludedTypes)
+        Set<Node> selection, int maximumDepth, Set<Type> excludedTypes)
     {
         var builder = new StringBuilder();
         builder.append("```mermaid\n");
@@ -263,10 +241,10 @@ public class MermaidGraph
         for (Map.Entry<String, String> entry : settings.mermaidClassDefinitions().entrySet())
         {
             builder.append("    classDef ")
-                    .append(entry.getKey())
-                    .append(" ")
-                    .append(entry.getValue())
-                    .append("\n");
+                .append(entry.getKey())
+                .append(" ")
+                .append(entry.getValue())
+                .append("\n");
         }
         builder.append("\n");
     }
@@ -282,8 +260,8 @@ public class MermaidGraph
      * @return Node names that were rendered.
      */
     private HashSet<Node> renderNodesAndEdges(
-            StringBuilder builder, Set<Node> selection, int maximumDepth,
-            Set<Type> excludedTypes)
+        StringBuilder builder, Set<Node> selection, int maximumDepth,
+        Set<Type> excludedTypes)
     {
         var queue = new LinkedList<Item>();
         selection.forEach(node -> queue.add(new Item(node, 1)));
@@ -313,10 +291,10 @@ public class MermaidGraph
                 {
                     queue.addLast(new Item(targetNode, depth + 1));
                     builder.append("    ")
-                            .append(sourceNode.id())
-                            .append(" --- ")
-                            .append(targetNode.id())
-                            .append("\n");
+                        .append(sourceNode.id())
+                        .append(" --- ")
+                        .append(targetNode.id())
+                        .append("\n");
                 }
             }
         }
@@ -333,15 +311,15 @@ public class MermaidGraph
     private void renderNodesAsInternalLinks(StringBuilder builder, HashSet<Node> visited)
     {
         builder.append("    class ")
-                .append(visited.stream()
-                        .map(Node::id)
-                        .sorted()
-                        .collect(joining(",")))
-                .append(" internal-link\n");
+            .append(visited.stream()
+                .map(Node::id)
+                .sorted()
+                .collect(joining(",")))
+            .append(" internal-link\n");
     }
 
     private class NodeFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private final Type type;
         private boolean isArchived;
