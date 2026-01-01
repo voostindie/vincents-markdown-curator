@@ -67,6 +67,18 @@ final class ProjectJournal
     }
 
     @Override
+    public Set<Class<?>> consumedObjectTypes()
+    {
+        return Set.of(Daily.class, Marker.class, Project.class);
+    }
+
+    @Override
+    public Set<DataModel> dependentModels()
+    {
+        return Set.of(journal, projectRepository);
+    }
+
+    @Override
     public Collection<Change<?>> fullRefresh()
     {
         this.projectStatuses.clear();
@@ -123,12 +135,14 @@ final class ProjectJournal
 
     private void discoverMarkers()
     {
-        for (var document : journal.markers().values())
+        for (var marker : journal.markers().values())
         {
-            processFrontMatter(document, PROJECT_STATUSES_MARKER_PROPERTY, statusMarkers,
-                linkToStatusMap
+            processFrontMatter(
+                marker.document(), PROJECT_STATUSES_MARKER_PROPERTY, statusMarkers, linkToStatusMap
             );
-            processFrontMatter(document, PROJECT_LEADS_MARKER_PROPERTY, leadMarkers, linkToLeadMap);
+            processFrontMatter(
+                marker.document(), PROJECT_LEADS_MARKER_PROPERTY, leadMarkers, linkToLeadMap
+            );
         }
     }
 
@@ -267,12 +281,6 @@ final class ProjectJournal
             return Optional.empty();
         }
         return Optional.of(latest.getValue());
-    }
-
-    @Override
-    public Set<DataModel> dependentModels()
-    {
-        return Set.of(journal, projectRepository);
     }
 
     private interface LineProcessor

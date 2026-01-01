@@ -155,8 +155,8 @@ public class MermaidGraph
         selectedMarkerNames.addAll(
             journal.markers().values().stream()
                 .filter(marker ->
-                    marker.frontMatter().bool(MARKER_PROPERTY_INCLUDE_IN_GRAPH, false))
-                .map(Document::name)
+                    marker.settings().bool(MARKER_PROPERTY_INCLUDE_IN_GRAPH, false))
+                .map(Marker::name)
                 .collect(toSet())
         );
     }
