@@ -4,12 +4,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
-import nl.ulso.markdown_curator.vault.event.*;
-import org.jspecify.annotations.NonNull;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,15 +16,14 @@ import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 /**
- * This is the start of what will hopefully be a richer data model at some point. For example
- * I'd like to keep track of book series as well, and list them in order.
+ * This is the start of what will hopefully be a richer data model at some point. For example I'd
+ * like to keep track of book series as well, and list them in order.
  */
 @Singleton
 public class Library
-        extends DataModelTemplate
+    extends DataModelTemplate
 {
     private static final String AUTHOR_FOLDER = "Authors";
     private static final String BOOK_FOLDER = "Books";
@@ -93,7 +89,7 @@ public class Library
     {
         authors.clear();
         books.forEach(
-            (name, book) -> {
+            (_, book) -> {
                 frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
                     dictionary -> dictionary.removeProperty("rating")
                 );
@@ -112,13 +108,13 @@ public class Library
     {
         var stillReading = now();
         return readingSessions.stream()
-                .filter(session -> session.fromDate().getYear() <= year
-                                   && session.toDate().map(date -> date.getYear() >= year)
-                                           .orElse(true))
-                .sorted(comparing(ReadingSession::fromDate)
-                        .thenComparing(s -> s.toDate().orElse(stillReading))
-                        .thenComparing(s -> s.book().name()))
-                .toList();
+            .filter(session -> session.fromDate().getYear() <= year
+                               && session.toDate().map(date -> date.getYear() >= year)
+                                   .orElse(true))
+            .sorted(comparing(ReadingSession::fromDate)
+                .thenComparing(s -> s.toDate().orElse(stillReading))
+                .thenComparing(s -> s.book().name()))
+            .toList();
     }
 
     List<Book> booksFor(String authorName)
@@ -129,13 +125,13 @@ public class Library
             return emptyList();
         }
         return books.values().stream()
-                .filter(book -> book.authors().contains(author))
-                .sorted(comparing(Book::name))
-                .toList();
+            .filter(book -> book.authors().contains(author))
+            .sorted(comparing(Book::name))
+            .toList();
     }
 
     private class AuthorFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         @Override
         public void visit(Document document)
@@ -146,7 +142,7 @@ public class Library
     }
 
     private class BookFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private static final Pattern DATE_PATTERN = compile("\\[\\[(\\d{4}-\\d{2}-\\d{2})]]");
         private Book book;
@@ -158,37 +154,39 @@ public class Library
             books.put(book.name(), book);
             super.visit(document);
             frontMatterUpdateCollector.updateFrontMatterFor(document, dictionary ->
-            {
-                book.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
-                book.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));
-                var authors = book.authors().stream().map(Author::link).toList();
-                dictionary.setProperty("authors", authors);
-            });
+                {
+                    book.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
+                    book.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));
+                    var authors = book.authors().stream().map(Author::link).toList();
+                    dictionary.setProperty("authors", authors);
+                }
+            );
         }
 
         @Override
         public void visit(TextBlock textBlock)
         {
             textBlock.parentSection().ifPresentOrElse(section ->
+                {
+                    if (section.level() != 2)
                     {
-                        if (section.level() != 2)
-                        {
-                            return;
-                        }
-                        if (section.title().startsWith("Author"))
-                        {
-                            extractAuthors(textBlock);
-                        }
-                        if (section.title().startsWith("Rating"))
-                        {
-                            extractRating(textBlock);
-                        }
-                        if (section.title().startsWith("Reading"))
-                        {
-                            extractSessions(textBlock);
-                        }
-                    },
-                    () -> extractCover(textBlock));
+                        return;
+                    }
+                    if (section.title().startsWith("Author"))
+                    {
+                        extractAuthors(textBlock);
+                    }
+                    if (section.title().startsWith("Rating"))
+                    {
+                        extractRating(textBlock);
+                    }
+                    if (section.title().startsWith("Reading"))
+                    {
+                        extractSessions(textBlock);
+                    }
+                },
+                () -> extractCover(textBlock)
+            );
         }
 
         private void extractCover(TextBlock block)
@@ -248,30 +246,30 @@ public class Library
         private void extractSessions(TextBlock block)
         {
             block.markdown().lines()
-                    .filter(line -> line.startsWith("- [["))
-                    .map(DATE_PATTERN::matcher)
-                    .map(Matcher::results)
-                    .forEach(stream ->
+                .filter(line -> line.startsWith("- [["))
+                .map(DATE_PATTERN::matcher)
+                .map(Matcher::results)
+                .forEach(stream ->
+                {
+                    var dates = stream
+                        .map(match -> match.group(1))
+                        .limit(2)
+                        .map(LocalDates::parseDateOrNull)
+                        .filter(Objects::nonNull)
+                        .toList();
+                    if (dates.isEmpty())
                     {
-                        var dates = stream
-                                .map(match -> match.group(1))
-                                .limit(2)
-                                .map(LocalDates::parseDateOrNull)
-                                .filter(Objects::nonNull)
-                                .toList();
-                        if (dates.isEmpty())
-                        {
-                            return;
-                        }
-                        var start = dates.get(0);
-                        LocalDate end = null;
-                        if (dates.size() > 1)
-                        {
-                            end = dates.get(1);
-                        }
-                        readingSessions.add(
-                                new ReadingSession(start, Optional.ofNullable(end), book));
-                    });
+                        return;
+                    }
+                    var start = dates.get(0);
+                    LocalDate end = null;
+                    if (dates.size() > 1)
+                    {
+                        end = dates.get(1);
+                    }
+                    readingSessions.add(
+                        new ReadingSession(start, Optional.ofNullable(end), book));
+                });
         }
     }
 }

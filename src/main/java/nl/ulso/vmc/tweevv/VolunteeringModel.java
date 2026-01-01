@@ -178,7 +178,7 @@ public class VolunteeringModel
 
         public static Season forStartYear(int startYear)
         {
-            return CACHE.computeIfAbsent(startYear, year -> new Season(startYear));
+            return CACHE.computeIfAbsent(startYear, _ -> new Season(startYear));
         }
 
         /*
@@ -341,7 +341,7 @@ public class VolunteeringModel
                 var seasonString = line.substring(2, colon).trim();
                 var activityText = line.substring(colon + 1).trim();
                 Season.fromString(seasonString).ifPresent(season ->
-                    volunteering.computeIfAbsent(season, s -> new HashSet<>()).add(
+                    volunteering.computeIfAbsent(season, _ -> new HashSet<>()).add(
                         new ContactActivity(
                             contact,
                             resolveActivity(activityText),

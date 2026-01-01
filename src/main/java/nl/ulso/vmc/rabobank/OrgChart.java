@@ -195,7 +195,7 @@ public class OrgChart
                         var role = matcher.group(1);
                         var contact = contactsFolder.document(link.targetDocument());
                         contact.ifPresent(
-                            c -> roles.computeIfAbsent(role, r -> new ConcurrentHashMap<>())
+                            c -> roles.computeIfAbsent(role, _ -> new HashMap<>())
                                 .put(c.name(), c));
                     }
                 });

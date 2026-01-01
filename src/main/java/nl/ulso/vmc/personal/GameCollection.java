@@ -4,7 +4,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
-import nl.ulso.markdown_curator.vault.event.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -14,7 +13,6 @@ import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
 import static nl.ulso.markdown_curator.Change.Kind.DELETION;
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 
 /**
  * My collection of console (PS4/PS5) games.
@@ -96,7 +94,6 @@ public class GameCollection
     private class GameFinder
         extends BreadthFirstVaultVisitor
     {
-        private static final Pattern DATE_PATTERN = compile("\\[\\[(\\d{4}-\\d{2}-\\d{2})]]");
         private Game game;
 
         @Override

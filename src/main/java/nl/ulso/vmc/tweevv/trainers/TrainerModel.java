@@ -4,7 +4,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
-import nl.ulso.markdown_curator.vault.event.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +13,6 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.markdown_curator.Changelog.emptyChangelog;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /**
@@ -76,7 +74,9 @@ public final class TrainerModel
         this.vault = vault;
         this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.seasons = new HashMap<>();
-        registerChangeHandler(hasObjectType(Document.class).and(isFolderInScope()), fullRefreshHandler());
+        registerChangeHandler(hasObjectType(Document.class).and(isFolderInScope()),
+            fullRefreshHandler()
+        );
     }
 
     @Override
