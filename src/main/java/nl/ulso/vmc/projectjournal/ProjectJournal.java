@@ -63,13 +63,18 @@ final class ProjectJournal
             hasObjectType(Project.class).and(isDeletion()),
             this::processProjectDeletion
         );
-        this.registerChangeHandler(journal.isMarkerEntry(), fullRefreshHandler());
     }
 
     @Override
     public Set<Class<?>> consumedObjectTypes()
     {
         return Set.of(Daily.class, Marker.class, Project.class);
+    }
+
+    @Override
+    protected boolean isFullRefreshRequired(Changelog changelog)
+    {
+        return changelog.changes().anyMatch(hasObjectType(Marker.class));
     }
 
     @Override

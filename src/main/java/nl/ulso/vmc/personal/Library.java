@@ -41,8 +41,14 @@ public class Library
         this.authors = new HashMap<>();
         this.books = new HashMap<>();
         this.readingSessions = new HashSet<>();
-        registerChangeHandler(isAuthorDocument().or(isBookDocument()), fullRefreshHandler());
-        registerChangeHandler(isLibraryFolder().and(isDeletion()), fullRefreshHandler());
+    }
+
+    @Override
+    protected boolean isFullRefreshRequired(Changelog changelog)
+    {
+        return super.isFullRefreshRequired(changelog) ||
+               changelog.changes().anyMatch(
+                   isLibraryFolder().and(isDeletion()).or(isAuthorDocument().or(isBookDocument())));
     }
 
     private Predicate<Change<?>> isAuthorDocument()

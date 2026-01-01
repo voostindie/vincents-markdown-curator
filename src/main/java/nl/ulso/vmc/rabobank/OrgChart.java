@@ -2,8 +2,7 @@ package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.Change;
-import nl.ulso.markdown_curator.DataModelTemplate;
+import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
@@ -32,9 +31,13 @@ public class OrgChart
     {
         this.vault = vault;
         this.orgUnits = ConcurrentHashMap.newKeySet();
-        registerChangeHandler(hasObjectType(Document.class).and(isFolderInScope()),
-            fullRefreshHandler()
-        );
+    }
+
+    @Override
+    protected boolean isFullRefreshRequired(Changelog changelog)
+    {
+        return super.isFullRefreshRequired(changelog)
+               || changelog.changes().anyMatch(hasObjectType(Document.class).and(isFolderInScope()));
     }
 
     @Override

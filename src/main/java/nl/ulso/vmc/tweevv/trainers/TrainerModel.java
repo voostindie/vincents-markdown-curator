@@ -74,10 +74,15 @@ public final class TrainerModel
         this.vault = vault;
         this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.seasons = new HashMap<>();
-        registerChangeHandler(hasObjectType(Document.class).and(isFolderInScope()),
-            fullRefreshHandler()
-        );
     }
+
+    @Override
+    protected boolean isFullRefreshRequired(Changelog changelog)
+    {
+        return super.isFullRefreshRequired(changelog)
+               || changelog.changes().anyMatch(hasObjectType(Document.class).and(isFolderInScope()));
+    }
+
 
     @Override
     public Collection<Change<?>> fullRefresh()

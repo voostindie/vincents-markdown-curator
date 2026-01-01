@@ -7,11 +7,9 @@ import nl.ulso.markdown_curator.vault.*;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static java.util.regex.Pattern.compile;
 import static nl.ulso.markdown_curator.Change.Kind.DELETION;
 
 /**
@@ -33,7 +31,13 @@ public class GameCollection
         this.frontMatterUpdateCollector = frontMatterUpdateCollector;
         this.games = new HashMap<>();
         this.registerChangeHandler(isGameDocument(), this::processGameDocumentUpdate);
-        this.registerChangeHandler(isGameFolder().and(isDeletion()), fullRefreshHandler());
+    }
+
+    @Override
+    protected boolean isFullRefreshRequired(Changelog changelog)
+    {
+        return super.isFullRefreshRequired(changelog) ||
+               changelog.changes().anyMatch(isGameFolder().and(isDeletion().or(isCreation())));
     }
 
     private Predicate<Change<?>> isGameDocument()
@@ -64,7 +68,7 @@ public class GameCollection
     public Collection<Change<?>> fullRefresh()
     {
         games.forEach(
-            (name, game) -> {
+            (_, game) -> {
                 frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
                     dictionary -> dictionary.removeProperty("rating")
                 );

@@ -67,9 +67,21 @@ public class MermaidGraph
         this.settings = settings;
         this.selectedMarkerNames = new HashSet<>();
         this.nodes = new HashMap<>();
-        registerChangeHandler(journal.isMarkerEntry(), fullRefreshHandler());
         registerChangeHandler(hasObjectType(Daily.class), this::processDailyUpdate);
         registerChangeHandler(isNodeEntry(), this::processNodeUpdate);
+    }
+
+    @Override
+    public Set<Class<?>> consumedObjectTypes()
+    {
+        return Set.of(Document.class, Marker.class, Daily.class);
+    }
+
+    @Override
+    protected boolean isFullRefreshRequired(Changelog changelog)
+    {
+        return super.isFullRefreshRequired(changelog)
+               || changelog.changes().anyMatch(hasObjectType(Marker.class));
     }
 
     private Predicate<Change<?>> isNodeEntry()
