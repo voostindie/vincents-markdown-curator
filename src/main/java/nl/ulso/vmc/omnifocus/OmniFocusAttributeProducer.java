@@ -71,14 +71,14 @@ final class OmniFocusAttributeProducer
 
     private Collection<Change<?>> processOmniFocusProjects(Change<?> change)
     {
-        var changes = new ArrayList<Change<?>>();
+        var changes = createChangeCollection();
         omniFocusRepository.projects().forEach(omniFocusProject ->
         {
             var project = projectRepository.projectsByName().get(omniFocusProject.name());
             if (project != null)
             {
                 createUrl(changes, project, omniFocusProject);
-                createPriority(omniFocusProject, changes, project);
+                createPriority(changes, project, omniFocusProject);
                 if (omniFocusProject.status() == ON_HOLD)
                 {
                     createStatus(changes, project);
@@ -103,7 +103,7 @@ final class OmniFocusAttributeProducer
     }
 
     private void createUrl(
-        ArrayList<Change<?>> changes, Project project, OmniFocusProject omniFocusProject)
+        Collection<Change<?>> changes, Project project, OmniFocusProject omniFocusProject)
     {
         changes.add(create(
             new AttributeValue(
@@ -116,7 +116,7 @@ final class OmniFocusAttributeProducer
         ));
     }
 
-    private void deleteUrl(ArrayList<Change<?>> changes, Project project)
+    private void deleteUrl(Collection<Change<?>> changes, Project project)
     {
         changes.add(delete(
             new AttributeValue(
@@ -130,7 +130,7 @@ final class OmniFocusAttributeProducer
     }
 
     private void createPriority(
-        OmniFocusProject omniFocusProject, ArrayList<Change<?>> changes, Project project)
+        Collection<Change<?>> changes, Project project, OmniFocusProject omniFocusProject)
     {
         changes.add(create(
             new AttributeValue(
@@ -143,7 +143,7 @@ final class OmniFocusAttributeProducer
         ));
     }
 
-    private void deletePriority(ArrayList<Change<?>> changes, Project project)
+    private void deletePriority(Collection<Change<?>> changes, Project project)
     {
         changes.add(delete(
             new AttributeValue(
@@ -156,7 +156,7 @@ final class OmniFocusAttributeProducer
         ));
     }
 
-    private void createStatus(ArrayList<Change<?>> changes, Project project)
+    private void createStatus(Collection<Change<?>> changes, Project project)
     {
         changes.add(create(
             new AttributeValue(
@@ -169,7 +169,7 @@ final class OmniFocusAttributeProducer
         ));
     }
 
-    private void deleteStatus(ArrayList<Change<?>> changes, Project project)
+    private void deleteStatus(Collection<Change<?>> changes, Project project)
     {
         changes.add(delete(
             new AttributeValue(
