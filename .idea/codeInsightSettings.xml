@@ -3,6 +3,7 @@
   <component name="JavaProjectCodeInsightSettings">
     <included-static-names>
       <name>nl.ulso.markdown_curator.vault.Dictionary.emptyDictionary</name>
+      <name>nl.ulso.markdown_curator.vault.Document.newDocument</name>
     </included-static-names>
   </component>
 </project>
