@@ -17,12 +17,12 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.Kind.CREATION;
-import static nl.ulso.markdown_curator.Change.Kind.MODIFICATION;
+import static nl.ulso.markdown_curator.Change.Kind.CREATE;
+import static nl.ulso.markdown_curator.Change.Kind.UPDATE;
 
 @Singleton
 public class VolunteeringModel
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     private static final String TEAM_FOLDER = "Teams";
     private static final String CONTACT_FOLDER = "Contacten";
@@ -45,7 +45,7 @@ public class VolunteeringModel
 
     private Predicate<Change<?>> isTeamDocument()
     {
-        return hasObjectType(Document.class).and(change ->
+        return isObjectType(Document.class).and(change ->
         {
             var document = (Document) change.object();
             return document.folder().name().equals(TEAM_FOLDER);
@@ -54,7 +54,7 @@ public class VolunteeringModel
 
     private Predicate<Change<?>> isContactDocument()
     {
-        return hasObjectType(Document.class).and(change ->
+        return isObjectType(Document.class).and(change ->
         {
             var document = (Document) change.object();
             return document.folder().name().equals(CONTACT_FOLDER);
@@ -90,7 +90,7 @@ public class VolunteeringModel
         var activity = activities.remove(document.name());
         volunteering.values().forEach(set ->
             set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
-        if (change.kind() == CREATION || change.kind() == MODIFICATION)
+        if (change.kind() == CREATE || change.kind() == UPDATE)
         {
             addActivity(document);
             volunteering.clear();
@@ -108,7 +108,7 @@ public class VolunteeringModel
         var contact = contacts.remove(document.name());
         volunteering.values().forEach(set ->
             set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));
-        if (change.kind() == CREATION || change.kind() == MODIFICATION)
+        if (change.kind() == CREATE || change.kind() == UPDATE)
         {
             addContact(document);
         }

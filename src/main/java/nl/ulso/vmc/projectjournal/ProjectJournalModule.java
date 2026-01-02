@@ -3,7 +3,7 @@ package nl.ulso.vmc.projectjournal;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.project.ProjectModule;
 
@@ -20,5 +20,5 @@ public abstract class ProjectJournalModule
 {
     @Binds
     @IntoSet
-    abstract DataModel bindProjectJournal(ProjectJournal projectJournal);
+    abstract ChangeProcessor bindProjectJournal(ProjectJournal projectJournal);
 }

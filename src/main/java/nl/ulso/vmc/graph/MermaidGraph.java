@@ -47,7 +47,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @Singleton
 public class MermaidGraph
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     private static final Logger LOGGER = getLogger(MermaidGraph.class);
 
@@ -67,7 +67,7 @@ public class MermaidGraph
         this.settings = settings;
         this.selectedMarkerNames = new HashSet<>();
         this.nodes = new HashMap<>();
-        registerChangeHandler(hasObjectType(Daily.class), this::processDailyUpdate);
+        registerChangeHandler(isObjectType(Daily.class), this::processDailyUpdate);
         registerChangeHandler(isNodeEntry(), this::processNodeUpdate);
     }
 
@@ -81,22 +81,16 @@ public class MermaidGraph
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(hasObjectType(Marker.class));
+               || changelog.changes().anyMatch(isObjectType(Marker.class));
     }
 
     private Predicate<Change<?>> isNodeEntry()
     {
-        return hasObjectType(Document.class).and(change ->
+        return isObjectType(Document.class).and(change ->
         {
             var document = (Document) change.object();
             return isNodeEntry(document);
         });
-    }
-
-    @Override
-    public Set<?> dependentModels()
-    {
-        return Set.of(journal);
     }
 
     @Override

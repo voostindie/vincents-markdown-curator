@@ -23,7 +23,7 @@ import static java.util.regex.Pattern.compile;
  */
 @Singleton
 public class Library
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     private static final String AUTHOR_FOLDER = "Authors";
     private static final String BOOK_FOLDER = "Books";
@@ -48,12 +48,12 @@ public class Library
     {
         return super.isFullRefreshRequired(changelog) ||
                changelog.changes().anyMatch(
-                   isLibraryFolder().and(isDeletion()).or(isAuthorDocument().or(isBookDocument())));
+                   isLibraryFolder().and(isDelete()).or(isAuthorDocument().or(isBookDocument())));
     }
 
     private Predicate<Change<?>> isAuthorDocument()
     {
-        return hasObjectType(Document.class).and(change ->
+        return isObjectType(Document.class).and(change ->
         {
             var document = (Document) change.object();
             var folder = document.folder();
@@ -63,7 +63,7 @@ public class Library
 
     private Predicate<Change<?>> isBookDocument()
     {
-        return hasObjectType(Document.class).and(change ->
+        return isObjectType(Document.class).and(change ->
         {
             var document = (Document) change.object();
             var folder = document.folder();
@@ -73,7 +73,7 @@ public class Library
 
     private Predicate<Change<?>> isLibraryFolder()
     {
-        return hasObjectType(Folder.class).and(change ->
+        return isObjectType(Folder.class).and(change ->
         {
             var folder = (Folder) change.object();
             return isAuthorFolder(folder) || isBookFolder(folder);

@@ -7,8 +7,8 @@ import nl.ulso.markdown_curator.project.*;
 
 import java.util.*;
 
-import static nl.ulso.markdown_curator.Change.creation;
-import static nl.ulso.markdown_curator.Change.deletion;
+import static nl.ulso.markdown_curator.Change.create;
+import static nl.ulso.markdown_curator.Change.delete;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.PRIORITY;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
@@ -17,17 +17,19 @@ import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
 ///
 /// 3 attributes are produced:
 ///
-/// - Status, but only if the project is on hold in OmniFocus.
-/// - Priority
-/// - OmniFocus URL
+/// - URL to the OmniFocus project
+/// - Priority of the project in OmniFocus
+/// - Status of the project in OmniFocus, but only if the project is "on hold".
 @Singleton
-public class OmniFocusAttributeProducer
-    extends DataModelTemplate
+final class OmniFocusAttributeProducer
+    extends ChangeProcessorTemplate
 {
     static final String OMNIFOCUS_URL_ATTRIBUTE = "omnifocus";
     private static final int WEIGHT = 200;
 
-    private final Map<String, AttributeDefinition> attributeDefinitions;
+    private final AttributeDefinition urlAttribute;
+    private final AttributeDefinition statusAttribute;
+    private final AttributeDefinition priorityAttribute;
     private final ProjectRepository projectRepository;
     private final OmniFocusRepository omniFocusRepository;
     private final OmniFocusMessages messages;
@@ -39,24 +41,20 @@ public class OmniFocusAttributeProducer
         OmniFocusRepository omniFocusRepository,
         OmniFocusMessages messages)
     {
-        this.attributeDefinitions = attributeDefinitions;
+        this.urlAttribute = attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE);
+        this.statusAttribute = attributeDefinitions.get(STATUS);
+        this.priorityAttribute = attributeDefinitions.get(PRIORITY);
         this.projectRepository = projectRepository;
         this.omniFocusRepository = omniFocusRepository;
         this.messages = messages;
-        registerChangeHandler(hasObjectType(OmniFocus.class), this::processOmniFocusProjects);
-        registerChangeHandler(hasObjectType(Project.class).and(isDeletion()), this::processProjectDelete);
-    }
-
-    @Override
-    public Set<?> dependentModels()
-    {
-        return Set.of(projectRepository);
+        registerChangeHandler(isObjectType(OmniFocusUpdate.class), this::processOmniFocusProjects);
+        registerChangeHandler(isObjectType(Project.class).and(isDelete()), this::processProjectDelete);
     }
 
     @Override
     public Set<Class<?>> consumedObjectTypes()
     {
-        return Set.of(OmniFocus.class, Project.class);
+        return Set.of(OmniFocusUpdate.class, Project.class);
     }
 
     @Override
@@ -71,25 +69,13 @@ public class OmniFocusAttributeProducer
         return false;
     }
 
-    @Override
-    public Collection<Change<?>> fullRefresh()
-    {
-        throw new IllegalStateException("This method should never be called!");
-    }
-
     private Collection<Change<?>> processOmniFocusProjects(Change<?> change)
     {
         var changes = new ArrayList<Change<?>>();
         omniFocusRepository.projects().forEach(omniFocusProject ->
         {
             var project = projectRepository.projectsByName().get(omniFocusProject.name());
-            if (project == null)
-            {
-                deleteUrl(changes, project);
-                deletePriority(changes, project);
-                deleteStatus(changes, project);
-            }
-            else
+            if (project != null)
             {
                 createUrl(changes, project, omniFocusProject);
                 createPriority(omniFocusProject, changes, project);
@@ -119,10 +105,10 @@ public class OmniFocusAttributeProducer
     private void createUrl(
         ArrayList<Change<?>> changes, Project project, OmniFocusProject omniFocusProject)
     {
-        changes.add(creation(
+        changes.add(create(
             new AttributeValue(
                 project,
-                attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE),
+                urlAttribute,
                 omniFocusProject.link(),
                 WEIGHT
             ),
@@ -132,10 +118,10 @@ public class OmniFocusAttributeProducer
 
     private void deleteUrl(ArrayList<Change<?>> changes, Project project)
     {
-        changes.add(deletion(
+        changes.add(delete(
             new AttributeValue(
                 project,
-                attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE),
+                urlAttribute,
                 null,
                 WEIGHT
             ),
@@ -146,10 +132,10 @@ public class OmniFocusAttributeProducer
     private void createPriority(
         OmniFocusProject omniFocusProject, ArrayList<Change<?>> changes, Project project)
     {
-        changes.add(creation(
+        changes.add(create(
             new AttributeValue(
                 project,
-                attributeDefinitions.get(PRIORITY),
+                priorityAttribute,
                 omniFocusProject.priority(),
                 WEIGHT
             ),
@@ -159,10 +145,10 @@ public class OmniFocusAttributeProducer
 
     private void deletePriority(ArrayList<Change<?>> changes, Project project)
     {
-        changes.add(deletion(
+        changes.add(delete(
             new AttributeValue(
                 project,
-                attributeDefinitions.get(PRIORITY),
+                priorityAttribute,
                 null,
                 WEIGHT
             ),
@@ -172,10 +158,10 @@ public class OmniFocusAttributeProducer
 
     private void createStatus(ArrayList<Change<?>> changes, Project project)
     {
-        changes.add(creation(
+        changes.add(create(
             new AttributeValue(
                 project,
-                attributeDefinitions.get(STATUS),
+                statusAttribute,
                 messages.projectOnHold(),
                 WEIGHT
             ),
@@ -185,10 +171,10 @@ public class OmniFocusAttributeProducer
 
     private void deleteStatus(ArrayList<Change<?>> changes, Project project)
     {
-        changes.add(deletion(
+        changes.add(delete(
             new AttributeValue(
                 project,
-                attributeDefinitions.get(STATUS),
+                statusAttribute,
                 null,
                 WEIGHT
             ),

@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.deletion;
-import static nl.ulso.markdown_curator.Change.modification;
+import static nl.ulso.markdown_curator.Change.delete;
+import static nl.ulso.markdown_curator.Change.update;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.LAST_MODIFIED;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.LEAD;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
@@ -23,7 +23,7 @@ import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLin
 /// Keeps track of project attributes - status, lead and last modification date - in the journal.
 @Singleton
 final class ProjectJournal
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectJournal.class);
 
@@ -65,15 +65,15 @@ final class ProjectJournal
         this.linkToLeadMap = new HashMap<>();
         this.allMarkers = new HashSet<>();
         this.registerChangeHandler(
-            hasObjectType(Daily.class).and(isCreationOrModification()),
+            isObjectType(Daily.class).and(isCreateOrUpdate()),
             this::processDailyUpdate
         );
         this.registerChangeHandler(
-            hasObjectType(Daily.class).and(isDeletion()),
+            isObjectType(Daily.class).and(isDelete()),
             this::processDailyDeletion
         );
         this.registerChangeHandler(
-            hasObjectType(Project.class).and(isDeletion()),
+            isObjectType(Project.class).and(isDelete()),
             this::processProjectDeletion
         );
     }
@@ -93,13 +93,7 @@ final class ProjectJournal
     @Override
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
-        return changelog.changes().anyMatch(hasObjectType(Marker.class));
-    }
-
-    @Override
-    public Set<?> dependentModels()
-    {
-        return Set.of(journal, projectRepository);
+        return changelog.changes().anyMatch(isObjectType(Marker.class));
     }
 
     @Override
@@ -173,7 +167,7 @@ final class ProjectJournal
     {
         statusOf(project).ifPresentOrElse(
             status ->
-                changes.add(modification(
+                changes.add(update(
                         new AttributeValue(
                             project,
                             statusDefinition,
@@ -183,7 +177,7 @@ final class ProjectJournal
                         AttributeValue.class
                     )
                 ), () ->
-                changes.add(deletion(
+                changes.add(delete(
                         new AttributeValue(
                             project,
                             statusDefinition,
@@ -195,7 +189,7 @@ final class ProjectJournal
                 )
         );
         leadOf(project).ifPresentOrElse(lead ->
-            changes.add(modification(
+            changes.add(update(
                     new AttributeValue(
                         project,
                         leadDefinition,
@@ -205,7 +199,7 @@ final class ProjectJournal
                     AttributeValue.class
                 )
             ), () ->
-            changes.add(deletion(
+            changes.add(delete(
                     new AttributeValue(
                         project,
                         leadDefinition,
@@ -217,7 +211,7 @@ final class ProjectJournal
             )
         );
         journal.mostRecentMentionOf(project.name()).ifPresentOrElse(date ->
-            changes.add(modification(
+            changes.add(update(
                     new AttributeValue(
                         project,
                         lastModifiedDefinition,
@@ -227,7 +221,7 @@ final class ProjectJournal
                     AttributeValue.class
                 )
             ), () ->
-            changes.add(deletion(
+            changes.add(delete(
                     new AttributeValue(
                         project,
                         lastModifiedDefinition,

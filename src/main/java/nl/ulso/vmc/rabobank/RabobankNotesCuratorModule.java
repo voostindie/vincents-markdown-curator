@@ -3,8 +3,8 @@ package nl.ulso.vmc.rabobank;
 import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
+import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.CuratorModule;
-import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.project.ProjectModule;
@@ -57,7 +57,7 @@ abstract class RabobankNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract DataModel bindOrgChart(OrgChart orgChart);
+    abstract ChangeProcessor bindOrgChart(OrgChart orgChart);
 
     @Binds
     @IntoSet

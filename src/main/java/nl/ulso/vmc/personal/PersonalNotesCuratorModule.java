@@ -3,8 +3,8 @@ package nl.ulso.vmc.personal;
 import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
+import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.CuratorModule;
-import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.project.ProjectModule;
@@ -50,7 +50,7 @@ abstract class PersonalNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract DataModel bindLibrary(Library library);
+    abstract ChangeProcessor bindLibrary(Library library);
 
     @Binds
     @IntoSet
@@ -66,7 +66,7 @@ abstract class PersonalNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract DataModel bindGameCollection(GameCollection gameCollection);
+    abstract ChangeProcessor bindGameCollection(GameCollection gameCollection);
 
     @Provides
     static JournalSettings provideJournalSettings()

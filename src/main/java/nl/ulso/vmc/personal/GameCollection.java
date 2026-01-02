@@ -10,14 +10,14 @@ import java.util.function.Predicate;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.markdown_curator.Change.Kind.DELETION;
+import static nl.ulso.markdown_curator.Change.Kind.DELETE;
 
 /**
  * My collection of console (PS4/PS5) games.
  */
 @Singleton
 public class GameCollection
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     private static final String GAMES_FOLDER = "Games";
     private final Vault vault;
@@ -37,12 +37,12 @@ public class GameCollection
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog) ||
-               changelog.changes().anyMatch(isGameFolder().and(isDeletion().or(isCreation())));
+               changelog.changes().anyMatch(isGameFolder().and(isDelete().or(isCreate())));
     }
 
     private Predicate<Change<?>> isGameDocument()
     {
-        return hasObjectType(Document.class).and(change ->
+        return isObjectType(Document.class).and(change ->
         {
             var document = (Document) change.object();
             var folder = document.folder();
@@ -52,7 +52,7 @@ public class GameCollection
 
     private Predicate<Change<?>> isGameFolder()
     {
-        return hasObjectType(Folder.class).and(change ->
+        return isObjectType(Folder.class).and(change ->
         {
             var folder = (Folder) change.object();
             return isGameFolder(folder);
@@ -84,7 +84,7 @@ public class GameCollection
     private Collection<Change<?>> processGameDocumentUpdate(Change<?> change)
     {
         var document = (Document) change.object();
-        if (change.kind() == DELETION)
+        if (change.kind() == DELETE)
         {
             games.remove(document.name());
         }

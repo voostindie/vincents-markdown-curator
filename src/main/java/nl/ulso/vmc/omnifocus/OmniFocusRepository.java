@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.stream.Collectors.toMap;
-import static nl.ulso.markdown_curator.Change.modification;
+import static nl.ulso.vmc.omnifocus.OmniFocusUpdate.OMNIFOCUS_CHANGE;
 import static nl.ulso.vmc.omnifocus.OmniFocusProject.NULL_PROJECT;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
@@ -83,7 +83,7 @@ public class OmniFocusRepository
                 if (oldProjects == null)
                 {
                     LOGGER.debug("Initial fetch from OmniFocus completed.");
-                    refresher.triggerRefresh(modification(new OmniFocus(), OmniFocus.class));
+                    refresher.triggerRefresh(OMNIFOCUS_CHANGE);
                     return;
                 }
                 if (newProjects.equals(oldProjects))
@@ -93,7 +93,7 @@ public class OmniFocusRepository
                 }
                 LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh in the " +
                             "vault.");
-                refresher.triggerRefresh(modification(new OmniFocus(), OmniFocus.class));
+                refresher.triggerRefresh(OMNIFOCUS_CHANGE);
             }, 0, REFRESH_DELAY_MINUTES, TimeUnit.MINUTES
         );
     }

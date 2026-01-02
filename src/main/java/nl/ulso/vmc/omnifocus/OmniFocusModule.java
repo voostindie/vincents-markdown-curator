@@ -5,7 +5,7 @@ import dagger.Module;
 import dagger.multibindings.*;
 import jakarta.inject.Singleton;
 import nl.ulso.jxa.JavaScriptForAutomationModule;
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.ExternalChangeObjectType;
 import nl.ulso.markdown_curator.project.AttributeDefinition;
 import nl.ulso.markdown_curator.project.ProjectModule;
@@ -37,12 +37,12 @@ public abstract class OmniFocusModule
     @ExternalChangeObjectType
     static Class<?> provideOmniFocusChangeObjectType()
     {
-        return OmniFocus.class;
+        return OmniFocusUpdate.class;
     }
 
     @Binds
     @IntoSet
-    abstract DataModel bindOmniFocusAttributeProducer(OmniFocusAttributeProducer producer);
+    abstract ChangeProcessor bindOmniFocusAttributeProducer(OmniFocusAttributeProducer producer);
 
     @Binds
     @IntoSet

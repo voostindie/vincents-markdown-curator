@@ -4,7 +4,7 @@ import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.CuratorModule;
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.project.ProjectModule;
@@ -50,11 +50,11 @@ abstract class TweevvNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract DataModel bindVolunteeringModel(VolunteeringModel volunteeringModel);
+    abstract ChangeProcessor bindVolunteeringModel(VolunteeringModel volunteeringModel);
 
     @Binds
     @IntoSet
-    abstract DataModel bindTrainerModel(TrainerModel trainerModel);
+    abstract ChangeProcessor bindTrainerModel(TrainerModel trainerModel);
 
     @Binds
     @IntoSet

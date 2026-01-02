@@ -3,7 +3,7 @@ package nl.ulso.vmc.graph;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.query.Query;
 
 /**
@@ -15,7 +15,7 @@ public abstract class MermaidGraphModule
 {
     @Binds
     @IntoSet
-    abstract DataModel bindMermaidGraph(MermaidGraph mermaidGraph);
+    abstract ChangeProcessor bindMermaidGraph(MermaidGraph mermaidGraph);
 
     @Binds
     @IntoSet

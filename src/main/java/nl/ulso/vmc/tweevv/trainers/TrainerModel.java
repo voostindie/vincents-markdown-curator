@@ -26,7 +26,7 @@ import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLin
  */
 @Singleton
 public final class TrainerModel
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     // For now all names of folders and sections are hardcoded.
     private static final String MODEL_FOLDER = "Trainersvergoedingen";
@@ -80,7 +80,7 @@ public final class TrainerModel
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(hasObjectType(Document.class).and(isFolderInScope()));
+               || changelog.changes().anyMatch(isObjectType(Document.class).and(isFolderInScope()));
     }
 
 

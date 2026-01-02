@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toSet;
 
 @Singleton
 public class OrgChart
-    extends DataModelTemplate
+    extends ChangeProcessorTemplate
 {
     public static final String TEAMS_FOLDER = "Teams";
     public static final String THIRD_PARTY_FOLDER = "3rd Parties";
@@ -37,7 +37,7 @@ public class OrgChart
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(hasObjectType(Document.class).and(isFolderInScope()));
+               || changelog.changes().anyMatch(isObjectType(Document.class).and(isFolderInScope()));
     }
 
     @Override
