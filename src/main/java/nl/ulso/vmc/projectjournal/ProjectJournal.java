@@ -4,8 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.journal.*;
-import nl.ulso.markdown_curator.project.Project;
-import nl.ulso.markdown_curator.project.ProjectRepository;
+import nl.ulso.markdown_curator.project.*;
 import nl.ulso.markdown_curator.vault.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,17 +12,15 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.*;
 
-import static java.util.Collections.emptyList;
-import static nl.ulso.markdown_curator.Change.Kind.DELETION;
+import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Change.deletion;
+import static nl.ulso.markdown_curator.Change.modification;
+import static nl.ulso.markdown_curator.project.AttributeDefinition.LAST_MODIFIED;
+import static nl.ulso.markdown_curator.project.AttributeDefinition.LEAD;
+import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
-/// Keeps track of project attributes - status and lead - in the journal.
-///
-/// The achievement of the day (May 4, 2025) is that this functionality now works. I've had it on my
-/// wishlist for a long time, but before I could start the implementation, I had to refactor the
-/// complete code base to accommodate for it. I did that yesterday. Today this functionality works.
-/// It will need further refactoring, optimization and test cases before I can bring it to the core
-/// curator. That's an adventure for another day.
+/// Keeps track of project attributes - status, lead and last modification date - in the journal.
 @Singleton
 final class ProjectJournal
     extends DataModelTemplate
@@ -32,9 +29,13 @@ final class ProjectJournal
 
     private static final String PROJECT_STATUSES_MARKER_PROPERTY = "project-statuses";
     private static final String PROJECT_LEADS_MARKER_PROPERTY = "project-leads";
+    private static final int WEIGHT = 100;
 
     private final Journal journal;
     private final ProjectRepository projectRepository;
+    private final AttributeDefinition leadDefinition;
+    private final AttributeDefinition statusDefinition;
+    private final AttributeDefinition lastModifiedDefinition;
 
     private final Map<String, NavigableMap<LocalDate, String>> projectStatuses;
     private final Set<String> statusMarkers;
@@ -47,10 +48,15 @@ final class ProjectJournal
     private final Set<String> allMarkers;
 
     @Inject
-    ProjectJournal(Journal journal, ProjectRepository projectRepository)
+    ProjectJournal(
+        Journal journal, ProjectRepository projectRepository,
+        Map<String, AttributeDefinition> attributeDefinitions)
     {
         this.journal = journal;
         this.projectRepository = projectRepository;
+        this.leadDefinition = attributeDefinitions.get(LEAD);
+        this.statusDefinition = attributeDefinitions.get(STATUS);
+        this.lastModifiedDefinition = attributeDefinitions.get(LAST_MODIFIED);
         this.projectStatuses = new HashMap<>();
         this.statusMarkers = new HashSet<>();
         this.linkToStatusMap = new HashMap<>();
@@ -58,7 +64,14 @@ final class ProjectJournal
         this.leadMarkers = new HashSet<>();
         this.linkToLeadMap = new HashMap<>();
         this.allMarkers = new HashSet<>();
-        this.registerChangeHandler(hasObjectType(Daily.class), this::processDailyUpdate);
+        this.registerChangeHandler(
+            hasObjectType(Daily.class).and(isCreationOrModification()),
+            this::processDailyUpdate
+        );
+        this.registerChangeHandler(
+            hasObjectType(Daily.class).and(isDeletion()),
+            this::processDailyDeletion
+        );
         this.registerChangeHandler(
             hasObjectType(Project.class).and(isDeletion()),
             this::processProjectDeletion
@@ -72,13 +85,19 @@ final class ProjectJournal
     }
 
     @Override
+    public Set<Class<?>> producedObjectTypes()
+    {
+        return Set.of(AttributeValue.class);
+    }
+
+    @Override
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return changelog.changes().anyMatch(hasObjectType(Marker.class));
     }
 
     @Override
-    public Set<DataModel> dependentModels()
+    public Set<?> dependentModels()
     {
         return Set.of(journal, projectRepository);
     }
@@ -100,34 +119,44 @@ final class ProjectJournal
         {
             processJournal();
         }
-        return emptyList();
+        var changes = new ArrayList<Change<?>>();
+        projectRepository.projects()
+            .forEach(project -> collectProjectChanges(changes, project));
+        return changes;
+    }
+
+    private Collection<Change<?>> processDailyDeletion(Change<?> change)
+    {
+        var daily = change.objectAs(Daily.class);
+        var relatedProjects = projectRepository.projects().stream()
+            .filter(project -> daily.refersTo(project.name()))
+            .collect(toSet());
+        removeAttributesForDate(daily.date(), projectStatuses);
+        removeAttributesForDate(daily.date(), projectLeads);
+        var changes = new ArrayList<Change<?>>();
+        relatedProjects.forEach(project -> collectProjectChanges(changes, project));
+        return changes;
     }
 
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        var daily = (Daily) change.object();
-        if (change.kind() == DELETION)
+        var daily = change.objectAs(Daily.class);
+        LOGGER.debug("Processing journal entry '{}' for project attributes", daily.date());
+        removeAttributesForDate(daily.date(), projectStatuses);
+        removeAttributesForDate(daily.date(), projectLeads);
+        for (Project project : projectRepository.projects())
         {
-            // When a journal entry is removed, we need to remove all associated attributes.
-            removeAttributesForDate(daily.date(), projectStatuses);
-            removeAttributesForDate(daily.date(), projectLeads);
-        }
-        else
-        {
-            LOGGER.debug("Processing journal entry '{}' for project attributes", daily.date());
-            removeAttributesForDate(daily.date(), projectStatuses);
-            removeAttributesForDate(daily.date(), projectLeads);
-            for (Project project : projectRepository.projects())
+            var projectName = project.name();
+            if (daily.refersTo(projectName))
             {
-                var projectName = project.name();
-                if (daily.refersTo(projectName))
-                {
-                    var entries = daily.markedLinesFor(projectName, allMarkers, false);
-                    updateProjectAttributes(projectName, entries);
-                }
+                var entries = daily.markedLinesFor(projectName, allMarkers, false);
+                updateProjectAttributes(projectName, entries);
             }
         }
-        return emptyList();
+        var changes = new ArrayList<Change<?>>();
+        projectRepository.projects()
+            .forEach(project -> collectProjectChanges(changes, project));
+        return changes;
     }
 
     private Collection<Change<?>> processProjectDeletion(Change<?> change)
@@ -135,7 +164,80 @@ final class ProjectJournal
         var project = (Project) change.object();
         projectStatuses.remove(project.name());
         projectLeads.remove(project.name());
-        return emptyList();
+        var changes = new ArrayList<Change<?>>();
+        collectProjectChanges(changes, project);
+        return changes;
+    }
+
+    private void collectProjectChanges(ArrayList<Change<?>> changes, Project project)
+    {
+        statusOf(project).ifPresentOrElse(
+            status ->
+                changes.add(modification(
+                        new AttributeValue(
+                            project,
+                            statusDefinition,
+                            status,
+                            WEIGHT
+                        ),
+                        AttributeValue.class
+                    )
+                ), () ->
+                changes.add(deletion(
+                        new AttributeValue(
+                            project,
+                            statusDefinition,
+                            null,
+                            WEIGHT
+                        ),
+                        AttributeValue.class
+                    )
+                )
+        );
+        leadOf(project).ifPresentOrElse(lead ->
+            changes.add(modification(
+                    new AttributeValue(
+                        project,
+                        leadDefinition,
+                        lead,
+                        WEIGHT
+                    ),
+                    AttributeValue.class
+                )
+            ), () ->
+            changes.add(deletion(
+                    new AttributeValue(
+                        project,
+                        leadDefinition,
+                        null,
+                        WEIGHT
+                    ),
+                    AttributeValue.class
+                )
+            )
+        );
+        journal.mostRecentMentionOf(project.name()).ifPresentOrElse(date ->
+            changes.add(modification(
+                    new AttributeValue(
+                        project,
+                        lastModifiedDefinition,
+                        date,
+                        WEIGHT
+                    ),
+                    AttributeValue.class
+                )
+            ), () ->
+            changes.add(deletion(
+                    new AttributeValue(
+                        project,
+                        lastModifiedDefinition,
+                        null,
+                        WEIGHT
+                    ),
+                    AttributeValue.class
+                )
+            )
+        );
     }
 
     private void discoverMarkers()

@@ -2,24 +2,24 @@ package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.project.ProjectPropertyRepository;
+import nl.ulso.markdown_curator.project.AttributeRegistry;
 import nl.ulso.vmc.graph.DefaultNodeClassifier;
 import nl.ulso.vmc.graph.Node;
 
 import java.util.*;
 
-import static nl.ulso.markdown_curator.project.ProjectProperty.STATUS;
+import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
 
 @Singleton
 public class ProjectNodeClassifier
-        extends DefaultNodeClassifier
+    extends DefaultNodeClassifier
 {
-    private final ProjectPropertyRepository projectPropertyRepository;
+    private final AttributeRegistry attributeRegistry;
 
     @Inject
-    ProjectNodeClassifier(ProjectPropertyRepository projectPropertyRepository)
+    ProjectNodeClassifier(AttributeRegistry attributeRegistry)
     {
-        this.projectPropertyRepository = projectPropertyRepository;
+        this.attributeRegistry = attributeRegistry;
     }
 
     @Override
@@ -40,12 +40,12 @@ public class ProjectNodeClassifier
     public Optional<String> classify(Node node)
     {
         return super.classify(node).or(() -> {
-            var project = projectPropertyRepository.projectFor(node.document());
+            var project = attributeRegistry.projectFor(node.document());
             return project
-                    .flatMap(p -> projectPropertyRepository.propertyValue(p, STATUS))
-                    .map(s -> (String) s)
-                    .map(this::toMermaid)
-                    .or(() -> Optional.of(toMermaid("unknown")));
+                .flatMap(p -> attributeRegistry.attributeValue(p, STATUS))
+                .map(s -> (String) s)
+                .map(this::toMermaid)
+                .or(() -> Optional.of(toMermaid("unknown")));
         });
     }
 
@@ -62,6 +62,5 @@ public class ProjectNodeClassifier
             default -> "unknown";
         };
     }
-
 
 }

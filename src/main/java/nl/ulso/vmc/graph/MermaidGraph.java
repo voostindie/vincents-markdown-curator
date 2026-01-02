@@ -94,7 +94,7 @@ public class MermaidGraph
     }
 
     @Override
-    public Set<DataModel> dependentModels()
+    public Set<?> dependentModels()
     {
         return Set.of(journal);
     }

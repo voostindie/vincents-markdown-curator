@@ -4,46 +4,45 @@ import dagger.*;
 import dagger.Module;
 import dagger.multibindings.*;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.project.*;
-import nl.ulso.markdown_curator.query.Query;
 import nl.ulso.jxa.JavaScriptForAutomationModule;
+import nl.ulso.markdown_curator.DataModel;
+import nl.ulso.markdown_curator.ExternalChangeObjectType;
+import nl.ulso.markdown_curator.project.AttributeDefinition;
+import nl.ulso.markdown_curator.project.ProjectModule;
+import nl.ulso.markdown_curator.query.Query;
 
-import static nl.ulso.markdown_curator.project.ProjectProperty.newProperty;
-import static nl.ulso.vmc.omnifocus.OmniFocusUrlResolver.OMNIFOCUS_URL;
+import static nl.ulso.markdown_curator.project.AttributeDefinition.newAttributeDefinition;
+import static nl.ulso.vmc.omnifocus.OmniFocusAttributeProducer.OMNIFOCUS_URL_ATTRIBUTE;
 
 @Module(includes = {
-        JavaScriptForAutomationModule.class,
-        ProjectModule.class
+    JavaScriptForAutomationModule.class,
+    ProjectModule.class
 })
 public abstract class OmniFocusModule
 {
     @Binds
     abstract OmniFocusMessages bindOmniFocusMessages(ResourceBundleOmniFocusMessages messages);
 
-    @Binds
-    @IntoSet
-    abstract ValueResolver bindOmniFocusPriorityResolver(
-            OmniFocusPriorityResolver resolver);
-
-    @Binds
-    @IntoSet
-    abstract ValueResolver bindOmniFocusStatusResolver(
-            OmniFocusStatusResolver resolver);
-
-    @Binds
-    @IntoSet
-    abstract ValueResolver bindOmniFocusUrlResolver(
-            OmniFocusUrlResolver resolver);
-
-
     @Provides
     @Singleton
     @IntoMap
-    @StringKey(OMNIFOCUS_URL)
-    static ProjectProperty provideOmniFocusUrlProperty()
+    @StringKey(OMNIFOCUS_URL_ATTRIBUTE)
+    static AttributeDefinition provideOmniFocusUrl()
     {
-        return newProperty(String.class, "omnifocus");
+        return newAttributeDefinition(String.class, "omnifocus");
     }
+
+    @Provides
+    @IntoSet
+    @ExternalChangeObjectType
+    static Class<?> provideOmniFocusChangeObjectType()
+    {
+        return OmniFocus.class;
+    }
+
+    @Binds
+    @IntoSet
+    abstract DataModel bindOmniFocusAttributeProducer(OmniFocusAttributeProducer producer);
 
     @Binds
     @IntoSet

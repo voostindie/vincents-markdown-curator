@@ -3,8 +3,8 @@ package nl.ulso.vmc.omnifocus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.JsonValue;
-import nl.ulso.markdown_curator.vault.VaultRefresher;
 import nl.ulso.jxa.JavaScriptForAutomation;
+import nl.ulso.markdown_curator.vault.VaultRefresher;
 import org.slf4j.*;
 
 import java.io.File;
@@ -17,6 +17,7 @@ import java.util.function.Function;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.stream.Collectors.toMap;
+import static nl.ulso.markdown_curator.Change.modification;
 import static nl.ulso.vmc.omnifocus.OmniFocusProject.NULL_PROJECT;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
@@ -36,9 +37,10 @@ public class OmniFocusRepository
     private static final Logger LOGGER = LoggerFactory.getLogger(OmniFocusRepository.class);
 
     private static final File DATABASE_PATH =
-            Path.of(System.getProperty("user.home"), "Library", "Containers",
-                    "com.omnigroup.OmniFocus4", "Data", "Library", "Application Support",
-                    "OmniFocus", "OmniFocus.ofocus").toFile();
+        Path.of(System.getProperty("user.home"), "Library", "Containers",
+            "com.omnigroup.OmniFocus4", "Data", "Library", "Application Support",
+            "OmniFocus", "OmniFocus.ofocus"
+        ).toFile();
     private static final String JXA_SCRIPT = "omnifocus-projects";
     private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
     private static final int REFRESH_DELAY_MINUTES = 5;
@@ -54,7 +56,7 @@ public class OmniFocusRepository
 
     @Inject
     public OmniFocusRepository(
-            VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
+        VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         if (!DATABASE_PATH.canRead())
         {
@@ -65,48 +67,52 @@ public class OmniFocusRepository
     }
 
     private void scheduleBackgroundRefresh(
-            VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
+        VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         var curatorName = MDC.get("curator");
         REFRESH_EXECUTOR.scheduleAtFixedRate(() -> {
-            MDC.put("curator", curatorName);
-            if (lastModified == DATABASE_PATH.lastModified())
-            {
-                LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
-                return;
-            }
-            var newProjects = fetchProjects(jxa, settings);
-            var oldProjects = cache.getAndSet(newProjects);
-            lastModified = DATABASE_PATH.lastModified();
-            if (oldProjects == null)
-            {
-                LOGGER.debug("Initial fetch from OmniFocus completed.");
-                return;
-            }
-            if (newProjects.equals(oldProjects))
-            {
-                LOGGER.debug("No changes in projects fetched from OmniFocus; skipping refresh.");
-                return;
-            }
-            LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh in the vault.");
-            refresher.triggerRefresh();
-        }, 0, REFRESH_DELAY_MINUTES, TimeUnit.MINUTES);
+                MDC.put("curator", curatorName);
+                if (lastModified == DATABASE_PATH.lastModified())
+                {
+                    LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
+                    return;
+                }
+                var newProjects = fetchProjects(jxa, settings);
+                var oldProjects = cache.getAndSet(newProjects);
+                lastModified = DATABASE_PATH.lastModified();
+                if (oldProjects == null)
+                {
+                    LOGGER.debug("Initial fetch from OmniFocus completed.");
+                    refresher.triggerRefresh(modification(new OmniFocus(), OmniFocus.class));
+                    return;
+                }
+                if (newProjects.equals(oldProjects))
+                {
+                    LOGGER.debug("No changes in projects from OmniFocus; skipping refresh.");
+                    return;
+                }
+                LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh in the " +
+                            "vault.");
+                refresher.triggerRefresh(modification(new OmniFocus(), OmniFocus.class));
+            }, 0, REFRESH_DELAY_MINUTES, TimeUnit.MINUTES
+        );
     }
 
     private Map<String, OmniFocusProject> fetchProjects(
-            JavaScriptForAutomation jxa, OmniFocusSettings settings)
+        JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         LOGGER.debug("Fetching OmniFocus projects in folder: {}", settings.omniFocusFolder());
         var array = jxa.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
         return array.stream()
-                .map(JsonValue::asJsonObject)
-                .map(object -> new OmniFocusProject(
-                        object.getString("id"),
-                        object.getString("name"),
-                        Status.fromString(object.getString("status")),
-                        object.getInt("priority")))
-                .filter(project -> SELECTED_STATUSES.contains(project.status()))
-                .collect(toMap(OmniFocusProject::name, Function.identity()));
+            .map(JsonValue::asJsonObject)
+            .map(object -> new OmniFocusProject(
+                object.getString("id"),
+                object.getString("name"),
+                Status.fromString(object.getString("status")),
+                object.getInt("priority")
+            ))
+            .filter(project -> SELECTED_STATUSES.contains(project.status()))
+            .collect(toMap(OmniFocusProject::name, Function.identity()));
     }
 
     public Collection<OmniFocusProject> projects()

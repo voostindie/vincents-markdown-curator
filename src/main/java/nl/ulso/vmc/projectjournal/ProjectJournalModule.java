@@ -6,7 +6,6 @@ import dagger.multibindings.IntoSet;
 import nl.ulso.markdown_curator.DataModel;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.project.ProjectModule;
-import nl.ulso.markdown_curator.project.ValueResolver;
 
 /// Combines the Project and Journal modules by offering additional functionality to extract project
 /// attributes from the journal instead of from front matter.
@@ -22,16 +21,4 @@ public abstract class ProjectJournalModule
     @Binds
     @IntoSet
     abstract DataModel bindProjectJournal(ProjectJournal projectJournal);
-
-    @Binds
-    @IntoSet
-    abstract ValueResolver bindLastModifiedResolver(LastModifiedResolver resolver);
-
-    @Binds
-    @IntoSet
-    abstract ValueResolver bindStatusResolver(StatusResolver resolver);
-
-    @Binds
-    @IntoSet
-    abstract ValueResolver bindLeadResolver(LeadResolver resolver);
 }
