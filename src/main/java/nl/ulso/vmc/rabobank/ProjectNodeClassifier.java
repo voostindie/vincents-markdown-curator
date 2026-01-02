@@ -3,6 +3,8 @@ package nl.ulso.vmc.rabobank;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.project.AttributeRegistry;
+import nl.ulso.markdown_curator.project.Project;
+import nl.ulso.markdown_curator.vault.Document;
 import nl.ulso.vmc.graph.DefaultNodeClassifier;
 import nl.ulso.vmc.graph.Node;
 
@@ -40,13 +42,20 @@ public class ProjectNodeClassifier
     public Optional<String> classify(Node node)
     {
         return super.classify(node).or(() -> {
-            var project = attributeRegistry.projectFor(node.document());
+            var project = projectFor(node.document(), attributeRegistry);
             return project
                 .flatMap(p -> attributeRegistry.attributeValue(p, STATUS))
                 .map(s -> (String) s)
                 .map(this::toMermaid)
                 .or(() -> Optional.of(toMermaid("unknown")));
         });
+    }
+
+    private Optional<Project> projectFor(Document document, AttributeRegistry registry)
+    {
+        return registry.projects().stream()
+            .filter(project -> project.document().name().equals(document.name()))
+            .findFirst();
     }
 
     private String toMermaid(String status)
