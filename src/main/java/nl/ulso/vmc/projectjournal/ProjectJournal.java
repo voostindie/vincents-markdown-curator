@@ -113,7 +113,7 @@ final class ProjectJournal
         {
             processJournal();
         }
-        var changes = new ArrayList<Change<?>>();
+        var changes = createChangeCollection();
         projectRepository.projects()
             .forEach(project -> collectProjectChanges(changes, project));
         return changes;
@@ -127,7 +127,7 @@ final class ProjectJournal
             .collect(toSet());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
-        var changes = new ArrayList<Change<?>>();
+        var changes = createChangeCollection();
         relatedProjects.forEach(project -> collectProjectChanges(changes, project));
         return changes;
     }
@@ -147,7 +147,7 @@ final class ProjectJournal
                 updateProjectAttributes(projectName, entries);
             }
         }
-        var changes = new ArrayList<Change<?>>();
+        var changes = createChangeCollection();
         projectRepository.projects()
             .forEach(project -> collectProjectChanges(changes, project));
         return changes;
@@ -158,12 +158,12 @@ final class ProjectJournal
         var project = (Project) change.object();
         projectStatuses.remove(project.name());
         projectLeads.remove(project.name());
-        var changes = new ArrayList<Change<?>>();
+        var changes = createChangeCollection();
         collectProjectChanges(changes, project);
         return changes;
     }
 
-    private void collectProjectChanges(ArrayList<Change<?>> changes, Project project)
+    private void collectProjectChanges(Collection<Change<?>> changes, Project project)
     {
         statusOf(project).ifPresentOrElse(
             status ->

@@ -94,7 +94,7 @@ final class OmniFocusAttributeProducer
 
     private Collection<Change<?>> processProjectDelete(Change<?> change)
     {
-        var changes = new ArrayList<Change<?>>();
+        var changes = createChangeCollection();
         var project = change.objectAs(Project.class);
         deleteUrl(changes, project);
         deletePriority(changes, project);
