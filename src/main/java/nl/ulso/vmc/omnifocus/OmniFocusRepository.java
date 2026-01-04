@@ -17,22 +17,19 @@ import java.util.function.Function;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toMap;
-import static nl.ulso.vmc.omnifocus.OmniFocusProject.NULL_PROJECT;
 import static nl.ulso.vmc.omnifocus.OmniFocusUpdate.OMNIFOCUS_CHANGE;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
 
-/**
- * Fetches projects from a folder in <a href="https://www.omnigroup.com/omnifocus">OmniFocus</a>.
- * <p/>
- * This implementation uses JXA scripting. Data is refreshed every 5 minutes, independently of the
- * queries themselves, to ensure queries run efficiently. If the OmniFocus database hasn't changed
- * (based on the modification timestamp of the database folder), refresh is skipped. If, after a
- * refresh, a change is detected to the set of projects in memory, the vault is refreshed, forcing
- * it to re-run all queries and write changed documents.
- */
+/// Fetches projects from a folder in <a href="https://www.omnigroup.com/omnifocus">OmniFocus</a>.
+///
+/// This implementation uses JXA scripting. Data is refreshed every 5 minutes, independently of the
+/// rest of the system, to ensure system overall throughput is not impacted. If the OmniFocus
+/// database hasn't changed (based on the modification timestamp of the database folder), refresh is
+/// skipped. If, after a refresh, a change is detected to the set of projects in memory, a change
+/// object is published, requesting the system to process the update.
 @Singleton
-public class OmniFocusRepository
+public final class OmniFocusRepository
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(OmniFocusRepository.class);
 
@@ -46,13 +43,16 @@ public class OmniFocusRepository
     private static final int INITIAL_DELAY_SECONDS = 5;
     private static final int REFRESH_DELAY_SECONDS = 300;
 
+    // Because fetching projects from OmniFocus is a scheduled activity, it might run in parallel
+    // with access in the [OmniFocusAttributeProducer]. In practice this can't happen as the access
+    // from the [OmniFocusAttributeProducer] always comes after the refresh; synchronization is
+    // done through the [OmniFocusUpdate] change object: this registry creates that object. No
+    // refresh, no object, no access. However, it's better to be safe than sorry.
     private final AtomicReference<Map<String, OmniFocusProject>> cache;
     private long lastModified = 0L;
 
-    /**
-     * The filtering on statuses is ideally done in the JXA script to limit the data pulled from
-     * OmniFocus, but this broke in OmniFocus 4.3.3. Now the filtering is in here.
-     */
+    // The filtering on statuses is ideally done in the JXA script to limit the data pulled from
+    // OmniFocus, but this broke in OmniFocus 4.3.3. Now the filtering is in here, in the client.
     private static final Set<Status> SELECTED_STATUSES = Set.of(ACTIVE, ON_HOLD);
 
     @Inject
@@ -71,7 +71,8 @@ public class OmniFocusRepository
         VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
         var curatorName = MDC.get("curator");
-        REFRESH_EXECUTOR.scheduleAtFixedRate(() -> {
+        REFRESH_EXECUTOR.scheduleAtFixedRate(() ->
+            {
                 MDC.put("curator", curatorName);
                 if (lastModified == DATABASE_PATH.lastModified())
                 {
@@ -83,7 +84,9 @@ public class OmniFocusRepository
                 lastModified = DATABASE_PATH.lastModified();
                 if (oldProjects == null)
                 {
-                    LOGGER.debug("Initial fetch from OmniFocus completed.");
+                    LOGGER.debug("Initial fetch from OmniFocus completed. Triggering initial " +
+                                 "refresh in the vault after {} seconds.", INITIAL_DELAY_SECONDS
+                    );
                     refresher.triggerRefresh(OMNIFOCUS_CHANGE);
                     return;
                 }
@@ -92,8 +95,7 @@ public class OmniFocusRepository
                     LOGGER.debug("No changes in projects from OmniFocus; skipping refresh.");
                     return;
                 }
-                LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh in the " +
-                            "vault.");
+                LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh.");
                 refresher.triggerRefresh(OMNIFOCUS_CHANGE);
             }, INITIAL_DELAY_SECONDS, REFRESH_DELAY_SECONDS, SECONDS
         );
@@ -118,33 +120,6 @@ public class OmniFocusRepository
 
     public Collection<OmniFocusProject> projects()
     {
-        return spinWaitForCache().values();
-    }
-
-    public OmniFocusProject project(String name)
-    {
-        return spinWaitForCache().getOrDefault(name, NULL_PROJECT);
-    }
-
-    public int priorityOf(String name)
-    {
-        return spinWaitForCache().getOrDefault(name, NULL_PROJECT).priority();
-    }
-
-    public Status statusOf(String name)
-    {
-        return spinWaitForCache().getOrDefault(name, NULL_PROJECT).status();
-    }
-
-    // If, at system start, the request for data comes before the data from OmniFocus
-    // is available the system spins and waits.
-    private Map<String, OmniFocusProject> spinWaitForCache()
-    {
-        Map<String, OmniFocusProject> result = null;
-        while (result == null)
-        {
-            result = cache.get();
-        }
-        return result;
+        return cache.get().values();
     }
 }
