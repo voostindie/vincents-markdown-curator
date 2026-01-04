@@ -11,14 +11,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toMap;
-import static nl.ulso.vmc.omnifocus.OmniFocusUpdate.OMNIFOCUS_CHANGE;
 import static nl.ulso.vmc.omnifocus.OmniFocusProject.NULL_PROJECT;
+import static nl.ulso.vmc.omnifocus.OmniFocusUpdate.OMNIFOCUS_CHANGE;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
 
@@ -43,7 +43,8 @@ public class OmniFocusRepository
         ).toFile();
     private static final String JXA_SCRIPT = "omnifocus-projects";
     private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
-    private static final int REFRESH_DELAY_MINUTES = 5;
+    private static final int INITIAL_DELAY_SECONDS = 5;
+    private static final int REFRESH_DELAY_SECONDS = 300;
 
     private final AtomicReference<Map<String, OmniFocusProject>> cache;
     private long lastModified = 0L;
@@ -94,7 +95,7 @@ public class OmniFocusRepository
                 LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh in the " +
                             "vault.");
                 refresher.triggerRefresh(OMNIFOCUS_CHANGE);
-            }, 0, REFRESH_DELAY_MINUTES, TimeUnit.MINUTES
+            }, INITIAL_DELAY_SECONDS, REFRESH_DELAY_SECONDS, SECONDS
         );
     }
 
