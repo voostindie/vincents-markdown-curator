@@ -269,7 +269,7 @@ public class MermaidGraph
         StringBuilder builder, Set<Node> selection, int maximumDepth,
         Set<Type> excludedTypes)
     {
-        var queue = new LinkedList<Item>();
+        var queue = new ArrayDeque<Item>();
         selection.forEach(node -> queue.add(new Item(node, 1)));
         var visited = new HashSet<Node>();
         while (!queue.isEmpty())
