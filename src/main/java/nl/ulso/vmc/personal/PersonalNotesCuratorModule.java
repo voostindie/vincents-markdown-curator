@@ -3,6 +3,7 @@ package nl.ulso.vmc.personal;
 import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
+import jakarta.inject.Named;
 import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.journal.JournalModule;
@@ -21,13 +22,14 @@ import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
+import static nl.ulso.markdown_curator.VaultReloader.WATCH_DOCUMENT_KEY;
 
 @Module(includes = {
-        CuratorModule.class,
-        ProjectModule.class,
-        JournalModule.class,
-        ProjectJournalModule.class,
-        OmniFocusModule.class
+    CuratorModule.class,
+    ProjectModule.class,
+    JournalModule.class,
+    ProjectJournalModule.class,
+    OmniFocusModule.class
 })
 abstract class PersonalNotesCuratorModule
 {
@@ -46,6 +48,13 @@ abstract class PersonalNotesCuratorModule
     static Locale provideLocale()
     {
         return ENGLISH;
+    }
+
+    @Provides
+    @Named(WATCH_DOCUMENT_KEY)
+    static String watchDocument()
+    {
+        return "Watchdoc";
     }
 
     @Binds
@@ -72,10 +81,10 @@ abstract class PersonalNotesCuratorModule
     static JournalSettings provideJournalSettings()
     {
         return new JournalSettings(
-                JOURNAL_FOLDER,
-                MARKER_SUB_FOLDER,
-                ACTIVITIES_SECTION,
-                PROJECT_FOLDER
+            JOURNAL_FOLDER,
+            MARKER_SUB_FOLDER,
+            ACTIVITIES_SECTION,
+            PROJECT_FOLDER
         );
     }
 
@@ -89,8 +98,10 @@ abstract class PersonalNotesCuratorModule
     static OmniFocusSettings provideOmniFocusSettings()
     {
         return new OmniFocusSettings(PROJECT_FOLDER, "👨🏻‍💻 Personal",
-                (name) -> !name.startsWith("⚡️") &&
-                          !Set.of("🤖 Routine",
-                                  "👨🏻‍💻 Various").contains(name));
+            (name) -> !name.startsWith("⚡️") &&
+                      !Set.of("🤖 Routine",
+                          "👨🏻‍💻 Various"
+                      ).contains(name)
+        );
     }
 }

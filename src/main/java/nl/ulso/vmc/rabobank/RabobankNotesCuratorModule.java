@@ -3,6 +3,7 @@ package nl.ulso.vmc.rabobank;
 import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
+import jakarta.inject.Named;
 import nl.ulso.markdown_curator.ChangeProcessor;
 import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.journal.JournalModule;
@@ -22,17 +23,18 @@ import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
+import static nl.ulso.markdown_curator.VaultReloader.WATCH_DOCUMENT_KEY;
 import static nl.ulso.vmc.graph.Shape.HEXAGON;
 import static nl.ulso.vmc.graph.Shape.RECTANGLE;
 import static nl.ulso.vmc.graph.Shape.STADIUM;
 
 @Module(includes = {
-        CuratorModule.class,
-        ProjectModule.class,
-        JournalModule.class,
-        ProjectJournalModule.class,
-        OmniFocusModule.class,
-        MermaidGraphModule.class
+    CuratorModule.class,
+    ProjectModule.class,
+    JournalModule.class,
+    ProjectJournalModule.class,
+    OmniFocusModule.class,
+    MermaidGraphModule.class
 })
 abstract class RabobankNotesCuratorModule
 {
@@ -55,6 +57,13 @@ abstract class RabobankNotesCuratorModule
         return ENGLISH;
     }
 
+    @Provides
+    @Named(WATCH_DOCUMENT_KEY)
+    static String watchDocument()
+    {
+        return "Watchdoc";
+    }
+
     @Binds
     @IntoSet
     abstract ChangeProcessor bindOrgChart(OrgChart orgChart);
@@ -70,7 +79,7 @@ abstract class RabobankNotesCuratorModule
     @Binds
     @IntoSet
     abstract Query bindArchitectureDecisionRecordsQuery(
-            ArchitectureDecisionRecordsQuery architectureDecisionRecordsQuery);
+        ArchitectureDecisionRecordsQuery architectureDecisionRecordsQuery);
 
     @Binds
     @IntoSet
@@ -96,10 +105,10 @@ abstract class RabobankNotesCuratorModule
     static JournalSettings provideJournalSettings()
     {
         return new JournalSettings(
-                JOURNAL_FOLDER,
-                MARKER_SUB_FOLDER,
-                ACTIVITIES_SECTION,
-                PROJECT_FOLDER
+            JOURNAL_FOLDER,
+            MARKER_SUB_FOLDER,
+            ACTIVITIES_SECTION,
+            PROJECT_FOLDER
         );
     }
 
@@ -113,26 +122,29 @@ abstract class RabobankNotesCuratorModule
     static OmniFocusSettings provideOmniFocusSettings()
     {
         return new OmniFocusSettings(PROJECT_FOLDER, "💼 Rabobank",
-                (name) -> !name.startsWith("⚡️") &&
-                          !Set.of("🤖 Routine",
-                                  "📖 Reading material",
-                                  "💡 Newsletter topics",
-                                  "💶 Statements",
-                                  "💼 Various",
-                                  "💬 Reminders").contains(name));
+            (name) -> !name.startsWith("⚡️") &&
+                      !Set.of("🤖 Routine",
+                          "📖 Reading material",
+                          "💡 Newsletter topics",
+                          "💶 Statements",
+                          "💼 Various",
+                          "💬 Reminders"
+                      ).contains(name)
+        );
     }
 
     @Binds
     abstract MermaidNodeClassifier bindProjectNodeClassifier(
-            ProjectNodeClassifier projectNodeClassifier);
+        ProjectNodeClassifier projectNodeClassifier);
 
     @Provides
-    static MermaidGraphSettings provideMermaidGraphSettings(MermaidNodeClassifier projectNodeClassifier)
+    static MermaidGraphSettings provideMermaidGraphSettings(
+        MermaidNodeClassifier projectNodeClassifier)
     {
         return new MermaidGraphSettings(Set.of(
-                new Type("project", PROJECT_FOLDER, RECTANGLE, projectNodeClassifier),
-                new Type("contact", CONTACS_FOLDER, STADIUM),
-                new Type("team", TEAMS_FOLDER, HEXAGON)
+            new Type("project", PROJECT_FOLDER, RECTANGLE, projectNodeClassifier),
+            new Type("contact", CONTACS_FOLDER, STADIUM),
+            new Type("team", TEAMS_FOLDER, HEXAGON)
         ));
     }
 }

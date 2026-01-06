@@ -83,7 +83,7 @@ public final class OmniFocusRepository
                 lastModified = DATABASE_PATH.lastModified();
                 if (oldProjects == null)
                 {
-                    LOGGER.info("Initial fetch from OmniFocus completed.");
+                    LOGGER.debug("Initial fetch from OmniFocus completed.");
                     return;
                 }
                 if (newProjects.equals(oldProjects))

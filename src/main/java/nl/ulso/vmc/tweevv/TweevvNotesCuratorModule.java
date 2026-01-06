@@ -3,8 +3,9 @@ package nl.ulso.vmc.tweevv;
 import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.markdown_curator.CuratorModule;
+import jakarta.inject.Named;
 import nl.ulso.markdown_curator.ChangeProcessor;
+import nl.ulso.markdown_curator.CuratorModule;
 import nl.ulso.markdown_curator.journal.JournalModule;
 import nl.ulso.markdown_curator.journal.JournalSettings;
 import nl.ulso.markdown_curator.project.ProjectModule;
@@ -21,13 +22,14 @@ import java.util.Locale;
 import java.util.Set;
 
 import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
+import static nl.ulso.markdown_curator.VaultReloader.WATCH_DOCUMENT_KEY;
 
 @Module(includes = {
-        CuratorModule.class,
-        ProjectModule.class,
-        JournalModule.class,
-        ProjectJournalModule.class,
-        OmniFocusModule.class
+    CuratorModule.class,
+    ProjectModule.class,
+    JournalModule.class,
+    ProjectJournalModule.class,
+    OmniFocusModule.class
 })
 abstract class TweevvNotesCuratorModule
 {
@@ -46,6 +48,13 @@ abstract class TweevvNotesCuratorModule
     static Locale provideLocale()
     {
         return Locale.forLanguageTag("nl");
+    }
+
+    @Provides
+    @Named(WATCH_DOCUMENT_KEY)
+    static String watchDocument()
+    {
+        return "Watchdoc";
     }
 
     @Binds
@@ -96,10 +105,10 @@ abstract class TweevvNotesCuratorModule
     static JournalSettings provideJournalSettings()
     {
         return new JournalSettings(
-                JOURNAL_FOLDER,
-                MARKER_SUB_FOLDER,
-                ACTIVITIES_SECTION,
-                PROJECT_FOLDER
+            JOURNAL_FOLDER,
+            MARKER_SUB_FOLDER,
+            ACTIVITIES_SECTION,
+            PROJECT_FOLDER
         );
     }
 
@@ -113,12 +122,14 @@ abstract class TweevvNotesCuratorModule
     static OmniFocusSettings provideOmniFocusSettings()
     {
         return new OmniFocusSettings(
-                PROJECT_FOLDER,
-                "🏐 TweeVV",
-                (name) -> !name.startsWith("⚡️") &&
-                          !Set.of("🤖 Routine",
-                                  "🏐 Diversen",
-                                  "💶 Declaraties",
-                                  "✉️ Eerstvolgende nieuwsbrief").contains(name));
+            PROJECT_FOLDER,
+            "🏐 TweeVV",
+            (name) -> !name.startsWith("⚡️") &&
+                      !Set.of("🤖 Routine",
+                          "🏐 Diversen",
+                          "💶 Declaraties",
+                          "✉️ Eerstvolgende nieuwsbrief"
+                      ).contains(name)
+        );
     }
 }
