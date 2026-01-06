@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -84,7 +85,7 @@ public class MermaidGraph
                || changelog.changes().anyMatch(isObjectType(Marker.class));
     }
 
-    private Predicate<Change<?>> isNodeEntry()
+    Predicate<Change<?>> isNodeEntry()
     {
         return isObjectType(Document.class).and(change ->
         {

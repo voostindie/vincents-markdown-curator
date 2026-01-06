@@ -42,6 +42,10 @@ public abstract class OmniFocusModule
 
     @Binds
     @IntoSet
+    abstract ChangeProcessor bindOmniFocusInitializer(OmniFocusInitializer producer);
+
+    @Binds
+    @IntoSet
     abstract ChangeProcessor bindOmniFocusAttributeProducer(OmniFocusAttributeProducer producer);
 
     @Binds

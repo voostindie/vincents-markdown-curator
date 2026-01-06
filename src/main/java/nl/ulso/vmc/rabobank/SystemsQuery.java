@@ -1,15 +1,17 @@
 package nl.ulso.vmc.rabobank;
 
+import jakarta.inject.Inject;
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
-import jakarta.inject.Inject;
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 class SystemsQuery
-        implements Query
+    implements Query
 {
     private final Vault vault;
     private final QueryResultFactory resultFactory;
@@ -40,6 +42,15 @@ class SystemsQuery
     }
 
     @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(isObjectType(Document.class)
+            .and(change ->
+                change.objectAs(Document.class).folder().name().equals("Systems"))
+        );
+    }
+
+    @Override
     public QueryResult run(QueryDefinition definition)
     {
         return vault.folder("Systems").map(folder ->
@@ -53,7 +64,7 @@ class SystemsQuery
     }
 
     private static class SystemFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private final List<String> systems = new ArrayList<>();
 

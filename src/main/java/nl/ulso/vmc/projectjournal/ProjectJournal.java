@@ -13,8 +13,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.delete;
-import static nl.ulso.markdown_curator.Change.update;
+import static nl.ulso.markdown_curator.Change.*;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.LAST_MODIFIED;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.LEAD;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
@@ -138,6 +137,7 @@ final class ProjectJournal
         LOGGER.debug("Processing journal entry '{}' for project attributes", daily.date());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
+        var changes = createChangeCollection();
         for (Project project : projectRepository.projects())
         {
             var projectName = project.name();
@@ -145,11 +145,9 @@ final class ProjectJournal
             {
                 var entries = daily.markedLinesFor(projectName, allMarkers, false);
                 updateProjectAttributes(projectName, entries);
+                collectProjectChanges(changes, project);
             }
         }
-        var changes = createChangeCollection();
-        projectRepository.projects()
-            .forEach(project -> collectProjectChanges(changes, project));
         return changes;
     }
 

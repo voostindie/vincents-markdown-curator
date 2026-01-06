@@ -9,6 +9,8 @@ import java.util.*;
 
 import static nl.ulso.markdown_curator.Change.create;
 import static nl.ulso.markdown_curator.Change.delete;
+import static nl.ulso.markdown_curator.Change.isDelete;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.PRIORITY;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;

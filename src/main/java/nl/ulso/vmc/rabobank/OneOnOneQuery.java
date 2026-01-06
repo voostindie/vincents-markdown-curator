@@ -1,5 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.*;
 
@@ -12,6 +13,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 class OneOnOneQuery
         implements Query
@@ -42,6 +44,15 @@ class OneOnOneQuery
     public Map<String, String> supportedConfiguration()
     {
         return emptyMap();
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(isObjectType(Document.class)
+            .and(change ->
+                change.objectAs(Document.class).folder().name().equals("Contacts"))
+        );
     }
 
     @Override

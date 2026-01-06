@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /**
@@ -99,7 +100,7 @@ public final class TrainerModel
         return emptyList();
     }
 
-    private Predicate<? super Change<?>> isFolderInScope()
+    Predicate<? super Change<?>> isFolderInScope()
     {
         return change -> {
             var document = (Document) change.object();

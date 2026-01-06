@@ -1,5 +1,6 @@
 package nl.ulso.vmc.personal;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 
 import jakarta.inject.Inject;
@@ -38,6 +39,14 @@ public class ReadingQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("year", "Year to list the sessions for");
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            library.isBookDocument().or(library.isAuthorDocument())
+        );
     }
 
     @Override

@@ -1,10 +1,14 @@
 package nl.ulso.vmc.tweevv.trainers;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
+import nl.ulso.markdown_curator.vault.Document;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
+
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 /**
  * Base class for queries that act on a specific season; the season is pre-selected, either pulled
@@ -30,6 +34,13 @@ abstract class SeasonQueryTemplate
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("season", "Season to get data for. Defaults to the current document.");
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            isObjectType(Document.class).and(trainerModel.isFolderInScope()));
     }
 
     @Override

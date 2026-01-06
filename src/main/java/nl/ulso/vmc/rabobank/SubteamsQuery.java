@@ -1,5 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
@@ -8,6 +9,7 @@ import java.util.*;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 class SubteamsQuery
         implements Query
@@ -39,6 +41,13 @@ class SubteamsQuery
     {
         return Map.of("style", "list or table; defaults to list"
                 , "roles", "names of the roles in the table");
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            isObjectType(Document.class).and(orgChart.isFolderInScope()));
     }
 
     @Override

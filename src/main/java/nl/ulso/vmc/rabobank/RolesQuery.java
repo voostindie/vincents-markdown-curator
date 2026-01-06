@@ -1,12 +1,16 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 
 import jakarta.inject.Inject;
+import nl.ulso.markdown_curator.vault.Document;
+
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Comparator.comparing;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 class RolesQuery
         implements Query
@@ -37,6 +41,13 @@ class RolesQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("contact", "Name of the contact; defaults to the current document");
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            isObjectType(Document.class).and(orgChart.isFolderInScope()));
     }
 
     @Override

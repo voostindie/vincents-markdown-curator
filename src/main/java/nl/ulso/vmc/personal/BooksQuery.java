@@ -1,5 +1,6 @@
 package nl.ulso.vmc.personal;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 
 import jakarta.inject.Inject;
@@ -34,6 +35,14 @@ public class BooksQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("author", "Author to list books for, defaults to the current document");
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            library.isBookDocument().or(library.isAuthorDocument())
+        );
     }
 
     @Override

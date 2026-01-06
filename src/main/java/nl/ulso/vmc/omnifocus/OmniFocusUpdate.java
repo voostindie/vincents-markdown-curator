@@ -17,4 +17,10 @@ record OmniFocusUpdate()
 {
     static final Change<?> OMNIFOCUS_CHANGE =
         update(new OmniFocusUpdate(), OmniFocusUpdate.class);
+
+    @Override
+    public String toString()
+    {
+        return "OmniFocus";
+    }
 }

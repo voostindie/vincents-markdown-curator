@@ -16,6 +16,8 @@ import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
+import static nl.ulso.markdown_curator.Change.isDelete;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 /**
  * This is the start of what will hopefully be a richer data model at some point. For example I'd
@@ -51,7 +53,7 @@ public class Library
                    isLibraryFolder().and(isDelete()).or(isAuthorDocument().or(isBookDocument())));
     }
 
-    private Predicate<Change<?>> isAuthorDocument()
+    Predicate<Change<?>> isAuthorDocument()
     {
         return isObjectType(Document.class).and(change ->
         {
@@ -61,7 +63,7 @@ public class Library
         });
     }
 
-    private Predicate<Change<?>> isBookDocument()
+    Predicate<Change<?>> isBookDocument()
     {
         return isObjectType(Document.class).and(change ->
         {

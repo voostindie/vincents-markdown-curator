@@ -1,6 +1,7 @@
 package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.project.Project;
 import nl.ulso.markdown_curator.project.ProjectRepository;
 import nl.ulso.markdown_curator.query.*;
@@ -14,6 +15,9 @@ import static java.lang.System.lineSeparator;
 import static java.net.URLEncoder.encode;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Change.isCreate;
+import static nl.ulso.markdown_curator.Change.isDelete;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 /// Reports on inconsistencies between OmniFocus and the projects in this vault.
 public final class OmniFocusQuery
@@ -52,6 +56,15 @@ public final class OmniFocusQuery
     public Map<String, String> supportedConfiguration()
     {
         return emptyMap();
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            isObjectType(Project.class).and(isCreate().or(isDelete()))
+                .or(isObjectType(OmniFocusUpdate.class))
+        );
     }
 
     @Override

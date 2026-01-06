@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toMap;
 import static nl.ulso.vmc.omnifocus.OmniFocusUpdate.OMNIFOCUS_CHANGE;
 import static nl.ulso.vmc.omnifocus.Status.ACTIVE;
@@ -40,8 +40,7 @@ public final class OmniFocusRepository
         ).toFile();
     private static final String JXA_SCRIPT = "omnifocus-projects";
     private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
-    private static final int INITIAL_DELAY_SECONDS = 5;
-    private static final int REFRESH_DELAY_SECONDS = 300;
+    private static final int REFRESH_DELAY_MINUTES = 5;
 
     // Because fetching projects from OmniFocus is a scheduled activity, it might run in parallel
     // with access in the [OmniFocusAttributeProducer]. In practice this can't happen as the access
@@ -84,10 +83,7 @@ public final class OmniFocusRepository
                 lastModified = DATABASE_PATH.lastModified();
                 if (oldProjects == null)
                 {
-                    LOGGER.debug("Initial fetch from OmniFocus completed. Triggering initial " +
-                                 "refresh in the vault after {} seconds.", INITIAL_DELAY_SECONDS
-                    );
-                    refresher.triggerRefresh(OMNIFOCUS_CHANGE);
+                    LOGGER.info("Initial fetch from OmniFocus completed.");
                     return;
                 }
                 if (newProjects.equals(oldProjects))
@@ -97,7 +93,11 @@ public final class OmniFocusRepository
                 }
                 LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh.");
                 refresher.triggerRefresh(OMNIFOCUS_CHANGE);
-            }, INITIAL_DELAY_SECONDS, REFRESH_DELAY_SECONDS, SECONDS
+            }, 0, REFRESH_DELAY_MINUTES, MINUTES
+        );
+        LOGGER.info(
+            "Scheduled background refresh of OmniFocus projects every {} minutes.",
+            REFRESH_DELAY_MINUTES
         );
     }
 
@@ -116,6 +116,18 @@ public final class OmniFocusRepository
             ))
             .filter(project -> SELECTED_STATUSES.contains(project.status()))
             .collect(toMap(OmniFocusProject::name, Function.identity()));
+    }
+
+    // If, at system start, the request for data comes before the data from OmniFocus
+    // is available the system spins and waits.
+    public void waitForInitialFetchToComplete()
+    {
+        Map<String, OmniFocusProject> result = null;
+        while (result == null)
+        {
+            result = cache.get();
+        }
+        LOGGER.info("Fetched {} projects from OmniFocus.", result.size());
     }
 
     public Collection<OmniFocusProject> projects()

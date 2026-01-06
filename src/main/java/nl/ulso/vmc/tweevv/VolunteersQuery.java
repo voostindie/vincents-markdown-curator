@@ -1,6 +1,7 @@
 package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import static java.util.Comparator.comparing;
 public class VolunteersQuery
     implements Query
 {
-    private final VolunteeringModel  model;
+    private final VolunteeringModel model;
     private final QueryResultFactory resultFactory;
 
     @Inject
@@ -38,6 +39,12 @@ public class VolunteersQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("season", "Season to list; e.g. '2021-2022'.");
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(model.isContactDocument());
     }
 
     @Override

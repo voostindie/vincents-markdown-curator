@@ -3,6 +3,7 @@ package nl.ulso.vmc.obsidian;
 import jakarta.json.Json;
 import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParsingException;
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.FileSystemVault;
 import org.slf4j.Logger;
@@ -52,6 +53,12 @@ public class StarredDocumentsQuery
     public Map<String, String> supportedConfiguration()
     {
         return emptyMap();
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return true;
     }
 
     @Override

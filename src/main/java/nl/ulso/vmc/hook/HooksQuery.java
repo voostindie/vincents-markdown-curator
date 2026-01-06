@@ -1,19 +1,21 @@
 package nl.ulso.vmc.hook;
 
+import jakarta.inject.Inject;
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.DocumentPathResolver;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
-import jakarta.inject.Inject;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 /**
  * Lists all hooks (bookmarks) for a document from Hook.
  */
 public class HooksQuery
-        implements Query
+    implements Query
 {
     private final HookmarkRepository repository;
     private final DocumentPathResolver documentPathResolver;
@@ -21,8 +23,8 @@ public class HooksQuery
 
     @Inject
     public HooksQuery(
-            HookmarkRepository repository, DocumentPathResolver documentPathResolver,
-            QueryResultFactory resultFactory)
+        HookmarkRepository repository, DocumentPathResolver documentPathResolver,
+        QueryResultFactory resultFactory)
     {
         this.repository = repository;
         this.documentPathResolver = documentPathResolver;
@@ -48,11 +50,23 @@ public class HooksQuery
     }
 
     @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        // Refreshing hookmarks is expensive. So, only do it if the document the query is in has
+        // changed.
+        return changelog.changes().anyMatch(
+            isObjectType(Document.class).and(change ->
+                change.objectAs(Document.class).equals(definition.document())
+            )
+        );
+    }
+
+    @Override
     public QueryResult run(QueryDefinition definition)
     {
         var documentUri = resolveUri(definition.document());
         return resultFactory.withPerformanceWarning().unorderedList(
-                repository.listHooks(documentUri).stream().map(Hook::toMarkdown).toList());
+            repository.listHooks(documentUri).stream().map(Hook::toMarkdown).toList());
     }
 
     private String resolveUri(Document document)

@@ -1,5 +1,6 @@
 package nl.ulso.vmc.tweevv;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 
 import jakarta.inject.Inject;
@@ -44,6 +45,12 @@ public class GroupQuery
                 "name", "Name of the activity; defaults to the current document name",
                 "format", "\"list\" or \"table\"; defaults to \"list\""
         );
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(model.isContactDocument().or(model.isTeamDocument()));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package nl.ulso.vmc.graph;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 
 import jakarta.inject.Inject;
@@ -46,6 +47,12 @@ public final class MermaidGraphQuery
                 "depth", "Number of edges to follow from the source; defaults to 1",
                 "exclude", "List of node types to exclude from the graph; defaults to empty."
         );
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(graph.isNodeEntry());
     }
 
     @Override

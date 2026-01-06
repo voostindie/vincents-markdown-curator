@@ -11,6 +11,9 @@ import java.util.function.Predicate;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
 import static nl.ulso.markdown_curator.Change.Kind.DELETE;
+import static nl.ulso.markdown_curator.Change.isCreate;
+import static nl.ulso.markdown_curator.Change.isDelete;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 /**
  * My collection of console (PS4/PS5) games.

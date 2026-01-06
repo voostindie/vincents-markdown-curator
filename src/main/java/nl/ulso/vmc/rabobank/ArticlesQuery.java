@@ -1,5 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Dictionary;
 import nl.ulso.markdown_curator.vault.*;
@@ -14,6 +15,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static java.util.regex.Pattern.compile;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 class ArticlesQuery
         implements Query
@@ -45,6 +47,15 @@ class ArticlesQuery
     public Map<String, String> supportedConfiguration()
     {
         return emptyMap();
+    }
+
+    @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(isObjectType(Document.class)
+            .and(change ->
+                change.objectAs(Document.class).folder().name().equals("Articles"))
+        );
     }
 
     @Override

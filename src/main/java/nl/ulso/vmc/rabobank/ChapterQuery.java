@@ -1,10 +1,15 @@
 package nl.ulso.vmc.rabobank;
 
+import nl.ulso.markdown_curator.Changelog;
 import nl.ulso.markdown_curator.query.*;
 import nl.ulso.markdown_curator.vault.Document;
 
 import jakarta.inject.Inject;
+
+import java.util.List;
 import java.util.Map;
+
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 public class ChapterQuery
         implements Query
@@ -43,19 +48,36 @@ public class ChapterQuery
     }
 
     @Override
+    public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
+    {
+        return changelog.changes().anyMatch(
+            isObjectType(Document.class).and(orgChart.isFolderInScope()));
+    }
+
+    @Override
     public QueryResult run(QueryDefinition definition)
     {
-        var roles = definition.configuration().listOfStrings("roles");
+        var roles = resolveRoles(definition);
         if (roles.isEmpty())
         {
             return resultFactory.error("'roles' is required");
         }
-        var teams = definition.configuration().listOfStrings("teams");
+        var teams = resolveTeams(definition);
         if (teams.isEmpty())
         {
             return resultFactory.error("'teams' is required");
         }
         var contacts = orgChart.chapterFor(roles, teams);
         return resultFactory.unorderedList(contacts.stream().map(Document::link).toList());
+    }
+
+    private List<String> resolveTeams(QueryDefinition definition)
+    {
+        return definition.configuration().listOfStrings("teams");
+    }
+
+    private List<String> resolveRoles(QueryDefinition definition)
+    {
+        return definition.configuration().listOfStrings("roles");
     }
 }

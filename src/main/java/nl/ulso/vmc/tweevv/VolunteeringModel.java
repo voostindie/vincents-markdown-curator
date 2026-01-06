@@ -19,6 +19,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
 import static nl.ulso.markdown_curator.Change.Kind.CREATE;
 import static nl.ulso.markdown_curator.Change.Kind.UPDATE;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 @Singleton
 public class VolunteeringModel
@@ -43,7 +44,7 @@ public class VolunteeringModel
         registerChangeHandler(isContactDocument(), this::processContactUpdate);
     }
 
-    private Predicate<Change<?>> isTeamDocument()
+    Predicate<Change<?>> isTeamDocument()
     {
         return isObjectType(Document.class).and(change ->
         {
@@ -52,7 +53,7 @@ public class VolunteeringModel
         });
     }
 
-    private Predicate<Change<?>> isContactDocument()
+    Predicate<Change<?>> isContactDocument()
     {
         return isObjectType(Document.class).and(change ->
         {

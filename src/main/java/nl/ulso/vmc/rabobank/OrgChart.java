@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 @Singleton
 public class OrgChart
@@ -59,7 +60,7 @@ public class OrgChart
         return emptyList();
     }
 
-    private Predicate<? super Change<?>> isFolderInScope()
+    Predicate<? super Change<?>> isFolderInScope()
     {
         return change -> {
             var document = (Document) change.object();
