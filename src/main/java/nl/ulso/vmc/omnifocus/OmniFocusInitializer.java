@@ -5,7 +5,11 @@ import jakarta.inject.Singleton;
 import nl.ulso.markdown_curator.*;
 import nl.ulso.markdown_curator.vault.Vault;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+
+import static nl.ulso.markdown_curator.Change.isCreate;
+import static nl.ulso.markdown_curator.Change.isObjectType;
 
 /// OmniFocus projects are fetched in a background process; this processor blocks until the initial
 /// fetch is complete. It is triggered only once, at applications start.
@@ -19,6 +23,7 @@ public class OmniFocusInitializer
     public OmniFocusInitializer(OmniFocusRepository omniFocusRepository)
     {
         this.omniFocusRepository = omniFocusRepository;
+        registerChangeHandler(isObjectType(Vault.class).and(isCreate()), this::waitForOmniFocus);
     }
 
     @Override
@@ -36,11 +41,10 @@ public class OmniFocusInitializer
     @Override
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
-        return true;
+        return false;
     }
 
-    @Override
-    protected Collection<Change<?>> fullRefresh()
+    private List<Change<?>> waitForOmniFocus(Change<?> change)
     {
         omniFocusRepository.waitForInitialFetchToComplete();
         return List.of(OmniFocusUpdate.OMNIFOCUS_CHANGE);

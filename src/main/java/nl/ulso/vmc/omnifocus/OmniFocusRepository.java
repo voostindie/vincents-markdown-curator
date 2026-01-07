@@ -118,8 +118,8 @@ public final class OmniFocusRepository
             .collect(toMap(OmniFocusProject::name, Function.identity()));
     }
 
-    // If, at system start, the request for data comes before the data from OmniFocus
-    // is available the system spins and waits.
+    // If, at system start, the request for data comes before the data from OmniFocus is available
+    // the system spins and waits.
     public void waitForInitialFetchToComplete()
     {
         Map<String, OmniFocusProject> result = null;
