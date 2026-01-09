@@ -30,7 +30,7 @@ public class HookmarkRepository
 
     public List<Hook> listHooks(String documentUri)
     {
-        LOGGER.debug("Loading hooks for URI: {}", documentUri);
+        LOGGER.debug("Loading hooks for URI '{}'.", documentUri);
         var array = jxa.runScriptForArray(SCRIPT, documentUri);
         return array.stream()
                 .map(JsonValue::asJsonObject)

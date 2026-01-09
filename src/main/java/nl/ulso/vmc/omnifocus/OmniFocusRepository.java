@@ -104,7 +104,7 @@ public final class OmniFocusRepository
     private Map<String, OmniFocusProject> fetchProjects(
         JavaScriptForAutomation jxa, OmniFocusSettings settings)
     {
-        LOGGER.debug("Fetching OmniFocus projects in folder: {}", settings.omniFocusFolder());
+        LOGGER.debug("Fetching OmniFocus projects in folder '{}'.", settings.omniFocusFolder());
         var array = jxa.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
         return array.stream()
             .map(JsonValue::asJsonObject)

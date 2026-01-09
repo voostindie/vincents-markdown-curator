@@ -134,7 +134,7 @@ final class ProjectJournal
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
         var daily = change.objectAs(Daily.class);
-        LOGGER.debug("Processing journal entry '{}' for project attributes", daily.date());
+        LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
         var changes = createChangeCollection();
@@ -280,7 +280,7 @@ final class ProjectJournal
     private void updateProjectAttributes(
         String projectName, Map<String, List<MarkedLine>> entries)
     {
-        LOGGER.debug("Extracting attributes of project '{}' from the journal", projectName);
+        LOGGER.debug("Extracting attributes of project '{}' from the journal.", projectName);
         for (Map.Entry<String, List<MarkedLine>> entry : entries.entrySet())
         {
             var markedLines = entry.getValue();
@@ -336,13 +336,13 @@ final class ProjectJournal
         var links = parseInternalLinkTargetNames(line.replace(link, ""));
         if (links.isEmpty())
         {
-            LOGGER.warn("Found no internal link in line '{}'. This line is ignored!", line);
+            LOGGER.warn("Found no internal link in line '{}'. Skipping.", line);
             return null;
         }
         if (links.size() > 1)
         {
             LOGGER.warn(
-                "Found more than one internal link in line '{}'. Results can be unpredictable!",
+                "Found more than one internal link in line '{}'. Results can be unpredictable.",
                 line
             );
         }

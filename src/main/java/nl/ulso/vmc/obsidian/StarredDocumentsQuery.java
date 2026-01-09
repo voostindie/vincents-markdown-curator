@@ -80,7 +80,7 @@ public class StarredDocumentsQuery
             }
             catch (IOException | JsonParsingException e)
             {
-                LOGGER.error("Couldn't parse configuration file: {}", e.getMessage(), e);
+                LOGGER.error("Couldn't parse configuration file '{}'.", e.getMessage(), e);
                 return resultFactory.error(
                         "Configuration file `" + STARRED_FILE +
                         "` couldn't be parsed.\n\nTechnical error: " + e.getMessage());
