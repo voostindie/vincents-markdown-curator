@@ -8,11 +8,13 @@ import static nl.ulso.markdown_curator.Change.update;
 ///
 /// The [OmniFocusRepository] produces an event of this type whenever a relevant change in OmniFocus
 /// is detected. This repository is not a [ChangeProcessor] however, instead it runs autonomously on
-/// its own scheduled thread. This class is registered as an [ExternalChangeObjectType] to the
-/// system.
+/// its own scheduled thread.
 ///
 /// The [OmniFocusAttributeProducer] triggers on changes of this type and produces attribute values
 /// for all available projects.
+///
+/// The [OmniFocusInitializer] ensures the projects are loaded from OmniFocus at applications
+/// startup.
 record OmniFocusUpdate()
 {
     static final Change<?> OMNIFOCUS_CHANGE =
