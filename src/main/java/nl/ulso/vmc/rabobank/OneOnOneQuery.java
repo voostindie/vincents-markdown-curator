@@ -51,7 +51,7 @@ class OneOnOneQuery
     {
         return changelog.changes().anyMatch(isObjectType(Document.class)
             .and(change ->
-                change.objectAs(Document.class).folder().name().equals("Contacts"))
+                change.as(Document.class).object().folder().name().equals("Contacts"))
         );
     }
 

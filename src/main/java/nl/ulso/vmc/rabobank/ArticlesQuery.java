@@ -54,7 +54,7 @@ class ArticlesQuery
     {
         return changelog.changes().anyMatch(isObjectType(Document.class)
             .and(change ->
-                change.objectAs(Document.class).folder().name().equals("Articles"))
+                change.as(Document.class).object().folder().name().equals("Articles"))
         );
     }
 

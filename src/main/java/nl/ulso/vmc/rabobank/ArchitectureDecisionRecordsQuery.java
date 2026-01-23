@@ -49,7 +49,7 @@ class ArchitectureDecisionRecordsQuery
     {
         return changelog.changes().anyMatch(isObjectType(Document.class)
             .and(change ->
-                change.objectAs(Document.class).folder().name().equals("ADRs"))
+                change.as(Document.class).object().folder().name().equals("ADRs"))
         );
     }
 

@@ -46,7 +46,7 @@ class SystemsQuery
     {
         return changelog.changes().anyMatch(isObjectType(Document.class)
             .and(change ->
-                change.objectAs(Document.class).folder().name().equals("Systems"))
+                change.as(Document.class).object().folder().name().equals("Systems"))
         );
     }
 

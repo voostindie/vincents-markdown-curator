@@ -56,7 +56,7 @@ public class HooksQuery
         // changed.
         return changelog.changes().anyMatch(
             isObjectType(Document.class).and(change ->
-                change.objectAs(Document.class).equals(definition.document())
+                change.as(Document.class).object().equals(definition.document())
             )
         );
     }

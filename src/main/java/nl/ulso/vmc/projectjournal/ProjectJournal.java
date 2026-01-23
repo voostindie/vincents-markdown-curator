@@ -120,7 +120,7 @@ final class ProjectJournal
 
     private Collection<Change<?>> processDailyDeletion(Change<?> change)
     {
-        var daily = change.objectAs(Daily.class);
+        var daily = change.as(Daily.class).object();
         var relatedProjects = projectRepository.projects().stream()
             .filter(project -> daily.refersTo(project.name()))
             .collect(toSet());
@@ -133,7 +133,7 @@ final class ProjectJournal
 
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        var daily = change.objectAs(Daily.class);
+        var daily = change.as(Daily.class).object();
         LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
