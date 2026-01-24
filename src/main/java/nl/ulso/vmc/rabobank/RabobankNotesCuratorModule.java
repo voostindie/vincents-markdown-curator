@@ -61,7 +61,7 @@ abstract class RabobankNotesCuratorModule
     @Named(WATCH_DOCUMENT_KEY)
     static String watchDocument()
     {
-        return "Watchdoc";
+        return "README";
     }
 
     @Binds
