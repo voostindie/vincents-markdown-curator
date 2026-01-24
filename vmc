@@ -14,10 +14,10 @@ cd "$(dirname $0)" || exit
 export MAVEN_OPTS="--sun-misc-unsafe-memory-access=allow"
 
 echo "Compiling and installing markdown-curator..."
-mvn -f ../markdown-curator/pom.xml -q -B install -DskipTests
+mvn -f ../markdown-curator/pom.xml -q -B clean install -DskipTests
 
 echo "Compiling and packaging vmc..."
-mvn -q -B package
+mvn -q -B clean package
 
 echo "Executing vmc..."
 java -Xmx128m -jar target/vmc-1.0.0-SNAPSHOT.jar "$@"
