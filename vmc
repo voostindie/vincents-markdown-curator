@@ -8,11 +8,6 @@
 
 cd "$(dirname $0)" || exit
 
-# Workaround for unsafe memory access on JDK 24 by Maven 3.9.11 and lower.
-# Once fixed in a new Maven release, this option can be removed.
-# https://github.com/apache/maven/issues/10312
-export MAVEN_OPTS="--sun-misc-unsafe-memory-access=allow"
-
 echo "Compiling and installing markdown-curator..."
 mvn -f ../markdown-curator/pom.xml -q -B clean install -DskipTests
 
