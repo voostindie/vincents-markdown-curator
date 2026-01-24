@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 class ArchitectureDecisionRecordsQuery
         implements Query
@@ -47,9 +47,9 @@ class ArchitectureDecisionRecordsQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changes().anyMatch(isObjectType(Document.class)
+        return changelog.changes().anyMatch(isPayloadType(Document.class)
             .and(change ->
-                change.as(Document.class).object().folder().name().equals("ADRs"))
+                change.as(Document.class).value().folder().name().equals("ADRs"))
         );
     }
 

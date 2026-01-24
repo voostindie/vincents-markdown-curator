@@ -17,7 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
 import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 /**
  * This is the start of what will hopefully be a richer data model at some point. For example I'd
@@ -55,9 +55,9 @@ public class Library
 
     Predicate<Change<?>> isAuthorDocument()
     {
-        return isObjectType(Document.class).and(change ->
+        return isPayloadType(Document.class).and(change ->
         {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             var folder = document.folder();
             return isAuthorFolder(folder);
         });
@@ -65,9 +65,9 @@ public class Library
 
     Predicate<Change<?>> isBookDocument()
     {
-        return isObjectType(Document.class).and(change ->
+        return isPayloadType(Document.class).and(change ->
         {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             var folder = document.folder();
             return isBookFolder(folder);
         });
@@ -75,9 +75,9 @@ public class Library
 
     private Predicate<Change<?>> isLibraryFolder()
     {
-        return isObjectType(Folder.class).and(change ->
+        return isPayloadType(Folder.class).and(change ->
         {
-            var folder = (Folder) change.object();
+            var folder = (Folder) change.value();
             return isAuthorFolder(folder) || isBookFolder(folder);
         });
     }

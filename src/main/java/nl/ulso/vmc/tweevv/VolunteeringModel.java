@@ -19,7 +19,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
 import static nl.ulso.markdown_curator.Change.Kind.CREATE;
 import static nl.ulso.markdown_curator.Change.Kind.UPDATE;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 @Singleton
 public class VolunteeringModel
@@ -46,18 +46,18 @@ public class VolunteeringModel
 
     Predicate<Change<?>> isTeamDocument()
     {
-        return isObjectType(Document.class).and(change ->
+        return isPayloadType(Document.class).and(change ->
         {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             return document.folder().name().equals(TEAM_FOLDER);
         });
     }
 
     Predicate<Change<?>> isContactDocument()
     {
-        return isObjectType(Document.class).and(change ->
+        return isPayloadType(Document.class).and(change ->
         {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             return document.folder().name().equals(CONTACT_FOLDER);
         });
     }
@@ -87,7 +87,7 @@ public class VolunteeringModel
 
     private Collection<Change<?>> processTeamUpdate(Change<?> change)
     {
-        var document = (Document) change.object();
+        var document = (Document) change.value();
         var activity = activities.remove(document.name());
         volunteering.values().forEach(set ->
             set.removeIf(contactActivity -> contactActivity.activity.equals(activity)));
@@ -105,7 +105,7 @@ public class VolunteeringModel
 
     private Collection<Change<?>> processContactUpdate(Change<?> change)
     {
-        var document = (Document) change.object();
+        var document = (Document) change.value();
         var contact = contacts.remove(document.name());
         volunteering.values().forEach(set ->
             set.removeIf(contactActivity -> contactActivity.contact.equals(contact)));

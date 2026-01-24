@@ -13,7 +13,7 @@ import static java.util.Collections.emptyList;
 import static nl.ulso.markdown_curator.Change.Kind.DELETE;
 import static nl.ulso.markdown_curator.Change.isCreate;
 import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 /**
  * My collection of console (PS4/PS5) games.
@@ -45,9 +45,9 @@ public class GameCollection
 
     private Predicate<Change<?>> isGameDocument()
     {
-        return isObjectType(Document.class).and(change ->
+        return isPayloadType(Document.class).and(change ->
         {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             var folder = document.folder();
             return isGameFolder(folder);
         });
@@ -55,9 +55,9 @@ public class GameCollection
 
     private Predicate<Change<?>> isGameFolder()
     {
-        return isObjectType(Folder.class).and(change ->
+        return isPayloadType(Folder.class).and(change ->
         {
-            var folder = (Folder) change.object();
+            var folder = (Folder) change.value();
             return isGameFolder(folder);
         });
     }
@@ -86,7 +86,7 @@ public class GameCollection
 
     private Collection<Change<?>> processGameDocumentUpdate(Change<?> change)
     {
-        var document = (Document) change.object();
+        var document = (Document) change.value();
         if (change.kind() == DELETE)
         {
             games.remove(document.name());

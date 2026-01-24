@@ -9,7 +9,7 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 public class ChapterQuery
         implements Query
@@ -51,7 +51,7 @@ public class ChapterQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes().anyMatch(
-            isObjectType(Document.class).and(orgChart.isFolderInScope()));
+            isPayloadType(Document.class).and(orgChart.isFolderInScope()));
     }
 
     @Override

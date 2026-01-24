@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import static nl.ulso.markdown_curator.Change.isCreate;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 /// OmniFocus projects are fetched in a background process; this processor blocks until the initial
 /// fetch is complete. It is triggered only once, at applications start.
@@ -23,17 +23,17 @@ public class OmniFocusInitializer
     public OmniFocusInitializer(OmniFocusRepository omniFocusRepository)
     {
         this.omniFocusRepository = omniFocusRepository;
-        registerChangeHandler(isObjectType(Vault.class).and(isCreate()), this::waitForOmniFocus);
+        registerChangeHandler(isPayloadType(Vault.class).and(isCreate()), this::waitForOmniFocus);
     }
 
     @Override
-    public Set<Class<?>> consumedObjectTypes()
+    public Set<Class<?>> consumedPayloadTypes()
     {
         return Set.of(Vault.class);
     }
 
     @Override
-    public Set<Class<?>> producedObjectTypes()
+    public Set<Class<?>> producedPayloadTypes()
     {
         return Set.of(OmniFocusUpdate.class);
     }

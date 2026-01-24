@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -68,12 +68,12 @@ public class MermaidGraph
         this.settings = settings;
         this.selectedMarkerNames = new HashSet<>();
         this.nodes = new HashMap<>();
-        registerChangeHandler(isObjectType(Daily.class), this::processDailyUpdate);
+        registerChangeHandler(isPayloadType(Daily.class), this::processDailyUpdate);
         registerChangeHandler(isNodeEntry(), this::processNodeUpdate);
     }
 
     @Override
-    public Set<Class<?>> consumedObjectTypes()
+    public Set<Class<?>> consumedPayloadTypes()
     {
         return Set.of(Document.class, Marker.class, Daily.class);
     }
@@ -82,14 +82,14 @@ public class MermaidGraph
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(isObjectType(Marker.class));
+               || changelog.changes().anyMatch(isPayloadType(Marker.class));
     }
 
     Predicate<Change<?>> isNodeEntry()
     {
-        return isObjectType(Document.class).and(change ->
+        return isPayloadType(Document.class).and(change ->
         {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             return isNodeEntry(document);
         });
     }
@@ -106,14 +106,14 @@ public class MermaidGraph
 
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        var daily = (Daily) change.object();
+        var daily = (Daily) change.value();
         refreshGraphForJournalEntryOn(daily.date());
         return emptyList();
     }
 
     private Collection<Change<?>> processNodeUpdate(Change<?> change)
     {
-        var document = (Document) change.object();
+        var document = (Document) change.value();
         var name = document.name();
         var node = nodes.get(name);
         if (node != null)

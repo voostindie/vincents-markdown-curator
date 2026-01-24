@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /**
@@ -81,7 +81,7 @@ public final class TrainerModel
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(isObjectType(Document.class).and(isFolderInScope()));
+               || changelog.changes().anyMatch(isPayloadType(Document.class).and(isFolderInScope()));
     }
 
 
@@ -103,7 +103,7 @@ public final class TrainerModel
     Predicate<? super Change<?>> isFolderInScope()
     {
         return change -> {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             var folder = document.folder();
             return isFolderInPath(folder, MODEL_FOLDER) || isFolderInPath(folder, TRAINER_FOLDER);
         };

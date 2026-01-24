@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 class RolesQuery
         implements Query
@@ -47,7 +47,7 @@ class RolesQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes().anyMatch(
-            isObjectType(Document.class).and(orgChart.isFolderInScope()));
+            isPayloadType(Document.class).and(orgChart.isFolderInScope()));
     }
 
     @Override

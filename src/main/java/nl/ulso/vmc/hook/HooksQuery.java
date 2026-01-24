@@ -9,7 +9,7 @@ import nl.ulso.markdown_curator.vault.Document;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 /**
  * Lists all hooks (bookmarks) for a document from Hook.
@@ -55,8 +55,8 @@ public class HooksQuery
         // Refreshing hookmarks is expensive. So, only do it if the document the query is in has
         // changed.
         return changelog.changes().anyMatch(
-            isObjectType(Document.class).and(change ->
-                change.as(Document.class).object().equals(definition.document())
+            isPayloadType(Document.class).and(change ->
+                change.as(Document.class).value().equals(definition.document())
             )
         );
     }

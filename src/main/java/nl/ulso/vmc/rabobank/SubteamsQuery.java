@@ -9,7 +9,7 @@ import java.util.*;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 class SubteamsQuery
         implements Query
@@ -47,7 +47,7 @@ class SubteamsQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes().anyMatch(
-            isObjectType(Document.class).and(orgChart.isFolderInScope()));
+            isPayloadType(Document.class).and(orgChart.isFolderInScope()));
     }
 
     @Override

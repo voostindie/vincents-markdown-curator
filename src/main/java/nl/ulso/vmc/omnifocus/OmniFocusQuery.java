@@ -17,7 +17,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toSet;
 import static nl.ulso.markdown_curator.Change.isCreate;
 import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 /// Reports on inconsistencies between OmniFocus and the projects in this vault.
 public final class OmniFocusQuery
@@ -62,8 +62,8 @@ public final class OmniFocusQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes().anyMatch(
-            isObjectType(Project.class).and(isCreate().or(isDelete()))
-                .or(isObjectType(OmniFocusUpdate.class))
+            isPayloadType(Project.class).and(isCreate().or(isDelete()))
+                .or(isPayloadType(OmniFocusUpdate.class))
         );
     }
 

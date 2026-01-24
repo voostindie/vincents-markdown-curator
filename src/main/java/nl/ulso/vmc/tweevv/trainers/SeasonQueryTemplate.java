@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 /**
  * Base class for queries that act on a specific season; the season is pre-selected, either pulled
@@ -40,7 +40,7 @@ abstract class SeasonQueryTemplate
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes().anyMatch(
-            isObjectType(Document.class).and(trainerModel.isFolderInScope()));
+            isPayloadType(Document.class).and(trainerModel.isFolderInScope()));
     }
 
     @Override

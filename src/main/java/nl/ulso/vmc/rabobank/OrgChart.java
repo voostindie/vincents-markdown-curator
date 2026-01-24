@@ -14,7 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 @Singleton
 public class OrgChart
@@ -38,7 +38,7 @@ public class OrgChart
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(isObjectType(Document.class).and(isFolderInScope()));
+               || changelog.changes().anyMatch(isPayloadType(Document.class).and(isFolderInScope()));
     }
 
     @Override
@@ -63,7 +63,7 @@ public class OrgChart
     Predicate<? super Change<?>> isFolderInScope()
     {
         return change -> {
-            var document = (Document) change.object();
+            var document = (Document) change.value();
             var folder = document.folder();
             return isFolderInScope(folder);
         };

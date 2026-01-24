@@ -8,7 +8,7 @@ import nl.ulso.markdown_curator.vault.*;
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 
 class SystemsQuery
     implements Query
@@ -44,9 +44,9 @@ class SystemsQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changes().anyMatch(isObjectType(Document.class)
+        return changelog.changes().anyMatch(isPayloadType(Document.class)
             .and(change ->
-                change.as(Document.class).object().folder().name().equals("Systems"))
+                change.as(Document.class).value().folder().name().equals("Systems"))
         );
     }
 

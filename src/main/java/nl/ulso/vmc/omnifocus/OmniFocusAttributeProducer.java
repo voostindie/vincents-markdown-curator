@@ -10,7 +10,7 @@ import java.util.*;
 import static nl.ulso.markdown_curator.Change.create;
 import static nl.ulso.markdown_curator.Change.delete;
 import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isObjectType;
+import static nl.ulso.markdown_curator.Change.isPayloadType;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.PRIORITY;
 import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
@@ -49,18 +49,18 @@ final class OmniFocusAttributeProducer
         this.projectRepository = projectRepository;
         this.omniFocusRepository = omniFocusRepository;
         this.messages = messages;
-        registerChangeHandler(isObjectType(OmniFocusUpdate.class), this::processOmniFocusProjects);
-        registerChangeHandler(isObjectType(Project.class).and(isDelete()), this::processProjectDelete);
+        registerChangeHandler(isPayloadType(OmniFocusUpdate.class), this::processOmniFocusProjects);
+        registerChangeHandler(isPayloadType(Project.class).and(isDelete()), this::processProjectDelete);
     }
 
     @Override
-    public Set<Class<?>> consumedObjectTypes()
+    public Set<Class<?>> consumedPayloadTypes()
     {
         return Set.of(OmniFocusUpdate.class, Project.class);
     }
 
     @Override
-    public Set<Class<?>> producedObjectTypes()
+    public Set<Class<?>> producedPayloadTypes()
     {
         return Set.of(AttributeValue.class);
     }
@@ -97,7 +97,7 @@ final class OmniFocusAttributeProducer
     private Collection<Change<?>> processProjectDelete(Change<?> change)
     {
         var changes = createChangeCollection();
-        var project = change.as(Project.class).object();
+        var project = change.as(Project.class).value();
         deleteUrl(changes, project);
         deletePriority(changes, project);
         deleteStatus(changes, project);

@@ -64,27 +64,27 @@ final class ProjectJournal
         this.linkToLeadMap = new HashMap<>();
         this.allMarkers = new HashSet<>();
         this.registerChangeHandler(
-            isObjectType(Daily.class).and(isCreateOrUpdate()),
+            isPayloadType(Daily.class).and(isCreateOrUpdate()),
             this::processDailyUpdate
         );
         this.registerChangeHandler(
-            isObjectType(Daily.class).and(isDelete()),
+            isPayloadType(Daily.class).and(isDelete()),
             this::processDailyDeletion
         );
         this.registerChangeHandler(
-            isObjectType(Project.class).and(isDelete()),
+            isPayloadType(Project.class).and(isDelete()),
             this::processProjectDeletion
         );
     }
 
     @Override
-    public Set<Class<?>> consumedObjectTypes()
+    public Set<Class<?>> consumedPayloadTypes()
     {
         return Set.of(Daily.class, Marker.class, Project.class);
     }
 
     @Override
-    public Set<Class<?>> producedObjectTypes()
+    public Set<Class<?>> producedPayloadTypes()
     {
         return Set.of(AttributeValue.class);
     }
@@ -92,7 +92,7 @@ final class ProjectJournal
     @Override
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
-        return changelog.changes().anyMatch(isObjectType(Marker.class));
+        return changelog.changes().anyMatch(isPayloadType(Marker.class));
     }
 
     @Override
@@ -120,7 +120,7 @@ final class ProjectJournal
 
     private Collection<Change<?>> processDailyDeletion(Change<?> change)
     {
-        var daily = change.as(Daily.class).object();
+        var daily = change.as(Daily.class).value();
         var relatedProjects = projectRepository.projects().stream()
             .filter(project -> daily.refersTo(project.name()))
             .collect(toSet());
@@ -133,7 +133,7 @@ final class ProjectJournal
 
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        var daily = change.as(Daily.class).object();
+        var daily = change.as(Daily.class).value();
         LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
@@ -153,7 +153,7 @@ final class ProjectJournal
 
     private Collection<Change<?>> processProjectDeletion(Change<?> change)
     {
-        var project = (Project) change.object();
+        var project = (Project) change.value();
         projectStatuses.remove(project.name());
         projectLeads.remove(project.name());
         var changes = createChangeCollection();
