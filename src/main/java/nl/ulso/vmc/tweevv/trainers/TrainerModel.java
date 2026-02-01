@@ -5,7 +5,7 @@ import jakarta.inject.Singleton;
 import nl.ulso.curator.ChangeProcessorTemplate;
 import nl.ulso.curator.changelog.Change;
 import nl.ulso.curator.changelog.Changelog;
-import nl.ulso.curator.main.FrontMatterUpdateCollector;
+import nl.ulso.curator.FrontMatterCollector;
 import nl.ulso.curator.vault.*;
 
 import java.math.BigDecimal;
@@ -67,14 +67,14 @@ public final class TrainerModel
     private static final String COACH_PROPERTY = "coach";
 
     private final Vault vault;
-    private final FrontMatterUpdateCollector frontMatterUpdateCollector;
+    private final FrontMatterCollector frontMatterCollector;
     private final Map<String, Season> seasons;
 
     @Inject
-    public TrainerModel(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
+    public TrainerModel(Vault vault, FrontMatterCollector frontMatterCollector)
     {
         this.vault = vault;
-        this.frontMatterUpdateCollector = frontMatterUpdateCollector;
+        this.frontMatterCollector = frontMatterCollector;
         this.seasons = new HashMap<>();
     }
 
@@ -234,7 +234,7 @@ public final class TrainerModel
     private void updateTrainerFrontMatter(Folder folder)
     {
         folder.documents().forEach(
-            document -> frontMatterUpdateCollector
+            document -> frontMatterCollector
                 .updateFrontMatterFor(document, dictionary ->
                     seasons.values().stream()
                         .map(season -> season.trainerFor(document))

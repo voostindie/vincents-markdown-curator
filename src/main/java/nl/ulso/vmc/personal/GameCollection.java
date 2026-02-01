@@ -5,7 +5,7 @@ import jakarta.inject.Singleton;
 import nl.ulso.curator.ChangeProcessorTemplate;
 import nl.ulso.curator.changelog.Change;
 import nl.ulso.curator.changelog.Changelog;
-import nl.ulso.curator.main.FrontMatterUpdateCollector;
+import nl.ulso.curator.FrontMatterCollector;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -25,14 +25,14 @@ public class GameCollection
 {
     private static final String GAMES_FOLDER = "Games";
     private final Vault vault;
-    private final FrontMatterUpdateCollector frontMatterUpdateCollector;
+    private final FrontMatterCollector frontMatterCollector;
     private final Map<String, Game> games;
 
     @Inject
-    public GameCollection(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
+    public GameCollection(Vault vault, FrontMatterCollector frontMatterCollector)
     {
         this.vault = vault;
-        this.frontMatterUpdateCollector = frontMatterUpdateCollector;
+        this.frontMatterCollector = frontMatterCollector;
         this.games = new HashMap<>();
         this.registerChangeHandler(isGameDocument(), this::processGameDocumentUpdate);
     }
@@ -73,10 +73,10 @@ public class GameCollection
     {
         games.forEach(
             (_, game) -> {
-                frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
+                frontMatterCollector.updateFrontMatterFor(game.document(),
                     dictionary -> dictionary.removeProperty("rating")
                 );
-                frontMatterUpdateCollector.updateFrontMatterFor(game.document(),
+                frontMatterCollector.updateFrontMatterFor(game.document(),
                     dictionary -> dictionary.removeProperty("cover")
                 );
             });
@@ -110,7 +110,7 @@ public class GameCollection
             game = new Game(document);
             games.put(document.name(), game);
             super.visit(document);
-            frontMatterUpdateCollector.updateFrontMatterFor(document, dictionary ->
+            frontMatterCollector.updateFrontMatterFor(document, dictionary ->
                 {
                     game.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
                     game.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));

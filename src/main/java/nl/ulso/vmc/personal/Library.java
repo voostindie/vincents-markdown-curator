@@ -3,10 +3,10 @@ package nl.ulso.vmc.personal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.FrontMatterCollector;
 import nl.ulso.date.LocalDates;
 import nl.ulso.curator.changelog.Change;
 import nl.ulso.curator.changelog.Changelog;
-import nl.ulso.curator.main.*;
 import nl.ulso.curator.vault.*;
 
 import java.time.LocalDate;
@@ -35,13 +35,13 @@ public class Library
     private final Map<String, Author> authors;
     private final Map<String, Book> books;
     private final Set<ReadingSession> readingSessions;
-    private final FrontMatterUpdateCollector frontMatterUpdateCollector;
+    private final FrontMatterCollector frontMatterCollector;
 
     @Inject
-    public Library(Vault vault, FrontMatterUpdateCollector frontMatterUpdateCollector)
+    public Library(Vault vault, FrontMatterCollector frontMatterCollector)
     {
         this.vault = vault;
-        this.frontMatterUpdateCollector = frontMatterUpdateCollector;
+        this.frontMatterCollector = frontMatterCollector;
         this.authors = new HashMap<>();
         this.books = new HashMap<>();
         this.readingSessions = new HashSet<>();
@@ -100,10 +100,10 @@ public class Library
         authors.clear();
         books.forEach(
             (_, book) -> {
-                frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                frontMatterCollector.updateFrontMatterFor(book.document(),
                     dictionary -> dictionary.removeProperty("rating")
                 );
-                frontMatterUpdateCollector.updateFrontMatterFor(book.document(),
+                frontMatterCollector.updateFrontMatterFor(book.document(),
                     dictionary -> dictionary.removeProperty("cover")
                 );
             });
@@ -163,7 +163,7 @@ public class Library
             book = new Book(document);
             books.put(book.name(), book);
             super.visit(document);
-            frontMatterUpdateCollector.updateFrontMatterFor(document, dictionary ->
+            frontMatterCollector.updateFrontMatterFor(document, dictionary ->
                 {
                     book.rating().ifPresent(rating -> dictionary.setProperty("rating", rating));
                     book.cover().ifPresent(cover -> dictionary.setProperty("cover", cover));
