@@ -3,9 +3,9 @@ package nl.ulso.vmc.obsidian;
 import jakarta.json.Json;
 import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParsingException;
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.FileSystemVault;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.FileSystemVault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

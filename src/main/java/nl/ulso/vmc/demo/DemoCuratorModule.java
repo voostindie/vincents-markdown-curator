@@ -2,13 +2,13 @@ package nl.ulso.vmc.demo;
 
 import dagger.Module;
 import dagger.Provides;
-import nl.ulso.markdown_curator.CuratorModule;
-import nl.ulso.markdown_curator.journal.JournalModule;
-import nl.ulso.markdown_curator.journal.JournalSettings;
+import nl.ulso.curator.CuratorModule;
+import nl.ulso.curator.journal.JournalModule;
+import nl.ulso.curator.journal.JournalSettings;
 
 import java.nio.file.Path;
 
-import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
+import static nl.ulso.curator.VaultPaths.pathInUserHome;
 
 @Module(includes = {CuratorModule.class, JournalModule.class})
 public class DemoCuratorModule

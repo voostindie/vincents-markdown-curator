@@ -3,8 +3,8 @@ package nl.ulso.vmc.graph;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.markdown_curator.ChangeProcessor;
-import nl.ulso.markdown_curator.query.Query;
+import nl.ulso.curator.ChangeProcessor;
+import nl.ulso.curator.query.Query;
 
 /**
  * Extracts a graph from the journal.

@@ -2,8 +2,8 @@ package nl.ulso.vmc.tweevv.trainers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.*;
+import nl.ulso.curator.vault.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
-import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /**
  * Manages trainer and trainer related data across seasons.

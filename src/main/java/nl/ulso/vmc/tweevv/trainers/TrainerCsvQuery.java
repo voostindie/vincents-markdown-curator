@@ -3,7 +3,7 @@ package nl.ulso.vmc.tweevv.trainers;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.query.*;
+import nl.ulso.curator.query.*;
 
 import java.io.IOException;
 import java.io.StringWriter;

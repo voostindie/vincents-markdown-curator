@@ -1,7 +1,7 @@
 package nl.ulso.vmc.personal;
 
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.query.*;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.query.*;
 
 import jakarta.inject.Inject;
 import java.time.LocalDate;

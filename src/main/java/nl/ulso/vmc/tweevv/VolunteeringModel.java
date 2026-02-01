@@ -2,8 +2,8 @@ package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.*;
+import nl.ulso.curator.vault.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -17,9 +17,9 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.Kind.CREATE;
-import static nl.ulso.markdown_curator.Change.Kind.UPDATE;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.Kind.CREATE;
+import static nl.ulso.curator.Change.Kind.UPDATE;
+import static nl.ulso.curator.Change.isPayloadType;
 
 @Singleton
 public class VolunteeringModel

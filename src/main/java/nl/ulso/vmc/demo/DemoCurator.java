@@ -1,7 +1,7 @@
 package nl.ulso.vmc.demo;
 
 import dagger.Component;
-import nl.ulso.markdown_curator.Curator;
+import nl.ulso.curator.Curator;
 
 import jakarta.inject.Singleton;
 

@@ -1,11 +1,11 @@
 package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.project.Project;
-import nl.ulso.markdown_curator.project.ProjectRepository;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.project.Project;
+import nl.ulso.curator.project.ProjectRepository;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.Document;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -15,9 +15,9 @@ import static java.lang.System.lineSeparator;
 import static java.net.URLEncoder.encode;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.isCreate;
-import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isCreate;
+import static nl.ulso.curator.Change.isDelete;
+import static nl.ulso.curator.Change.isPayloadType;
 
 /// Reports on inconsistencies between OmniFocus and the projects in this vault.
 public final class OmniFocusQuery

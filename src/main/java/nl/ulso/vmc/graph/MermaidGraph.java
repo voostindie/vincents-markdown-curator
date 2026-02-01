@@ -2,9 +2,9 @@ package nl.ulso.vmc.graph;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.journal.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.*;
+import nl.ulso.curator.journal.*;
+import nl.ulso.curator.vault.*;
 import org.slf4j.Logger;
 
 import java.time.LocalDate;
@@ -14,8 +14,8 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
-import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**

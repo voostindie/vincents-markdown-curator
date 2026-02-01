@@ -1,6 +1,6 @@
 package nl.ulso.vmc.graph;
 
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.curator.vault.Document;
 
 import java.time.LocalDate;
 import java.util.*;

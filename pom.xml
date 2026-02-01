@@ -127,7 +127,7 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>nl.ulso.markdown_curator.Application</mainClass>
+                            <mainClass>nl.ulso.curator.Application</mainClass>
                             <finalName>vmc-${project.version}</finalName>
                         </configuration>
                     </execution>

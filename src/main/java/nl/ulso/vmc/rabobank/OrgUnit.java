@@ -1,6 +1,6 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.curator.vault.Document;
 
 import java.util.*;
 

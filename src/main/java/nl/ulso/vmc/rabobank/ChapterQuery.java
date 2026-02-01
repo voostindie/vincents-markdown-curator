@@ -1,15 +1,15 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.Document;
 
 import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
 
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isPayloadType;
 
 public class ChapterQuery
         implements Query

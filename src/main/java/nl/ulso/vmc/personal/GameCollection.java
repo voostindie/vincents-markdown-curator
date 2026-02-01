@@ -2,18 +2,18 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.*;
+import nl.ulso.curator.vault.*;
 
 import java.util.*;
 import java.util.function.Predicate;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.markdown_curator.Change.Kind.DELETE;
-import static nl.ulso.markdown_curator.Change.isCreate;
-import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.Kind.DELETE;
+import static nl.ulso.curator.Change.isCreate;
+import static nl.ulso.curator.Change.isDelete;
+import static nl.ulso.curator.Change.isPayloadType;
 
 /**
  * My collection of console (PS4/PS5) games.

@@ -2,15 +2,15 @@ package nl.ulso.vmc.tweevv.trainers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.query.*;
+import nl.ulso.curator.query.*;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.markdown_curator.query.TableResult.Alignment.LEFT;
-import static nl.ulso.markdown_curator.query.TableResult.Alignment.RIGHT;
+import static nl.ulso.curator.query.TableResult.Alignment.LEFT;
+import static nl.ulso.curator.query.TableResult.Alignment.RIGHT;
 
 /**
  * Generates a concise table of all trainers in a season, including their qualifications and the

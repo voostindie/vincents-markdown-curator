@@ -1,8 +1,8 @@
 package nl.ulso.vmc.omnifocus;
 
-import nl.ulso.markdown_curator.*;
+import nl.ulso.curator.*;
 
-import static nl.ulso.markdown_curator.Change.update;
+import static nl.ulso.curator.Change.update;
 
 /// Represents a change in OmniFocus.
 ///

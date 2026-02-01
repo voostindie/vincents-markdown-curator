@@ -4,13 +4,13 @@ import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
-import nl.ulso.markdown_curator.ChangeProcessor;
-import nl.ulso.markdown_curator.CuratorModule;
-import nl.ulso.markdown_curator.journal.JournalModule;
-import nl.ulso.markdown_curator.journal.JournalSettings;
-import nl.ulso.markdown_curator.project.ProjectModule;
-import nl.ulso.markdown_curator.project.ProjectSettings;
-import nl.ulso.markdown_curator.query.Query;
+import nl.ulso.curator.ChangeProcessor;
+import nl.ulso.curator.CuratorModule;
+import nl.ulso.curator.journal.JournalModule;
+import nl.ulso.curator.journal.JournalSettings;
+import nl.ulso.curator.project.ProjectModule;
+import nl.ulso.curator.project.ProjectSettings;
+import nl.ulso.curator.query.Query;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
@@ -21,8 +21,8 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Set;
 
-import static nl.ulso.markdown_curator.VaultPaths.pathInUserHome;
-import static nl.ulso.markdown_curator.VaultReloader.WATCH_DOCUMENT_KEY;
+import static nl.ulso.curator.VaultPaths.pathInUserHome;
+import static nl.ulso.curator.VaultReloader.WATCH_DOCUMENT_KEY;
 
 @Module(includes = {
     CuratorModule.class,

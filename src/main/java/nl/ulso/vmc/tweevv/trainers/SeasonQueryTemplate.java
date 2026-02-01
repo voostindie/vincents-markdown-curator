@@ -1,14 +1,14 @@
 package nl.ulso.vmc.tweevv.trainers;
 
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.Document;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isPayloadType;
 
 /**
  * Base class for queries that act on a specific season; the season is pre-selected, either pulled

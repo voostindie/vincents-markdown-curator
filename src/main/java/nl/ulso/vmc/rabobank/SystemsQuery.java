@@ -1,14 +1,14 @@
 package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.*;
 
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isPayloadType;
 
 class SystemsQuery
     implements Query

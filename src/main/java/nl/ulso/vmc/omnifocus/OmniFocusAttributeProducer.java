@@ -2,17 +2,17 @@ package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.project.*;
+import nl.ulso.curator.*;
+import nl.ulso.curator.project.*;
 
 import java.util.*;
 
-import static nl.ulso.markdown_curator.Change.create;
-import static nl.ulso.markdown_curator.Change.delete;
-import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
-import static nl.ulso.markdown_curator.project.AttributeDefinition.PRIORITY;
-import static nl.ulso.markdown_curator.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.Change.create;
+import static nl.ulso.curator.Change.delete;
+import static nl.ulso.curator.Change.isDelete;
+import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.project.AttributeDefinition.PRIORITY;
+import static nl.ulso.curator.project.AttributeDefinition.STATUS;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
 
 /// Produces attribute values for projects from matching projects in OmniFocus.

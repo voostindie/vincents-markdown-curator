@@ -5,12 +5,12 @@ import dagger.Module;
 import dagger.multibindings.*;
 import jakarta.inject.Singleton;
 import nl.ulso.jxa.JavaScriptForAutomationModule;
-import nl.ulso.markdown_curator.ChangeProcessor;
-import nl.ulso.markdown_curator.project.AttributeDefinition;
-import nl.ulso.markdown_curator.project.ProjectModule;
-import nl.ulso.markdown_curator.query.Query;
+import nl.ulso.curator.ChangeProcessor;
+import nl.ulso.curator.project.AttributeDefinition;
+import nl.ulso.curator.project.ProjectModule;
+import nl.ulso.curator.query.Query;
 
-import static nl.ulso.markdown_curator.project.AttributeDefinition.newAttributeDefinition;
+import static nl.ulso.curator.project.AttributeDefinition.newAttributeDefinition;
 import static nl.ulso.vmc.omnifocus.OmniFocusAttributeProducer.OMNIFOCUS_URL_ATTRIBUTE;
 
 @Module(includes = {

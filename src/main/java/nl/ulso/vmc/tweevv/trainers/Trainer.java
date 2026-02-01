@@ -1,13 +1,13 @@
 package nl.ulso.vmc.tweevv.trainers;
 
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.vault.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static nl.ulso.markdown_curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /**
  * Represents a trainer in a specific season.

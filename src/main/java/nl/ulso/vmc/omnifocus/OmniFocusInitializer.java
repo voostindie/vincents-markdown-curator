@@ -2,14 +2,14 @@ package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.vault.Vault;
+import nl.ulso.curator.*;
+import nl.ulso.curator.vault.Vault;
 
 import java.util.List;
 import java.util.Set;
 
-import static nl.ulso.markdown_curator.Change.isCreate;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isCreate;
+import static nl.ulso.curator.Change.isPayloadType;
 
 /// OmniFocus projects are fetched in a background process; this processor blocks until the initial
 /// fetch is complete. It is triggered only once, at applications start.

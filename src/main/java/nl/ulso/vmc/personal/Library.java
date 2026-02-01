@@ -2,8 +2,8 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.markdown_curator.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.*;
+import nl.ulso.curator.vault.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -16,8 +16,8 @@ import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.markdown_curator.Change.isDelete;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isDelete;
+import static nl.ulso.curator.Change.isPayloadType;
 
 /**
  * This is the start of what will hopefully be a richer data model at some point. For example I'd

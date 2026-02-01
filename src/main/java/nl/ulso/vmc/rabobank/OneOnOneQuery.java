@@ -1,8 +1,8 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.*;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.*;
 
 import jakarta.inject.Inject;
 import java.time.LocalDate;
@@ -13,7 +13,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isPayloadType;
 
 class OneOnOneQuery
         implements Query

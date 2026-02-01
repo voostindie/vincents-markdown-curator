@@ -3,7 +3,7 @@
     <envs>
       <env name="LC_CTYPE" value="UTF-8" />
     </envs>
-    <option name="MAIN_CLASS_NAME" value="nl.ulso.markdown_curator.Application" />
+    <option name="MAIN_CLASS_NAME" value="nl.ulso.curator.Application" />
     <module name="vincents-markdown-curator" />
     <option name="VM_PARAMETERS" value="--enable-native-access=ALL-UNNAMED" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />

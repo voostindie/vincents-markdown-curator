@@ -1,15 +1,15 @@
 package nl.ulso.vmc.hook;
 
 import jakarta.inject.Inject;
-import nl.ulso.markdown_curator.Changelog;
-import nl.ulso.markdown_curator.DocumentPathResolver;
-import nl.ulso.markdown_curator.query.*;
-import nl.ulso.markdown_curator.vault.Document;
+import nl.ulso.curator.Changelog;
+import nl.ulso.curator.DocumentPathResolver;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.Document;
 
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
-import static nl.ulso.markdown_curator.Change.isPayloadType;
+import static nl.ulso.curator.Change.isPayloadType;
 
 /**
  * Lists all hooks (bookmarks) for a document from Hook.
