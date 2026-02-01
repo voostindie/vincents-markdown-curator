@@ -1,11 +1,11 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.curator.Changelog;
-import nl.ulso.curator.query.*;
-import nl.ulso.curator.vault.Dictionary;
-import nl.ulso.curator.vault.*;
-
 import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.query.*;
+import nl.ulso.curator.vault.*;
+import nl.ulso.dictionary.Dictionary;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
@@ -15,10 +15,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 class ArticlesQuery
-        implements Query
+    implements Query
 {
     private static final String CONFLUENCE = "https://confluence.dev.rabobank.nl";
     private final Vault vault;
@@ -95,10 +95,10 @@ class ArticlesQuery
      * if the link points to Rabobank's Confluence site, the label is set to "Confluence".
      */
     private static class ArticleFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private static final Pattern CHANGES_PATTERN =
-                compile("^- \\[\\[(\\d{4}-\\d{2}-\\d{2})]]: (.*)$");
+            compile("^- \\[\\[(\\d{4}-\\d{2}-\\d{2})]]: (.*)$");
 
         private final List<Map<String, String>> articles = new ArrayList<>();
         private String date;
@@ -111,15 +111,16 @@ class ArticlesQuery
             if (date == null)
             {
                 date = document.frontMatter().date("date",
-                        Instant.ofEpochMilli(document.lastModified())
-                                .atZone(ZoneId.of("UTC"))
-                                .toLocalDate()
+                    Instant.ofEpochMilli(document.lastModified())
+                        .atZone(ZoneId.of("UTC"))
+                        .toLocalDate()
                 ).toString();
             }
             articles.add(Map.of(
-                    "Date", date,
-                    "Title", document.link(),
-                    "Publication", publicationLink(document.frontMatter())));
+                "Date", date,
+                "Title", document.link(),
+                "Publication", publicationLink(document.frontMatter())
+            ));
         }
 
         @Override

@@ -1,6 +1,7 @@
 package nl.ulso.vmc.tweevv.trainers;
 
 import nl.ulso.curator.vault.*;
+import nl.ulso.date.LocalDates;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,19 +10,17 @@ import java.util.stream.Stream;
 
 import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
-/**
- * Represents a trainer in a specific season.
- * <p/>
- * A better name would maybe be "TrainerInSeason", but, ah well...
- * <p/>
- * There's some waste in processing here: if the same trainer is present in multiple seasons, then
- * the processing of the personal data takes place multiple times, and the same data is stored
- * several times. I don't see this as a big problem, however, given the limited amount of data to
- * process, all in memory. Maybe in the next decade or so... It's also not hard to solve, but the
- * code would be more complex. So, for later. Maybe.
- * <p/>
- * A trainer is considered to be read-only, except for the {@link TrainerModel} that manages it.
- */
+/// Represents a trainer in a specific season.
+///
+/// A better name would maybe be "TrainerInSeason", but, ah well...
+///
+/// There's some waste in processing here: if the same trainer is present in multiple seasons, then
+/// the processing of the personal data takes place multiple times, and the same data is stored
+/// several times. I don't see this as a big problem, however, given the limited amount of data to
+/// process, all in memory. Maybe in the next decade or so... It's also not hard to solve, but the
+/// code would be more complex. So, for later. Maybe.
+///
+/// A trainer is considered to be read-only, except for the [TrainerModel] that manages it.
 public final class Trainer
 {
     private final Document document;
@@ -125,11 +124,6 @@ public final class Trainer
         qualifications.add(qualification);
     }
 
-    /**
-     * Computes the trainer's compensation.
-     *
-     * @return The total compensation for a trainer in a season.
-     */
     public BigDecimal computeCompensation()
     {
         var total = BigDecimal.ZERO;
@@ -174,14 +168,12 @@ public final class Trainer
             .orElse(BigDecimal.ZERO);
     }
 
-    /**
-     * Extracts personal data for a trainer from a document; the data is expected to be in an
-     * unordered list in a section with the name {@link #PERSONAL_DATA_SECTION}.
-     * <p/>
-     * In the wiki, every personal data field is actually a reference to a document representing
-     * that field. This ensures that typos can't be made, and that for each field there's room for a
-     * bit of explanation as to why we're administering it.
-     */
+    /// Extracts personal data for a trainer from a document; the data is expected to be in an
+    /// unordered list in a section with the name [#PERSONAL_DATA_SECTION].
+    ///
+    /// In the wiki, every personal data field is actually a reference to a document representing
+    /// that field. This ensures that typos can't be made, and that for each field there's room for
+    /// a bit of explanation as to why we're administering it.
     private static class PersonalDataFinder
         extends BreadthFirstVaultVisitor
     {

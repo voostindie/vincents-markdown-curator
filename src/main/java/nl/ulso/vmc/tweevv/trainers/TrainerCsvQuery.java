@@ -15,19 +15,17 @@ import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 
-/**
- * Generates CSV data for trainers in a season; the CSV contains everything needed to later generate
- * and send out trainer agreements (by the secretary), pay out trainer compensations (by the
- * treasurer), and do the yearly verification of the certificates of conduct (by the general board
- * member).
- * <p/>
- * The CSV is generated as query output and therefore ends up in the Markdown document. That's the
- * easiest way to do it; it's what the Markdown Curator is created for. Writing CSV to a separate
- * file sounds easy enough, but is actually difficult to do efficiently. Any existing CSV file
- * should only be overwritten if the contents changed. How do we know? Within Markdown content, this
- * is exactly what the curator takes care of. And copy-pasting the CSV to a separate file, or into
- * Numbers or Excel, is easy enough as it is.
- */
+/// Generates CSV data for trainers in a season; the CSV contains everything needed to later
+/// generate and send out trainer agreements (by the secretary), pay out trainer compensations (by
+/// the treasurer), and do the yearly verification of the certificates of conduct (by the general
+/// board member).
+///
+/// The CSV is generated as query output and therefore ends up in the Markdown document. That's the
+/// easiest way to do it; it's what the Markdown Curator is created for. Writing CSV to a separate
+/// file sounds easy enough, but is actually difficult to do efficiently. Any existing CSV file
+/// should only be overwritten if the contents changed. How do we know? Within Markdown content,
+/// this is exactly what the curator takes care of. And copy-pasting the CSV to a separate file, or
+/// into Numbers or Excel, is easy enough as it is.
 @Singleton
 public class TrainerCsvQuery
     extends SeasonQueryTemplate

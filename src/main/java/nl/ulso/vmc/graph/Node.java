@@ -7,15 +7,13 @@ import java.util.*;
 
 import static nl.ulso.hash.ShortHasher.shortHashOf;
 
-/**
- * Represents a single node in the graph.
- * <p/>
- * Edges are bidirectional. The same edge is registered on both nodes involved. That means that if
- * an edge is added or removed to the graph, this must be done to both nodes, always. The reason to
- * do this is to be able to efficiently generate graphs, starting from any seed node.
- */
+/// Represents a single node in the graph.
+///
+/// Edges are bidirectional. The same edge is registered on both nodes involved. That means that if
+/// an edge is added or removed to the graph, this must be done to both nodes, always. The reason to
+/// do this is to be able to efficiently generate graphs, starting from any seed node.
 public final class Node
-        implements Comparable<Node>
+    implements Comparable<Node>
 {
     private final String id;
     private final Type type;
@@ -37,11 +35,20 @@ public final class Node
         return id;
     }
 
-    public Document document() {return document;}
+    public Document document()
+    {
+        return document;
+    }
 
-    public Type nodeType() {return type;}
+    public Type nodeType()
+    {
+        return type;
+    }
 
-    public boolean isArchived() {return isArchived;}
+    public boolean isArchived()
+    {
+        return isArchived;
+    }
 
     public Set<Node> edges()
     {
@@ -83,7 +90,7 @@ public final class Node
         {
             return;
         }
-        edges.computeIfAbsent(targetNode, n -> new EdgeData()).addDate(date);
+        edges.computeIfAbsent(targetNode, _ -> new EdgeData()).addDate(date);
     }
 
     void removeEdgesFor(LocalDate date)
@@ -98,14 +105,14 @@ public final class Node
         });
         edgesToRemove.forEach(edges::remove);
     }
-    
+
     void replaceDocumentWith(Document newDocument)
     {
         if (!document.name().equals(newDocument.name()))
         {
             throw new IllegalStateException(
-                    "Document name mismatch. Only replace documents if they represent the same " +
-                    "file!");
+                "Document name mismatch. Only replace documents if they represent the same " +
+                "file!");
         }
         this.document = newDocument;
     }

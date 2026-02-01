@@ -1,18 +1,18 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
 
-import jakarta.inject.Inject;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 class SubteamsQuery
-        implements Query
+    implements Query
 {
     private final OrgChart orgChart;
     private final QueryResultFactory resultFactory;
@@ -40,7 +40,8 @@ class SubteamsQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("style", "list or table; defaults to list"
-                , "roles", "names of the roles in the table");
+            , "roles", "names of the roles in the table"
+        );
     }
 
     @Override
@@ -60,32 +61,33 @@ class SubteamsQuery
             case "list" ->
             {
                 var units = orgChart.forParent(parent).stream()
-                        .map(OrgUnit::team)
-                        .sorted(comparing(Document::sortableTitle))
-                        .map(Document::link)
-                        .toList();
+                    .map(OrgUnit::team)
+                    .sorted(comparing(Document::sortableTitle))
+                    .map(Document::link)
+                    .toList();
                 return resultFactory.unorderedList(units);
             }
             case "table" ->
             {
                 var roles = definition.configuration().listOfStrings("roles");
                 var rows = orgChart.forParent(parent).stream()
-                        .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
-                        .map(orgUnit ->
+                    .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
+                    .map(orgUnit ->
+                    {
+                        Map<String, String> row = new HashMap<>();
+                        row.put("Name", orgUnit.team().link());
+                        for (String role : roles)
                         {
-                            Map<String, String> row = new HashMap<>();
-                            row.put("Name", orgUnit.team().link());
-                            for (String role : roles)
+                            var contactMap = orgUnit.roles().get(role);
+                            if (contactMap != null)
                             {
-                                var contactMap = orgUnit.roles().get(role);
-                                if (contactMap != null)
-                                {
-                                    row.put(role, contactMap.values().stream()
-                                            .map(Document::link).collect(joining(", ")));
-                                }
+                                row.put(role, contactMap.values().stream()
+                                    .map(Document::link).collect(joining(", "))
+                                );
                             }
-                            return row;
-                        }).toList();
+                        }
+                        return row;
+                    }).toList();
                 var columns = new ArrayList<String>(roles.size() + 1);
                 columns.add("Name");
                 columns.addAll(roles);

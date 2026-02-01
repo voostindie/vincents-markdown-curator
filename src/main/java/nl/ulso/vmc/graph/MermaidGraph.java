@@ -2,8 +2,10 @@ package nl.ulso.vmc.graph;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.*;
-import nl.ulso.curator.journal.*;
+import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.addon.journal.*;
+import nl.ulso.curator.changelog.Change;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.vault.*;
 import org.slf4j.Logger;
 
@@ -14,38 +16,33 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 import static org.slf4j.LoggerFactory.getLogger;
 
-/**
- * Builds a graph from notes in the repository.
- * <p/>
- * This graph is <strong>not</strong> built from all notes and the links between them. There are
- * several reasons for that, all relating to the fact that this curator uses queries to generate new
- * output within notes:
- * <p/>
- * <ul>
- *     <li>Without query output, there often aren't many links, or any links at all. A note can be
- *     built up from queries only. The curator looks at page content <strong>without</strong> query
- *     output. So, there are few links in the content, and therefore few relations to discover.</li>
- *     <li>With query output, there are often too many links. They're also not stable. Take the
- *     {@code timeline} query as an example. Because it generates the context for each item in
- *     the journal, it might include much more than is needed. Also, the query can be configured to
- *     have limit the number of results. If the limit is reached, every new entry pushes out the
- *     oldest one. That makes the links unstable.
- *     </li>
- * </ul>
- * <p/>
- * So, how is the graph generated? First off, documents are included only in the graph as nodes
- * if there is an associated {@link Type} for it, linked to a folder in the repository. Secondly,
- * edges between nodes are constructed by pulling them out of the journal, from marked lines, as
- * supported by the {@link Journal}. Only markers that have set the front matter property
- * {@code include-in-graph} are considered.
- * <p/>
- * Nodes that are in a subfolder of the type folder are considered to be archived. They are
- * rendered differently.
- */
+/// Builds a graph from notes in the repository.
+///
+/// This graph is **not** built from all notes and the links between them. There are several reasons
+/// for that, all relating to the fact that this curator uses queries to generate new output within
+/// notes:
+///
+/// - Without query output, there often aren't many links, or any links at all. A note can be built
+/// up from queries only. The curator looks at page content **without** query output. So, there are
+/// few links in the content, and therefore few relations to discover.
+/// - With query output, there are often too many links. They're also not stable. Take the
+/// `timeline` query as an example. Because it generates the context for each item in the journal,
+/// it might include much more than is needed. Also, the query can be configured to have limit the
+/// number of results. If the limit is reached, every new entry pushes out the oldest one. That
+/// makes the links unstable.
+///
+/// So, how is the graph generated? First off, documents are included only in the graph as nodes if
+/// there is an associated [Type] for it, linked to a folder in the repository. Secondly, edges
+/// between nodes are constructed by pulling them out of the journal, from marked lines, as
+/// supported by the [Journal]. Only markers that have set the front matter property
+/// `include-in-graph` are considered.
+///
+/// Nodes that are in a subfolder of the type folder are considered to be archived. They are
+/// rendered differently.
 @Singleton
 public class MermaidGraph
     extends ChangeProcessorTemplate

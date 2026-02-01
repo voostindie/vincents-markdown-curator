@@ -2,7 +2,10 @@ package nl.ulso.vmc.tweevv.trainers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.*;
+import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.changelog.Change;
+import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.main.FrontMatterUpdateCollector;
 import nl.ulso.curator.vault.*;
 
 import java.math.BigDecimal;
@@ -13,18 +16,16 @@ import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
-/**
- * Manages trainer and trainer related data across seasons.
- * <p/>
- * All data is managed in normal Markdown files and sections with unordered lists. There's a little
- * work involved to pull the data from these files, including matching regular expressions.
- * <p/>
- * The season-independent personal data for trainers is written back as property data, for easy
- * consumption in Obsidian's Base core plugin, and other tools that can act on YAML front matter.
- */
+/// Manages trainer and trainer-related data across seasons.
+///
+/// All data is managed in normal Markdown files and sections with unordered lists. There's a little
+/// work involved in pulling the data from these files, including matching regular expressions.
+///
+/// The season-independent personal data for trainers is written back as property data, for easy
+/// consumption in Obsidian's Base core plugin, and other tools that can act on YAML front matter.
 @Singleton
 public final class TrainerModel
     extends ChangeProcessorTemplate
@@ -81,9 +82,9 @@ public final class TrainerModel
     protected boolean isFullRefreshRequired(Changelog changelog)
     {
         return super.isFullRefreshRequired(changelog)
-               || changelog.changes().anyMatch(isPayloadType(Document.class).and(isFolderInScope()));
+               ||
+               changelog.changes().anyMatch(isPayloadType(Document.class).and(isFolderInScope()));
     }
-
 
     @Override
     public Collection<Change<?>> fullRefresh()

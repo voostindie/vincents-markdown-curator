@@ -1,10 +1,10 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.*;
 
-import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -13,10 +13,10 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 class OneOnOneQuery
-        implements Query
+    implements Query
 {
     private final Vault vault;
     private final QueryResultFactory resultFactory;
@@ -69,7 +69,7 @@ class OneOnOneQuery
     }
 
     private static class OneOnOneFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private final List<Map<String, String>> contacts = new ArrayList<>();
 
@@ -86,7 +86,8 @@ class OneOnOneQuery
                 contacts.add(Map.of(
                         "Date", "[[" + date + "]]",
                         "Name", document.link(),
-                        "When", computeWeeksAgo(date))
+                        "When", computeWeeksAgo(date)
+                    )
                 );
             }
             else
@@ -94,7 +95,8 @@ class OneOnOneQuery
                 contacts.add(Map.of(
                         "Date", "",
                         "Name", document.link(),
-                        "When", "Unplanned")
+                        "When", "Unplanned"
+                    )
                 );
             }
         }

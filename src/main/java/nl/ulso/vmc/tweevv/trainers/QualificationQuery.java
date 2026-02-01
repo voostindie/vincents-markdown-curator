@@ -9,12 +9,10 @@ import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.query.TableResult.Alignment.LEFT;
-import static nl.ulso.curator.query.TableResult.Alignment.RIGHT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.LEFT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.RIGHT;
 
-/**
- * Generates a table of all qualifications in a season, including the trainers who qualify for it.
- */
+/// Generates a table of all qualifications in a season, including the trainers who qualify for it.
 @Singleton
 public class QualificationQuery
     extends SeasonQueryTemplate

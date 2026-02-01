@@ -45,13 +45,11 @@ public record Hook(String name, String address)
         return PROTOCOL_TO_EMOJI.getOrDefault(protocol, UNKNOWN_PROTOCOL);
     }
 
-    /**
-     * URLs from Hookmark seem to be encoded, but at least the character ")" is not, which
-     * breaks the Markdown formatting.
-     *
-     * @param url URL to format.
-     * @return Properly encoded URL for use in Markdown links.
-     */
+    /// URLs from Hookmark seem to be encoded, but at least the character ")" is not, which
+    /// breaks the Markdown formatting.
+    ///
+    /// @param url URL to format.
+    /// @return Properly encoded URL for use in Markdown links.
     private String fixHookmarkUrlEncoding(String url)
     {
         return url.replace(")", "%29");

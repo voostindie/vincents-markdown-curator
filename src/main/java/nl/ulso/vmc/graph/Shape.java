@@ -2,11 +2,9 @@ package nl.ulso.vmc.graph;
 
 import java.util.Optional;
 
-/**
- * Represents the shape of the node, as known in Mermaid.
- * <p/>
- * <a href="https://mermaid.js.org/syntax/flowchart.html#expanded-node-shapes-in-mermaid-flowcharts-v11-3-0">Mermaid Docs</a>
- */
+/// Represents the shape of the node, as known in Mermaid.
+///
+/// <a href="https://mermaid.js.org/syntax/flowchart.html#expanded-node-shapes-in-mermaid-flowcharts-v11-3-0">Mermaid Docs</a>
 public enum Shape
 {
     NOTCHED_RECTANGLE("notch-rect"),

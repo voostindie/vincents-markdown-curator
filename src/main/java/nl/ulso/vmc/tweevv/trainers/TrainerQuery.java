@@ -9,16 +9,14 @@ import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.query.TableResult.Alignment.LEFT;
-import static nl.ulso.curator.query.TableResult.Alignment.RIGHT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.LEFT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.RIGHT;
 
-/**
- * Generates a concise table of all trainers in a season, including their qualifications and the
- * teams they train.
- * <p/>
- * This table is really meant for display purposes, as a quick lookup, For a query that generates
- * detailed information per trainer, see the {@link TrainerCsvQuery}.
- */
+/// Generates a concise table of all trainers in a season, including their qualifications and the
+/// teams they train.
+///
+/// This table is really meant for display purposes, as a quick lookup, For a query that generates
+/// detailed information per trainer, see the [TrainerCsvQuery].
 @Singleton
 public class TrainerQuery
     extends SeasonQueryTemplate
@@ -76,6 +74,5 @@ public class TrainerQuery
                 ))
                 .toList()
         );
-
     }
 }

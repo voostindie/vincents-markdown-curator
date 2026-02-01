@@ -1,20 +1,20 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.*;
 
-import jakarta.inject.Inject;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 class ArchitectureDecisionRecordsQuery
-        implements Query
+    implements Query
 {
     private final Vault vault;
     private final QueryResultFactory resultFactory;
@@ -67,10 +67,10 @@ class ArchitectureDecisionRecordsQuery
     }
 
     private static class AdrFinder
-            extends BreadthFirstVaultVisitor
+        extends BreadthFirstVaultVisitor
     {
         private static final Pattern CHANGES_PATTERN =
-                compile("^- \\[\\[(\\d{4}-\\d{2}-\\d{2})]]: (.*)$");
+            compile("^- \\[\\[(\\d{4}-\\d{2}-\\d{2})]]: (.*)$");
 
         private final List<Map<String, String>> adrs = new ArrayList<>();
 
@@ -89,10 +89,10 @@ class ArchitectureDecisionRecordsQuery
             status = "";
             super.visit(document);
             adrs.add(Map.of(
-                    "ID", id,
-                    "Date", date,
-                    "Status", status,
-                    "Name", document.link()
+                "ID", id,
+                "Date", date,
+                "Status", status,
+                "Name", document.link()
             ));
         }
 

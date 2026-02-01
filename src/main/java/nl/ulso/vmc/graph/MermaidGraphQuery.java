@@ -1,21 +1,19 @@
 package nl.ulso.vmc.graph;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 
-import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
 
 import static java.lang.Integer.max;
 
-/**
- * Query to generate graphs from notes.
- * <p/>
- * See {@link MermaidGraph} for details on how the graph is constructed.
- */
+/// Query to generate graphs from notes.
+///
+/// See [MermaidGraph] for details on how the graph is constructed.
 public final class MermaidGraphQuery
-        implements Query
+    implements Query
 {
     private final MermaidGraph graph;
     private final QueryResultFactory resultFactory;
@@ -43,9 +41,9 @@ public final class MermaidGraphQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of(
-                "seed", "Document to start with; defaults to the current document",
-                "depth", "Number of edges to follow from the source; defaults to 1",
-                "exclude", "List of node types to exclude from the graph; defaults to empty."
+            "seed", "Document to start with; defaults to the current document",
+            "depth", "Number of edges to follow from the source; defaults to 1",
+            "exclude", "List of node types to exclude from the graph; defaults to empty."
         );
     }
 

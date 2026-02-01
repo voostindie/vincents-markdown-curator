@@ -1,7 +1,7 @@
 package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
-import nl.ulso.curator.Changelog;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 
 import java.util.List;

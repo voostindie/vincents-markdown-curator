@@ -3,8 +3,8 @@ package nl.ulso.vmc.demo;
 import dagger.Module;
 import dagger.Provides;
 import nl.ulso.curator.CuratorModule;
-import nl.ulso.curator.journal.JournalModule;
-import nl.ulso.curator.journal.JournalSettings;
+import nl.ulso.curator.addon.journal.JournalModule;
+import nl.ulso.curator.addon.journal.JournalSettings;
 
 import java.nio.file.Path;
 

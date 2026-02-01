@@ -1,13 +1,13 @@
 package nl.ulso.vmc.personal;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 
-import jakarta.inject.Inject;
 import java.util.Map;
 
 public class BooksQuery
-        implements Query
+    implements Query
 {
     private final Library library;
     private final QueryResultFactory resultFactory;
@@ -49,8 +49,8 @@ public class BooksQuery
     public QueryResult run(QueryDefinition definition)
     {
         var author = definition.configuration()
-                .string("author", definition.document().name());
+            .string("author", definition.document().name());
         return resultFactory.unorderedList(
-                library.booksFor(author).stream().map(book -> book.document().link()).toList());
+            library.booksFor(author).stream().map(book -> book.document().link()).toList());
     }
 }

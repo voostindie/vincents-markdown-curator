@@ -9,13 +9,11 @@ import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.query.TableResult.Alignment.LEFT;
-import static nl.ulso.curator.query.TableResult.Alignment.RIGHT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.LEFT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.RIGHT;
 
-/**
- * Generates a table of all tariff groups in a season, including the training groups that qualify
- * for it.
- */
+/// Generates a table of all tariff groups in a season, including the training groups that qualify
+/// for it.
 @Singleton
 public class TariffGroupQuery
     extends SeasonQueryTemplate

@@ -6,15 +6,13 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
-/**
- * Represents a single season and holds all trainer and related data for that season.
- * <p/>
- * Almost all logic applies to a single season. By having all data on trainers and reference data
- * already grouped per season, this logic is straightforward to implement.
- * <p/>
- * Changes to a season are meant to be applied by the {@link TrainerModel} only. For all others
- * seasons are meant to be read-only.
- */
+/// Represents a single season and holds all trainer and related data for that season.
+///
+/// Almost all logic applies to a single season. By having all data on trainers and reference data
+/// already grouped per season, this logic is straightforward to implement.
+///
+/// Changes to a season are meant to be applied by the [TrainerModel] only. For all others seasons
+/// are meant to be read-only.
 public final class Season
 {
     private final Document document;
@@ -106,7 +104,7 @@ public final class Season
     private Trainer resolveTrainer(Document trainerDocument)
     {
         return trainers.computeIfAbsent(trainerDocument.name(),
-            key -> new Trainer(trainerDocument)
+            _ -> new Trainer(trainerDocument)
         );
     }
 

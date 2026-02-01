@@ -1,19 +1,17 @@
 package nl.ulso.vmc.hook;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.json.JsonValue;
 import nl.ulso.jxa.JavaScriptForAutomation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.util.List;
 
-/**
- * Fetches hooks (bookmarks) for a URI from <a href="https://hookproductivity.com">Hookmark</a>.
- * <p/>
- * This implementation uses JXA scripting.
- */
+/// Fetches hooks (bookmarks) for a URI from <a href="https://hookproductivity.com">Hookmark</a>.
+///
+/// This implementation uses JXA scripting.
 @Singleton
 public class HookmarkRepository
 {
@@ -33,10 +31,11 @@ public class HookmarkRepository
         LOGGER.debug("Loading hooks for URI '{}'.", documentUri);
         var array = jxa.runScriptForArray(SCRIPT, documentUri);
         return array.stream()
-                .map(JsonValue::asJsonObject)
-                .map(object -> new Hook(
-                        object.getString("name"),
-                        object.getString("address")))
-                .toList();
+            .map(JsonValue::asJsonObject)
+            .map(object -> new Hook(
+                object.getString("name"),
+                object.getString("address")
+            ))
+            .toList();
     }
 }

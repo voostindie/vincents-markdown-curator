@@ -1,6 +1,6 @@
 package nl.ulso.vmc.tweevv.trainers;
 
-import nl.ulso.curator.Changelog;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
 
@@ -8,13 +8,11 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
-/**
- * Base class for queries that act on a specific season; the season is pre-selected, either pulled
- * from the document name if it matches the name of a season, and otherwise pulled from the
- * configuration parameter {@code season}.
- */
+/// Base class for queries that act on a specific season; the season is pre-selected, either pulled
+/// from the document name if it matches the name of a season, and otherwise pulled from the
+/// configuration parameter `season`.
 abstract class SeasonQueryTemplate
     implements Query
 {
@@ -62,10 +60,8 @@ abstract class SeasonQueryTemplate
         return queryResultFactory;
     }
 
-    /**
-     * @param amount Amount to format in Euros
-     * @return The amount as a string in Euros, using the Dutch locale.
-     */
+    /// @param amount Amount to format in Euros
+    /// @return The amount as a string in Euros, using the Dutch locale.
     protected String toEuroString(BigDecimal amount)
     {
         var formatter = NumberFormat.getCurrencyInstance(Locale.of(LANGUAGE));
@@ -73,19 +69,15 @@ abstract class SeasonQueryTemplate
         return formatter.format(amount.doubleValue());
     }
 
-    /**
-     * @param number Number to format.
-     * @return The number as a string in Euros, using the Dutch locale.
-     */
+    /// @param number Number to format.
+    /// @return The number as a string in Euros, using the Dutch locale.
     protected String toNumberString(BigDecimal number)
     {
         return NumberFormat.getInstance(Locale.of(LANGUAGE)).format(number.doubleValue());
     }
 
-    /**
-     * @param factor Factor to format.
-     * @return The factor as a percentage, using the Dutch locale.
-     */
+    /// @param factor Factor to format.
+    /// @return The factor as a percentage, using the Dutch locale.
     protected String toPercentageString(BigDecimal factor)
     {
         return NumberFormat.getPercentInstance(Locale.of(LANGUAGE)).format(factor.doubleValue());

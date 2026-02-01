@@ -1,19 +1,18 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.curator.Changelog;
-import nl.ulso.curator.query.*;
-
 import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Comparator.comparing;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 class RolesQuery
-        implements Query
+    implements Query
 {
     private final OrgChart orgChart;
     private final QueryResultFactory resultFactory;
@@ -55,12 +54,13 @@ class RolesQuery
     {
         var contact = definition.configuration().string("contact", definition.document().name());
         var roles = orgChart.forContact(contact).stream()
-                .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
-                .map(unit -> Map.of("Team", unit.team().link(),
-                        "Role", unit.roles().entrySet().stream()
-                                .filter(e -> e.getValue().containsKey(contact))
-                                .map(Map.Entry::getKey).findFirst().orElse("")))
-                .toList();
+            .sorted(comparing(orgUnit -> orgUnit.team().sortableTitle()))
+            .map(unit -> Map.of("Team", unit.team().link(),
+                "Role", unit.roles().entrySet().stream()
+                    .filter(e -> e.getValue().containsKey(contact))
+                    .map(Map.Entry::getKey).findFirst().orElse("")
+            ))
+            .toList();
         return resultFactory.table(List.of("Team", "Role"), roles);
     }
 }

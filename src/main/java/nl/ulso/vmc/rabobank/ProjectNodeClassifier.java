@@ -2,15 +2,15 @@ package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.project.AttributeRegistry;
-import nl.ulso.curator.project.Project;
+import nl.ulso.curator.addon.project.AttributeRegistry;
+import nl.ulso.curator.addon.project.Project;
 import nl.ulso.curator.vault.Document;
 import nl.ulso.vmc.graph.DefaultNodeClassifier;
 import nl.ulso.vmc.graph.Node;
 
 import java.util.*;
 
-import static nl.ulso.curator.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
 
 @Singleton
 public class ProjectNodeClassifier

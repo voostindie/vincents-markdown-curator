@@ -2,7 +2,10 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.*;
+import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.changelog.Change;
+import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.main.FrontMatterUpdateCollector;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -10,14 +13,12 @@ import java.util.function.Predicate;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.curator.Change.Kind.DELETE;
-import static nl.ulso.curator.Change.isCreate;
-import static nl.ulso.curator.Change.isDelete;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.Kind.DELETE;
+import static nl.ulso.curator.changelog.Change.isCreate;
+import static nl.ulso.curator.changelog.Change.isDelete;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
-/**
- * My collection of console (PS4/PS5) games.
- */
+/// My collection of console (PS4/PS5) games.
 @Singleton
 public class GameCollection
     extends ChangeProcessorTemplate

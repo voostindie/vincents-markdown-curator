@@ -1,9 +1,9 @@
 package nl.ulso.vmc.tweevv;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 
-import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.comparing;
 
 public class GroupQuery
-        implements Query
+    implements Query
 {
     private static final int JULY_SEASON_END = 7;
     private final VolunteeringModel model;
@@ -41,9 +41,9 @@ public class GroupQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of(
-                "season", "Season to list the people for; defaults to the current season",
-                "name", "Name of the activity; defaults to the current document name",
-                "format", "\"list\" or \"table\"; defaults to \"list\""
+            "season", "Season to list the people for; defaults to the current season",
+            "name", "Name of the activity; defaults to the current document name",
+            "format", "\"list\" or \"table\"; defaults to \"list\""
         );
     }
 
@@ -60,13 +60,14 @@ public class GroupQuery
         var group = definition.configuration().string("name", definition.document().name());
         var format = definition.configuration().string("format", "list");
         var table = model.volunteersFor(seasonString, group).entrySet().stream()
-                .map(entry -> Map.of("Vrijwilliger", entry.getKey().link(),
-                        "Rol", entry.getValue().stream()
-                                .sorted(comparing(VolunteeringModel.ContactActivity::description))
-                                .map(VolunteeringModel.ContactActivity::shortDescription)
-                                .collect(Collectors.joining(", "))))
-                .sorted(comparing(map -> map.get("Vrijwilliger")))
-                .toList();
+            .map(entry -> Map.of("Vrijwilliger", entry.getKey().link(),
+                "Rol", entry.getValue().stream()
+                    .sorted(comparing(VolunteeringModel.ContactActivity::description))
+                    .map(VolunteeringModel.ContactActivity::shortDescription)
+                    .collect(Collectors.joining(", "))
+            ))
+            .sorted(comparing(map -> map.get("Vrijwilliger")))
+            .toList();
         if (format.contentEquals("table"))
         {
             return resultFactory.table(List.of("Vrijwilliger", "Rol"), table);

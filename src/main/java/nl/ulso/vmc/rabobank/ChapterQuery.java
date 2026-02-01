@@ -1,18 +1,17 @@
 package nl.ulso.vmc.rabobank;
 
-import nl.ulso.curator.Changelog;
+import jakarta.inject.Inject;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
 
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 public class ChapterQuery
-        implements Query
+    implements Query
 {
     private final OrgChart orgChart;
     private final QueryResultFactory resultFactory;
@@ -40,11 +39,12 @@ public class ChapterQuery
     public Map<String, String> supportedConfiguration()
     {
         return Map.of("roles",
-                "Roles of the people in the chapter. Roles are matched on substrings in lower " +
-                "case, e.g. 'architect' is enough to find 'Solution Architect'.",
-                "teams",
-                "List of teams to look in, hierarchically. Teams are matched on substrings in " +
-                "lower case.");
+            "Roles of the people in the chapter. Roles are matched on substrings in lower " +
+            "case, e.g. 'architect' is enough to find 'Solution Architect'.",
+            "teams",
+            "List of teams to look in, hierarchically. Teams are matched on substrings in " +
+            "lower case."
+        );
     }
 
     @Override

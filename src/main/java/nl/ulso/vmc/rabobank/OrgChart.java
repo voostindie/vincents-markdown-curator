@@ -2,7 +2,9 @@ package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.*;
+import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.changelog.Change;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -14,7 +16,7 @@ import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.Change.isPayloadType;
+import static nl.ulso.curator.changelog.Change.isPayloadType;
 
 @Singleton
 public class OrgChart

@@ -2,9 +2,11 @@ package nl.ulso.vmc.projectjournal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.*;
-import nl.ulso.curator.journal.*;
-import nl.ulso.curator.project.*;
+import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.addon.journal.*;
+import nl.ulso.curator.addon.project.*;
+import nl.ulso.curator.changelog.Change;
+import nl.ulso.curator.changelog.Changelog;
 import nl.ulso.curator.vault.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +15,10 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.Change.*;
-import static nl.ulso.curator.project.AttributeDefinition.LAST_MODIFIED;
-import static nl.ulso.curator.project.AttributeDefinition.LEAD;
-import static nl.ulso.curator.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.changelog.Change.*;
+import static nl.ulso.curator.addon.project.AttributeDefinition.LAST_MODIFIED;
+import static nl.ulso.curator.addon.project.AttributeDefinition.LEAD;
+import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
 import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /// Keeps track of project attributes - status, lead and last modification date - in the journal.

@@ -9,12 +9,10 @@ import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.query.TableResult.Alignment.LEFT;
-import static nl.ulso.curator.query.TableResult.Alignment.RIGHT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.LEFT;
+import static nl.ulso.curator.query.QueryResultFactory.Alignment.RIGHT;
 
-/**
- * Generates a table of all traing groups in a season, including their trainers.
- */
+/// Generates a table of all traing groups in a season, including their trainers.
 @Singleton
 public final class TrainingGroupQuery
     extends SeasonQueryTemplate

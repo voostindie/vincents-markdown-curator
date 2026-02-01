@@ -3,9 +3,9 @@ package nl.ulso.vmc.projectjournal;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.curator.ChangeProcessor;
-import nl.ulso.curator.journal.JournalModule;
-import nl.ulso.curator.project.ProjectModule;
+import nl.ulso.curator.changelog.ChangeProcessor;
+import nl.ulso.curator.addon.journal.JournalModule;
+import nl.ulso.curator.addon.project.ProjectModule;
 
 /// Combines the Project and Journal modules by offering additional functionality to extract project
 /// attributes from the journal instead of from front matter.

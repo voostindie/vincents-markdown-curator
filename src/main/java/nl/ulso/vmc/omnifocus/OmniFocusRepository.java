@@ -3,8 +3,8 @@ package nl.ulso.vmc.omnifocus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.JsonValue;
+import nl.ulso.curator.changelog.ExternalChangeHandler;
 import nl.ulso.jxa.JavaScriptForAutomation;
-import nl.ulso.curator.vault.VaultRefresher;
 import org.slf4j.*;
 
 import java.io.File;
@@ -56,18 +56,22 @@ public final class OmniFocusRepository
 
     @Inject
     public OmniFocusRepository(
-        VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
+        ExternalChangeHandler externalChangeHandler,
+        JavaScriptForAutomation javaScriptForAutomation,
+        OmniFocusSettings settings)
     {
         if (!DATABASE_PATH.canRead())
         {
             throw new IllegalStateException("OmniFocus database is inaccessible: " + DATABASE_PATH);
         }
         this.cache = new AtomicReference<>();
-        scheduleBackgroundRefresh(refresher, jxa, settings);
+        scheduleBackgroundRefresh(externalChangeHandler, javaScriptForAutomation, settings);
     }
 
     private void scheduleBackgroundRefresh(
-        VaultRefresher refresher, JavaScriptForAutomation jxa, OmniFocusSettings settings)
+        ExternalChangeHandler externalChangeHandler,
+        JavaScriptForAutomation javaScriptForAutomation,
+        OmniFocusSettings settings)
     {
         var curatorName = MDC.get("curator");
         REFRESH_EXECUTOR.scheduleAtFixedRate(() ->
@@ -78,7 +82,7 @@ public final class OmniFocusRepository
                     LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
                     return;
                 }
-                var newProjects = fetchProjects(jxa, settings);
+                var newProjects = fetchProjects(javaScriptForAutomation, settings);
                 var oldProjects = cache.getAndSet(newProjects);
                 lastModified = DATABASE_PATH.lastModified();
                 if (oldProjects == null)
@@ -92,7 +96,7 @@ public final class OmniFocusRepository
                     return;
                 }
                 LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh.");
-                refresher.triggerRefresh(OMNIFOCUS_CHANGE);
+                externalChangeHandler.process(OMNIFOCUS_CHANGE);
             }, 0, REFRESH_DELAY_MINUTES, MINUTES
         );
         LOGGER.info(
@@ -102,10 +106,11 @@ public final class OmniFocusRepository
     }
 
     private Map<String, OmniFocusProject> fetchProjects(
-        JavaScriptForAutomation jxa, OmniFocusSettings settings)
+        JavaScriptForAutomation javaScriptForAutomation, OmniFocusSettings settings)
     {
         LOGGER.debug("Fetching OmniFocus projects in folder '{}'.", settings.omniFocusFolder());
-        var array = jxa.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
+        var array =
+            javaScriptForAutomation.runScriptForArray(JXA_SCRIPT, settings.omniFocusFolder());
         return array.stream()
             .map(JsonValue::asJsonObject)
             .map(object -> new OmniFocusProject(
