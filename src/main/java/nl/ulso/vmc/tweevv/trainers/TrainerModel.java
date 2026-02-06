@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
 import static nl.ulso.curator.change.Change.isPayloadType;
-import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinkTargetNamesFrom;
 
 /// Manages trainer and trainer-related data across seasons.
 ///
@@ -158,7 +158,7 @@ public final class TrainerModel
     {
         folder.documents().forEach(document ->
             document.accept(new SectionVisitor(PRACTICE_SECTION, (season, text) -> {
-                var tariffGroup = parseInternalLinkTargetNames(text).iterator().next();
+                var tariffGroup = extractInternalLinkTargetNamesFrom(text).iterator().next();
                 int count;
                 int weeks;
                 var matcher = SINGLE_PRACTICE_PATTERN.matcher(text);
@@ -197,13 +197,13 @@ public final class TrainerModel
                                 return;
                             }
                             var trainer =
-                                parseInternalLinkTargetNames(matcher.group(1)).iterator().next();
+                                extractInternalLinkTargetNamesFrom(matcher.group(1)).iterator().next();
                             if (!trainer.contentEquals(TRAINER_DOCUMENT))
                             {
                                 return;
                             }
                             var trainingGroupName =
-                                parseInternalLinkTargetNames(matcher.group(2)).iterator().next();
+                                extractInternalLinkTargetNamesFrom(matcher.group(2)).iterator().next();
                             var percentageString = matcher.group(4);
                             var percentage = percentageString != null
                                              ? parseInt(percentageString)
@@ -217,7 +217,7 @@ public final class TrainerModel
                 document.accept(new SectionVisitor(QUALIFICATION_SECTION,
                         (season, text) ->
                         {
-                            var links = parseInternalLinkTargetNames(text);
+                            var links = extractInternalLinkTargetNamesFrom(text);
                             if (links.isEmpty())
                             {
                                 return;
@@ -339,7 +339,7 @@ public final class TrainerModel
                 {
                     return;
                 }
-                var seasonLink = parseInternalLinkTargetNames(line.substring(2, colon));
+                var seasonLink = extractInternalLinkTargetNamesFrom(line.substring(2, colon));
                 if (seasonLink.isEmpty())
                 {
                     return;

@@ -9,6 +9,7 @@ import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.change.ChangeHandler;
 import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.vault.Document;
+import nl.ulso.curator.vault.InternalLinkFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ import static nl.ulso.curator.addon.project.AttributeDefinition.LEAD;
 import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
 import static nl.ulso.curator.change.Change.*;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
-import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinksFrom;
 
 /// Keeps track of project attributes - status, lead and last modification date - in the journal.
 @Singleton
@@ -343,21 +344,14 @@ final class ProjectJournal
 
     private String extractProjectLead(String line, String link, String alias)
     {
-        // The lead of a project is the (hopefully) one and only internal link in the line
-        var links = parseInternalLinkTargetNames(line.replace(link, ""));
+        // The lead of a project is the first internal link on the line.
+        var links = extractInternalLinksFrom(line.replace(link, ""));
         if (links.isEmpty())
         {
             LOGGER.warn("Found no internal link in line '{}'. Skipping.", line);
             return null;
         }
-        if (links.size() > 1)
-        {
-            LOGGER.warn(
-                "Found more than one internal link in line '{}'. Results can be unpredictable.",
-                line
-            );
-        }
-        return links.iterator().next();
+        return links.getFirst().targetDocument();
     }
 
     private void removeAttributesForDate(

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinkTargetNamesFrom;
 
 /// Represents a trainer in a specific season.
 ///
@@ -219,7 +219,7 @@ public final class Trainer
                 if (colon == -1)
                 {
                     // This is just a marker; there's no data attached to the field
-                    var links = parseInternalLinkTargetNames(line.substring(2));
+                    var links = extractInternalLinkTargetNamesFrom(line.substring(2));
                     if (links.size() != 1)
                     {
                         return;
@@ -235,7 +235,7 @@ public final class Trainer
                     return;
                 }
                 // This is a field with data attached to it, after the colon
-                var links = parseInternalLinkTargetNames(line.substring(2, colon));
+                var links = extractInternalLinkTargetNamesFrom(line.substring(2, colon));
                 if (links.size() != 1)
                 {
                     return;

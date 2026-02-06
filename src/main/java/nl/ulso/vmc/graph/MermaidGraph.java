@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static nl.ulso.curator.change.Change.isPayloadType;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
-import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
+import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinkTargetNamesFrom;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /// Builds a graph from notes in the repository.
@@ -202,7 +202,7 @@ public class MermaidGraph
             .flatMap(Collection::stream)
             .forEach(markedLine ->
             {
-                var targetNames = parseInternalLinkTargetNames(markedLine.line());
+                var targetNames = extractInternalLinkTargetNamesFrom(markedLine.line());
                 for (String targetName : targetNames)
                 {
                     var targetNode = nodes.get(targetName);
