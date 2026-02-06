@@ -5,7 +5,7 @@ import dagger.Module;
 import dagger.multibindings.*;
 import jakarta.inject.Singleton;
 import nl.ulso.jxa.JavaScriptForAutomationModule;
-import nl.ulso.curator.changelog.ChangeProcessor;
+import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.addon.project.AttributeDefinition;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.query.Query;

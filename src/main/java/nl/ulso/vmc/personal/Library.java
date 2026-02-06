@@ -2,11 +2,11 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.ChangeProcessorTemplate;
-import nl.ulso.curator.FrontMatterCollector;
+import nl.ulso.curator.change.ChangeProcessorTemplate;
+import nl.ulso.curator.main.FrontMatterCollector;
 import nl.ulso.date.LocalDates;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.vault.*;
 
 import java.time.LocalDate;
@@ -20,8 +20,8 @@ import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
-import static nl.ulso.curator.changelog.Change.isDelete;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isDelete;
+import static nl.ulso.curator.change.Change.isPayloadType;
 
 /// This is the start of what will hopefully be a richer data model at some point. For example I'd
 /// like to keep track of book series as well, and list them in order.
@@ -48,9 +48,9 @@ public class Library
     }
 
     @Override
-    protected boolean isFullRefreshRequired(Changelog changelog)
+    protected boolean isResetRequired(Changelog changelog)
     {
-        return super.isFullRefreshRequired(changelog) ||
+        return super.isResetRequired(changelog) ||
                changelog.changes().anyMatch(
                    isLibraryFolder().and(isDelete()).or(isAuthorDocument().or(isBookDocument())));
     }
@@ -95,7 +95,7 @@ public class Library
     }
 
     @Override
-    public Collection<Change<?>> fullRefresh()
+    public Collection<Change<?>> reset()
     {
         authors.clear();
         books.forEach(

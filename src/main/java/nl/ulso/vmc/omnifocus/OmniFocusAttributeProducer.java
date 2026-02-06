@@ -2,19 +2,21 @@ package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.ChangeProcessorTemplate;
 import nl.ulso.curator.addon.project.*;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.Changelog;
+import nl.ulso.curator.change.ChangeHandler;
+import nl.ulso.curator.change.ChangeProcessorTemplate;
 
 import java.util.*;
 
-import static nl.ulso.curator.changelog.Change.create;
-import static nl.ulso.curator.changelog.Change.delete;
-import static nl.ulso.curator.changelog.Change.isDelete;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
 import static nl.ulso.curator.addon.project.AttributeDefinition.PRIORITY;
 import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.change.Change.create;
+import static nl.ulso.curator.change.Change.delete;
+import static nl.ulso.curator.change.Change.isDelete;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
 
 /// Produces attribute values for projects from matching projects in OmniFocus.
@@ -51,8 +53,21 @@ final class OmniFocusAttributeProducer
         this.projectRepository = projectRepository;
         this.omniFocusRepository = omniFocusRepository;
         this.messages = messages;
-        registerChangeHandler(isPayloadType(OmniFocusUpdate.class), this::processOmniFocusProjects);
-        registerChangeHandler(isPayloadType(Project.class).and(isDelete()), this::processProjectDelete);
+    }
+
+    @Override
+    protected Set<? extends ChangeHandler> createChangeHandlers()
+    {
+        return Set.of(
+            newChangeHandler(
+                isPayloadType(OmniFocusUpdate.class),
+                this::processOmniFocusProjects
+            ),
+            newChangeHandler(
+                isPayloadType(Project.class).and(isDelete()),
+                this::processProjectDelete
+            )
+        );
     }
 
     @Override
@@ -68,7 +83,7 @@ final class OmniFocusAttributeProducer
     }
 
     @Override
-    protected boolean isFullRefreshRequired(Changelog changelog)
+    protected boolean isResetRequired(Changelog changelog)
     {
         return false;
     }

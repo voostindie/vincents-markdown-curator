@@ -2,10 +2,8 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.ChangeProcessorTemplate;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.Changelog;
-import nl.ulso.curator.FrontMatterCollector;
+import nl.ulso.curator.change.*;
+import nl.ulso.curator.main.*;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -13,10 +11,11 @@ import java.util.function.Predicate;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
-import static nl.ulso.curator.changelog.Change.Kind.DELETE;
-import static nl.ulso.curator.changelog.Change.isCreate;
-import static nl.ulso.curator.changelog.Change.isDelete;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.Kind.DELETE;
+import static nl.ulso.curator.change.Change.isCreate;
+import static nl.ulso.curator.change.Change.isDelete;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 
 /// My collection of console (PS4/PS5) games.
 @Singleton
@@ -34,13 +33,20 @@ public class GameCollection
         this.vault = vault;
         this.frontMatterCollector = frontMatterCollector;
         this.games = new HashMap<>();
-        this.registerChangeHandler(isGameDocument(), this::processGameDocumentUpdate);
     }
 
     @Override
-    protected boolean isFullRefreshRequired(Changelog changelog)
+    protected Set<? extends ChangeHandler> createChangeHandlers()
     {
-        return super.isFullRefreshRequired(changelog) ||
+        return Set.of(
+            newChangeHandler(isGameDocument(), this::processGameDocumentUpdate)
+        );
+    }
+
+    @Override
+    protected boolean isResetRequired(Changelog changelog)
+    {
+        return super.isResetRequired(changelog) ||
                changelog.changes().anyMatch(isGameFolder().and(isDelete().or(isCreate())));
     }
 
@@ -69,7 +75,7 @@ public class GameCollection
     }
 
     @Override
-    public Collection<Change<?>> fullRefresh()
+    public Collection<Change<?>> reset()
     {
         games.forEach(
             (_, game) -> {

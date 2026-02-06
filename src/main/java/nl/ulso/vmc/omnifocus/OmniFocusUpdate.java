@@ -1,9 +1,9 @@
 package nl.ulso.vmc.omnifocus;
 
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.ChangeProcessor;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.ChangeProcessor;
 
-import static nl.ulso.curator.changelog.Change.update;
+import static nl.ulso.curator.change.Change.update;
 
 /// Represents a change in OmniFocus.
 ///

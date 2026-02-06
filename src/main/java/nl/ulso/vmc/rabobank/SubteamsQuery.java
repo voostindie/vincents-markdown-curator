@@ -1,7 +1,7 @@
 package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
 
@@ -9,7 +9,7 @@ import java.util.*;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isPayloadType;
 
 class SubteamsQuery
     implements Query

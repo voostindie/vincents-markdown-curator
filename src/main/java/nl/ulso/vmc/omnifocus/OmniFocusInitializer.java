@@ -2,16 +2,18 @@ package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.ChangeProcessorTemplate;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.Changelog;
+import nl.ulso.curator.change.ChangeHandler;
+import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.vault.Vault;
 
 import java.util.List;
 import java.util.Set;
 
-import static nl.ulso.curator.changelog.Change.isCreate;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isCreate;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 
 /// OmniFocus projects are fetched in a background process; this processor blocks until the initial
 /// fetch is complete. It is triggered only once, at applications start.
@@ -25,7 +27,14 @@ public class OmniFocusInitializer
     public OmniFocusInitializer(OmniFocusRepository omniFocusRepository)
     {
         this.omniFocusRepository = omniFocusRepository;
-        registerChangeHandler(isPayloadType(Vault.class).and(isCreate()), this::waitForOmniFocus);
+    }
+
+    @Override
+    protected Set<? extends ChangeHandler> createChangeHandlers()
+    {
+        return Set.of(
+            newChangeHandler(isPayloadType(Vault.class).and(isCreate()), this::waitForOmniFocus)
+        );
     }
 
     @Override
@@ -41,7 +50,7 @@ public class OmniFocusInitializer
     }
 
     @Override
-    protected boolean isFullRefreshRequired(Changelog changelog)
+    protected boolean isResetRequired(Changelog changelog)
     {
         return false;
     }

@@ -3,7 +3,7 @@ package nl.ulso.vmc.omnifocus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.JsonValue;
-import nl.ulso.curator.changelog.ExternalChangeHandler;
+import nl.ulso.curator.change.ExternalChangeHandler;
 import nl.ulso.jxa.JavaScriptForAutomation;
 import org.slf4j.*;
 

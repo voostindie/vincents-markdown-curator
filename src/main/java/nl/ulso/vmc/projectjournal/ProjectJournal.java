@@ -2,11 +2,12 @@ package nl.ulso.vmc.projectjournal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.ChangeProcessorTemplate;
 import nl.ulso.curator.addon.journal.*;
 import nl.ulso.curator.addon.project.*;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.Changelog;
+import nl.ulso.curator.change.ChangeHandler;
+import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.vault.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +16,11 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.changelog.Change.*;
 import static nl.ulso.curator.addon.project.AttributeDefinition.LAST_MODIFIED;
 import static nl.ulso.curator.addon.project.AttributeDefinition.LEAD;
 import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.change.Change.*;
+import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 
 /// Keeps track of project attributes - status, lead and last modification date - in the journal.
@@ -65,17 +67,24 @@ final class ProjectJournal
         this.leadMarkers = new HashSet<>();
         this.linkToLeadMap = new HashMap<>();
         this.allMarkers = new HashSet<>();
-        this.registerChangeHandler(
-            isPayloadType(Daily.class).and(isCreateOrUpdate()),
-            this::processDailyUpdate
-        );
-        this.registerChangeHandler(
-            isPayloadType(Daily.class).and(isDelete()),
-            this::processDailyDeletion
-        );
-        this.registerChangeHandler(
-            isPayloadType(Project.class).and(isDelete()),
-            this::processProjectDeletion
+    }
+
+    @Override
+    protected Set<? extends ChangeHandler> createChangeHandlers()
+    {
+        return Set.of(
+            newChangeHandler(
+                isPayloadType(Daily.class).and(isCreateOrUpdate()),
+                this::processDailyUpdate
+            ),
+            newChangeHandler(
+                isPayloadType(Daily.class).and(isDelete()),
+                this::processDailyDeletion
+            ),
+            newChangeHandler(
+                isPayloadType(Project.class).and(isDelete()),
+                this::processProjectDeletion
+            )
         );
     }
 
@@ -92,13 +101,13 @@ final class ProjectJournal
     }
 
     @Override
-    protected boolean isFullRefreshRequired(Changelog changelog)
+    protected boolean isResetRequired(Changelog changelog)
     {
         return changelog.changes().anyMatch(isPayloadType(Marker.class));
     }
 
     @Override
-    public Collection<Change<?>> fullRefresh()
+    public Collection<Change<?>> reset()
     {
         this.projectStatuses.clear();
         this.statusMarkers.clear();

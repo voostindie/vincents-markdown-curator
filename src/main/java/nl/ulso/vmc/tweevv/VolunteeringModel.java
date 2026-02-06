@@ -2,8 +2,9 @@ package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.ChangeHandler;
+import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -18,9 +19,10 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.changelog.Change.Kind.CREATE;
-import static nl.ulso.curator.changelog.Change.Kind.UPDATE;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.Kind.CREATE;
+import static nl.ulso.curator.change.Change.Kind.UPDATE;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 
 @Singleton
 public class VolunteeringModel
@@ -41,8 +43,15 @@ public class VolunteeringModel
         this.activities = new HashMap<>();
         this.contacts = new HashMap<>();
         this.volunteering = new HashMap<>();
-        registerChangeHandler(isTeamDocument(), this::processTeamUpdate);
-        registerChangeHandler(isContactDocument(), this::processContactUpdate);
+    }
+
+    @Override
+    protected Set<? extends ChangeHandler> createChangeHandlers()
+    {
+        return Set.of(
+            newChangeHandler(isTeamDocument(), this::processTeamUpdate),
+            newChangeHandler(isContactDocument(), this::processContactUpdate)
+        );
     }
 
     Predicate<Change<?>> isTeamDocument()
@@ -64,7 +73,7 @@ public class VolunteeringModel
     }
 
     @Override
-    public Collection<Change<?>> fullRefresh()
+    public Collection<Change<?>> reset()
     {
         activities.clear();
         contacts.clear();

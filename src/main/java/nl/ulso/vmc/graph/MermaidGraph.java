@@ -2,10 +2,11 @@ package nl.ulso.vmc.graph;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.ChangeProcessorTemplate;
+import nl.ulso.curator.change.ChangeHandler;
+import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.addon.journal.*;
-import nl.ulso.curator.changelog.Change;
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.vault.*;
 import org.slf4j.Logger;
 
@@ -16,7 +17,8 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.curator.vault.InternalLinkFinder.parseInternalLinkTargetNames;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -65,8 +67,15 @@ public class MermaidGraph
         this.settings = settings;
         this.selectedMarkerNames = new HashSet<>();
         this.nodes = new HashMap<>();
-        registerChangeHandler(isPayloadType(Daily.class), this::processDailyUpdate);
-        registerChangeHandler(isNodeEntry(), this::processNodeUpdate);
+    }
+
+    @Override
+    protected Set<? extends ChangeHandler> createChangeHandlers()
+    {
+        return Set.of(
+            newChangeHandler(isPayloadType(Daily.class), this::processDailyUpdate),
+            newChangeHandler(isNodeEntry(), this::processNodeUpdate)
+        );
     }
 
     @Override
@@ -76,9 +85,9 @@ public class MermaidGraph
     }
 
     @Override
-    protected boolean isFullRefreshRequired(Changelog changelog)
+    protected boolean isResetRequired(Changelog changelog)
     {
-        return super.isFullRefreshRequired(changelog)
+        return super.isResetRequired(changelog)
                || changelog.changes().anyMatch(isPayloadType(Marker.class));
     }
 
@@ -92,7 +101,7 @@ public class MermaidGraph
     }
 
     @Override
-    public Collection<Change<?>> fullRefresh()
+    public Collection<Change<?>> reset()
     {
         refreshSelectedMarkers();
         refreshNodes();
@@ -124,7 +133,7 @@ public class MermaidGraph
         {
             // This is a new node. It might refer to other nodes already, and other nodes
             // might refer to it. So, a full refresh is all we can do.
-            return fullRefresh();
+            return reset();
         }
     }
 

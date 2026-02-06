@@ -1,6 +1,6 @@
 package nl.ulso.vmc.tweevv.trainers;
 
-import nl.ulso.curator.changelog.Changelog;
+import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
 
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static nl.ulso.curator.changelog.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isPayloadType;
 
 /// Base class for queries that act on a specific season; the season is pre-selected, either pulled
 /// from the document name if it matches the name of a season, and otherwise pulled from the
