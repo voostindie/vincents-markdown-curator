@@ -2,8 +2,7 @@ package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.addon.project.AttributeRegistry;
-import nl.ulso.curator.addon.project.Project;
+import nl.ulso.curator.addon.project.*;
 import nl.ulso.curator.vault.Document;
 import nl.ulso.vmc.graph.DefaultNodeClassifier;
 import nl.ulso.vmc.graph.Node;
@@ -16,11 +15,13 @@ import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
 public class ProjectNodeClassifier
     extends DefaultNodeClassifier
 {
+    private final ProjectRepository projectRepository;
     private final AttributeRegistry attributeRegistry;
 
     @Inject
-    ProjectNodeClassifier(AttributeRegistry attributeRegistry)
+    ProjectNodeClassifier(ProjectRepository projectRepository,  AttributeRegistry attributeRegistry)
     {
+        this.projectRepository = projectRepository;
         this.attributeRegistry = attributeRegistry;
     }
 
@@ -42,18 +43,18 @@ public class ProjectNodeClassifier
     public Optional<String> classify(Node node)
     {
         return super.classify(node).or(() -> {
-            var project = projectFor(node.document(), attributeRegistry);
+            var project = projectFor(node.document());
             return project
-                .flatMap(p -> attributeRegistry.attributeValue(p, STATUS))
+                .flatMap(p -> attributeRegistry.valueOf(p, STATUS))
                 .map(s -> (String) s)
                 .map(this::toMermaid)
                 .or(() -> Optional.of(toMermaid("unknown")));
         });
     }
 
-    private Optional<Project> projectFor(Document document, AttributeRegistry registry)
+    private Optional<Project> projectFor(Document document)
     {
-        return registry.projects().stream()
+        return projectRepository.projects().stream()
             .filter(project -> project.document().name().equals(document.name()))
             .findFirst();
     }

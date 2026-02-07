@@ -4,12 +4,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.addon.journal.*;
 import nl.ulso.curator.addon.project.*;
-import nl.ulso.curator.change.Change;
-import nl.ulso.curator.change.Changelog;
-import nl.ulso.curator.change.ChangeHandler;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
+import nl.ulso.curator.change.*;
 import nl.ulso.curator.vault.Document;
-import nl.ulso.curator.vault.InternalLinkFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,18 +141,23 @@ final class ProjectJournal
 
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
-        var daily = change.as(Daily.class).value();
-        LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
-        removeAttributesForDate(daily.date(), projectStatuses);
-        removeAttributesForDate(daily.date(), projectLeads);
+        var oldDaily = change.as(Daily.class).oldValue();
+        LOGGER.debug("Processing journal entry '{}' for project attributes.", oldDaily.date());
+        removeAttributesForDate(oldDaily.date(), projectStatuses);
+        removeAttributesForDate(oldDaily.date(), projectLeads);
         var changes = createChangeCollection();
+        var newDaily = change.as(Daily.class).newValue();
         for (Project project : projectRepository.projects())
         {
             var projectName = project.name();
-            if (daily.refersTo(projectName))
+            if (newDaily.refersTo(projectName))
             {
-                var entries = daily.markedLinesFor(projectName, allMarkers, false);
+                var entries = newDaily.markedLinesFor(projectName, allMarkers, false);
                 updateProjectAttributes(projectName, entries);
+                collectProjectChanges(changes, project);
+            }
+            else if (oldDaily.refersTo(projectName))
+            {
                 collectProjectChanges(changes, project);
             }
         }
