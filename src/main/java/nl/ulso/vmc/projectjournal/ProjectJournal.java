@@ -21,6 +21,8 @@ import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinksFrom;
 
 /// Keeps track of project attributes - status, lead and last modification date - in the journal.
+///
+/// TODO: clean up this code.
 @Singleton
 final class ProjectJournal
     extends ChangeProcessorTemplate
@@ -71,7 +73,11 @@ final class ProjectJournal
     {
         return Set.of(
             newChangeHandler(
-                isPayloadType(Daily.class).and(isCreateOrUpdate()),
+                isPayloadType(Daily.class).and(isCreate()),
+                this::processDailyCreation
+            ),
+            newChangeHandler(
+                isPayloadType(Daily.class).and(isUpdate()),
                 this::processDailyUpdate
             ),
             newChangeHandler(
@@ -126,21 +132,9 @@ final class ProjectJournal
         return changes;
     }
 
-    private Collection<Change<?>> processDailyDeletion(Change<?> change)
-    {
-        var daily = change.as(Daily.class).value();
-        var relatedProjects = projectRepository.projects().stream()
-            .filter(project -> daily.refersTo(project.name()))
-            .collect(toSet());
-        removeAttributesForDate(daily.date(), projectStatuses);
-        removeAttributesForDate(daily.date(), projectLeads);
-        var changes = createChangeCollection();
-        relatedProjects.forEach(project -> collectProjectChanges(changes, project));
-        return changes;
-    }
-
     private Collection<Change<?>> processDailyUpdate(Change<?> change)
     {
+
         var oldDaily = change.as(Daily.class).oldValue();
         LOGGER.debug("Processing journal entry '{}' for project attributes.", oldDaily.date());
         removeAttributesForDate(oldDaily.date(), projectStatuses);
@@ -161,6 +155,39 @@ final class ProjectJournal
                 collectProjectChanges(changes, project);
             }
         }
+        return changes;
+    }
+    private Collection<Change<?>> processDailyCreation(Change<?> change)
+    {
+
+        var daily = change.as(Daily.class).value();
+        LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
+        removeAttributesForDate(daily.date(), projectStatuses);
+        removeAttributesForDate(daily.date(), projectLeads);
+        var changes = createChangeCollection();
+        for (Project project : projectRepository.projects())
+        {
+            var projectName = project.name();
+            if (daily.refersTo(projectName))
+            {
+                var entries = daily.markedLinesFor(projectName, allMarkers, false);
+                updateProjectAttributes(projectName, entries);
+                collectProjectChanges(changes, project);
+            }
+        }
+        return changes;
+    }
+
+    private Collection<Change<?>> processDailyDeletion(Change<?> change)
+    {
+        var daily = change.as(Daily.class).value();
+        var relatedProjects = projectRepository.projects().stream()
+            .filter(project -> daily.refersTo(project.name()))
+            .collect(toSet());
+        removeAttributesForDate(daily.date(), projectStatuses);
+        removeAttributesForDate(daily.date(), projectLeads);
+        var changes = createChangeCollection();
+        relatedProjects.forEach(project -> collectProjectChanges(changes, project));
         return changes;
     }
 
