@@ -2,24 +2,22 @@ package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.Change;
+import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.change.Changelog;
-import nl.ulso.curator.change.ChangeHandler;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.vault.Vault;
 
-import java.util.List;
 import java.util.Set;
 
 import static nl.ulso.curator.change.Change.isCreate;
-import static nl.ulso.curator.change.Change.isPayloadType;
-import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
+import static nl.ulso.curator.change.Changelog.changelogFor;
+import static nl.ulso.curator.change.Changelog.emptyChangelog;
 
 /// OmniFocus projects are fetched in a background process; this processor blocks until the initial
-/// fetch is complete. It is triggered only once, at applications start.
+/// fetch is complete. It is triggered only once, at application startup; that is the only time a
+/// `Vault` create event is produced.
 @Singleton
 public class OmniFocusInitializer
-    extends ChangeProcessorTemplate
+    implements ChangeProcessor
 {
     private final OmniFocusRepository omniFocusRepository;
 
@@ -27,14 +25,6 @@ public class OmniFocusInitializer
     public OmniFocusInitializer(OmniFocusRepository omniFocusRepository)
     {
         this.omniFocusRepository = omniFocusRepository;
-    }
-
-    @Override
-    protected Set<? extends ChangeHandler> createChangeHandlers()
-    {
-        return Set.of(
-            newChangeHandler(isPayloadType(Vault.class).and(isCreate()), this::waitForOmniFocus)
-        );
     }
 
     @Override
@@ -50,14 +40,13 @@ public class OmniFocusInitializer
     }
 
     @Override
-    protected boolean isResetRequired(Changelog changelog)
+    public Changelog apply(Changelog changelog)
     {
-        return false;
-    }
-
-    private List<Change<?>> waitForOmniFocus(Change<?> change)
-    {
-        omniFocusRepository.waitForInitialFetchToComplete();
-        return List.of(OmniFocusUpdate.OMNIFOCUS_CHANGE);
+        if (changelog.changes().anyMatch(isCreate()))
+        {
+            omniFocusRepository.waitForInitialFetchToComplete();
+            return changelogFor(OmniFocusUpdate.OMNIFOCUS_CHANGE);
+        }
+        return emptyChangelog();
     }
 }

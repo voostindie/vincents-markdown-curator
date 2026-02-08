@@ -42,16 +42,16 @@ public final class OmniFocusRepository
     private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
     private static final int REFRESH_DELAY_MINUTES = 5;
 
-    // Because fetching projects from OmniFocus is a scheduled activity, it might run in parallel
-    // with access in the [OmniFocusAttributeProducer]. In practice this can't happen as the access
-    // from the [OmniFocusAttributeProducer] always comes after the refresh; synchronization is
-    // done through the [OmniFocusUpdate] change object: this registry creates that object. No
-    // refresh, no object, no access. However, it's better to be safe than sorry.
+    /// Because fetching projects from OmniFocus is a scheduled activity, it might run in parallel
+    /// with access in the [OmniFocusAttributeProducer]. In practice this can't happen as the access
+    /// from the [OmniFocusAttributeProducer] always comes after the refresh; synchronization is
+    /// done through the [OmniFocusUpdate] change object: this registry creates that object. No
+    /// refresh, no object, no access. However, it's better to be safe than sorry.
     private final AtomicReference<Map<String, OmniFocusProject>> cache;
     private long lastModified = 0L;
 
-    // The filtering on statuses is ideally done in the JXA script to limit the data pulled from
-    // OmniFocus, but this broke in OmniFocus 4.3.3. Now the filtering is in here, in the client.
+    /// The filtering on statuses is ideally done in the JXA script to limit the data pulled from
+    /// OmniFocus, but this broke in OmniFocus 4.3.3. Now the filtering is in here, in the client.
     private static final Set<Status> SELECTED_STATUSES = Set.of(ACTIVE, ON_HOLD);
 
     @Inject
@@ -123,8 +123,10 @@ public final class OmniFocusRepository
             .collect(toMap(OmniFocusProject::name, Function.identity()));
     }
 
-    // If, at system start, the request for data comes before the data from OmniFocus is available
-    // the system spins and waits.
+    /// If, at system start, the request for data comes before the data from OmniFocus is available,
+    /// the system spins and waits.
+    ///
+    /// @see OmniFocusInitializer
     public void waitForInitialFetchToComplete()
     {
         Map<String, OmniFocusProject> result = null;
