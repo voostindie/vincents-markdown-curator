@@ -2,9 +2,7 @@ package nl.ulso.vmc.tweevv.trainers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
-import nl.ulso.curator.change.Change;
-import nl.ulso.curator.change.Changelog;
+import nl.ulso.curator.change.*;
 import nl.ulso.curator.main.FrontMatterCollector;
 import nl.ulso.curator.vault.*;
 
@@ -15,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.emptyList;
 import static nl.ulso.curator.change.Change.isPayloadType;
 import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinkTargetNamesFrom;
 
@@ -87,7 +84,7 @@ public final class TrainerModel
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         seasons.clear();
         vault.folder(MODEL_FOLDER).ifPresent(modelFolder -> {
@@ -98,7 +95,6 @@ public final class TrainerModel
         });
         vault.folder(TRAINER_FOLDER).ifPresent(this::importTrainers);
         vault.folder(TRAINER_FOLDER).ifPresent(this::updateTrainerFrontMatter);
-        return emptyList();
     }
 
     Predicate<? super Change<?>> isFolderInScope()

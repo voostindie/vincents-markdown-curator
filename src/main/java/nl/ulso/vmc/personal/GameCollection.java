@@ -3,14 +3,13 @@ package nl.ulso.vmc.personal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.*;
-import nl.ulso.curator.main.*;
+import nl.ulso.curator.main.FrontMatterCollector;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
 import java.util.function.Predicate;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.emptyList;
 import static nl.ulso.curator.change.Change.Kind.DELETE;
 import static nl.ulso.curator.change.Change.isCreate;
 import static nl.ulso.curator.change.Change.isDelete;
@@ -75,7 +74,7 @@ public class GameCollection
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         games.forEach(
             (_, game) -> {
@@ -88,10 +87,9 @@ public class GameCollection
             });
         games.clear();
         vault.folder(GAMES_FOLDER).ifPresent(folder -> folder.accept(new GameFinder()));
-        return emptyList();
     }
 
-    private Collection<Change<?>> processGameDocumentUpdate(Change<?> change)
+    private void processGameDocumentUpdate(Change<?> change, ChangeCollector collector)
     {
         var document = (Document) change.value();
         if (change.kind() == DELETE)
@@ -102,7 +100,6 @@ public class GameCollection
         {
             document.accept(new GameFinder());
         }
-        return null;
     }
 
     private class GameFinder

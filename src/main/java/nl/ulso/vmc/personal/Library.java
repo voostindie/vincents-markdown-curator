@@ -2,12 +2,10 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
+import nl.ulso.curator.change.*;
 import nl.ulso.curator.main.FrontMatterCollector;
-import nl.ulso.date.LocalDates;
-import nl.ulso.curator.change.Change;
-import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.vault.*;
+import nl.ulso.date.LocalDates;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -95,7 +93,7 @@ public class Library
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         authors.clear();
         books.forEach(
@@ -111,7 +109,6 @@ public class Library
         readingSessions.clear();
         vault.folder(AUTHOR_FOLDER).ifPresent(folder -> folder.accept(new AuthorFinder()));
         vault.folder(BOOK_FOLDER).ifPresent(folder -> folder.accept(new BookFinder()));
-        return emptyList();
     }
 
     List<ReadingSession> readingFor(int year)

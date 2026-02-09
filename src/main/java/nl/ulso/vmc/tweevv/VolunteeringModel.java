@@ -2,9 +2,7 @@ package nl.ulso.vmc.tweevv;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.Change;
-import nl.ulso.curator.change.ChangeHandler;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
+import nl.ulso.curator.change.*;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.Character.isDigit;
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
@@ -73,7 +70,7 @@ public class VolunteeringModel
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         activities.clear();
         contacts.clear();
@@ -92,10 +89,9 @@ public class VolunteeringModel
                 addContact(document);
             }
         });
-        return emptyList();
     }
 
-    private Collection<Change<?>> processTeamUpdate(Change<?> change)
+    private void processTeamUpdate(Change<?> change, ChangeCollector collector)
     {
         var document = (Document) change.value();
         var activity = activities.remove(document.name());
@@ -110,10 +106,9 @@ public class VolunteeringModel
                 new ActivityProcessor(contact).process();
             }
         }
-        return emptyList();
     }
 
-    private Collection<Change<?>> processContactUpdate(Change<?> change)
+    private void processContactUpdate(Change<?> change, ChangeCollector collector)
     {
         var document = (Document) change.value();
         var contact = contacts.remove(document.name());
@@ -123,7 +118,6 @@ public class VolunteeringModel
         {
             addContact(document);
         }
-        return emptyList();
     }
 
     private void addActivity(Document document)

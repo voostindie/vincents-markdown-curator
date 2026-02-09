@@ -2,9 +2,7 @@ package nl.ulso.vmc.rabobank;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
-import nl.ulso.curator.change.Change;
-import nl.ulso.curator.change.Changelog;
+import nl.ulso.curator.change.*;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -12,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
@@ -44,7 +41,7 @@ public class OrgChart
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         orgUnits.clear();
         var teams = vault.folder(TEAMS_FOLDER).orElse(null);
@@ -59,7 +56,6 @@ public class OrgChart
             thirdParties.documents().forEach(
                 thirdParty -> thirdParty.accept(new OrgUnitFinder(thirdParties, contacts)));
         }
-        return emptyList();
     }
 
     Predicate<? super Change<?>> isFolderInScope()

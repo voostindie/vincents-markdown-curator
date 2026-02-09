@@ -2,11 +2,8 @@ package nl.ulso.vmc.graph;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.ChangeHandler;
-import nl.ulso.curator.change.ChangeProcessorTemplate;
 import nl.ulso.curator.addon.journal.*;
-import nl.ulso.curator.change.Change;
-import nl.ulso.curator.change.Changelog;
+import nl.ulso.curator.change.*;
 import nl.ulso.curator.vault.*;
 import org.slf4j.Logger;
 
@@ -14,7 +11,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static nl.ulso.curator.change.Change.isPayloadType;
@@ -101,23 +97,21 @@ public class MermaidGraph
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         refreshSelectedMarkers();
         refreshNodes();
         refreshEdges();
         LOGGER.debug("Constructed a graph with {} nodes", nodes.size());
-        return emptyList();
     }
 
-    private Collection<Change<?>> processDailyUpdate(Change<?> change)
+    private void processDailyUpdate(Change<?> change, ChangeCollector collector)
     {
         var daily = (Daily) change.value();
         refreshGraphForJournalEntryOn(daily.date());
-        return emptyList();
     }
 
-    private Collection<Change<?>> processNodeUpdate(Change<?> change)
+    private void processNodeUpdate(Change<?> change, ChangeCollector collector)
     {
         var document = (Document) change.value();
         var name = document.name();
@@ -127,13 +121,12 @@ public class MermaidGraph
             // A node already exists. All we need to do is replace the underlying document
             // reference.
             node.replaceDocumentWith(document);
-            return emptyList();
         }
         else
         {
             // This is a new node. It might refer to other nodes already, and other nodes
             // might refer to it. So, a full refresh is all we can do.
-            return reset();
+            reset(collector);
         }
     }
 

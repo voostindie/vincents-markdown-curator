@@ -16,7 +16,10 @@ import static java.util.stream.Collectors.toSet;
 import static nl.ulso.curator.addon.project.AttributeDefinition.LAST_MODIFIED;
 import static nl.ulso.curator.addon.project.AttributeDefinition.LEAD;
 import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
-import static nl.ulso.curator.change.Change.*;
+import static nl.ulso.curator.change.Change.isCreate;
+import static nl.ulso.curator.change.Change.isDelete;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isUpdate;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinksFrom;
 
@@ -110,7 +113,7 @@ final class ProjectJournal
     }
 
     @Override
-    public Collection<Change<?>> reset()
+    public void reset(ChangeCollector collector)
     {
         this.projectStatuses.clear();
         this.statusMarkers.clear();
@@ -126,20 +129,17 @@ final class ProjectJournal
         {
             processJournal();
         }
-        var changes = createChangeCollection();
         projectRepository.projects()
-            .forEach(project -> collectProjectChanges(changes, project));
-        return changes;
+            .forEach(project -> collectProjectChanges(collector, project));
     }
 
-    private Collection<Change<?>> processDailyUpdate(Change<?> change)
+    private void processDailyUpdate(Change<?> change, ChangeCollector collector)
     {
 
         var oldDaily = change.as(Daily.class).oldValue();
         LOGGER.debug("Processing journal entry '{}' for project attributes.", oldDaily.date());
         removeAttributesForDate(oldDaily.date(), projectStatuses);
         removeAttributesForDate(oldDaily.date(), projectLeads);
-        var changes = createChangeCollection();
         var newDaily = change.as(Daily.class).newValue();
         for (Project project : projectRepository.projects())
         {
@@ -148,23 +148,22 @@ final class ProjectJournal
             {
                 var entries = newDaily.markedLinesFor(projectName, allMarkers, false);
                 updateProjectAttributes(projectName, entries);
-                collectProjectChanges(changes, project);
+                collectProjectChanges(collector, project);
             }
             else if (oldDaily.refersTo(projectName))
             {
-                collectProjectChanges(changes, project);
+                collectProjectChanges(collector, project);
             }
         }
-        return changes;
     }
-    private Collection<Change<?>> processDailyCreation(Change<?> change)
+
+    private void processDailyCreation(Change<?> change, ChangeCollector collector)
     {
 
         var daily = change.as(Daily.class).value();
         LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
-        var changes = createChangeCollection();
         for (Project project : projectRepository.projects())
         {
             var projectName = project.name();
@@ -172,13 +171,12 @@ final class ProjectJournal
             {
                 var entries = daily.markedLinesFor(projectName, allMarkers, false);
                 updateProjectAttributes(projectName, entries);
-                collectProjectChanges(changes, project);
+                collectProjectChanges(collector, project);
             }
         }
-        return changes;
     }
 
-    private Collection<Change<?>> processDailyDeletion(Change<?> change)
+    private void processDailyDeletion(Change<?> change, ChangeCollector collector)
     {
         var daily = change.as(Daily.class).value();
         var relatedProjects = projectRepository.projects().stream()
@@ -186,88 +184,78 @@ final class ProjectJournal
             .collect(toSet());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
-        var changes = createChangeCollection();
-        relatedProjects.forEach(project -> collectProjectChanges(changes, project));
-        return changes;
+        relatedProjects.forEach(project -> collectProjectChanges(collector, project));
     }
 
-    private Collection<Change<?>> processProjectDeletion(Change<?> change)
+    private void processProjectDeletion(Change<?> change, ChangeCollector collector)
     {
         var project = (Project) change.value();
         projectStatuses.remove(project.name());
         projectLeads.remove(project.name());
-        var changes = createChangeCollection();
-        collectProjectChanges(changes, project);
-        return changes;
+        collectProjectChanges(collector, project);
     }
 
-    private void collectProjectChanges(Collection<Change<?>> changes, Project project)
+    private void collectProjectChanges(ChangeCollector collector, Project project)
     {
         statusOf(project).ifPresentOrElse(
             status ->
-                changes.add(update(
-                        new AttributeValue(
-                            project,
-                            statusDefinition,
-                            status,
-                            WEIGHT
-                        ),
-                        AttributeValue.class
-                    )
+                collector.update(
+                    new AttributeValue(
+                        project,
+                        statusDefinition,
+                        status,
+                        WEIGHT
+                    ),
+                    AttributeValue.class
                 ), () ->
-                changes.add(delete(
-                        new AttributeValue(
-                            project,
-                            statusDefinition,
-                            null,
-                            WEIGHT
-                        ),
-                        AttributeValue.class
-                    )
+                collector.delete(
+                    new AttributeValue(
+                        project,
+                        statusDefinition,
+                        null,
+                        WEIGHT
+                    ),
+                    AttributeValue.class
                 )
         );
         leadOf(project).ifPresentOrElse(lead ->
-            changes.add(update(
-                    new AttributeValue(
-                        project,
-                        leadDefinition,
-                        lead,
-                        WEIGHT
-                    ),
-                    AttributeValue.class
-                )
+            collector.update(
+                new AttributeValue(
+                    project,
+                    leadDefinition,
+                    lead,
+                    WEIGHT
+                ),
+                AttributeValue.class
             ), () ->
-            changes.add(delete(
-                    new AttributeValue(
-                        project,
-                        leadDefinition,
-                        null,
-                        WEIGHT
-                    ),
-                    AttributeValue.class
-                )
+            collector.delete(
+                new AttributeValue(
+                    project,
+                    leadDefinition,
+                    null,
+                    WEIGHT
+                ),
+                AttributeValue.class
             )
         );
         journal.mostRecentMentionOf(project.name()).ifPresentOrElse(date ->
-            changes.add(update(
-                    new AttributeValue(
-                        project,
-                        lastModifiedDefinition,
-                        date,
-                        WEIGHT
-                    ),
-                    AttributeValue.class
-                )
+            collector.update(
+                new AttributeValue(
+                    project,
+                    lastModifiedDefinition,
+                    date,
+                    WEIGHT
+                ),
+                AttributeValue.class
             ), () ->
-            changes.add(delete(
-                    new AttributeValue(
-                        project,
-                        lastModifiedDefinition,
-                        null,
-                        WEIGHT
-                    ),
-                    AttributeValue.class
-                )
+            collector.delete(
+                new AttributeValue(
+                    project,
+                    lastModifiedDefinition,
+                    null,
+                    WEIGHT
+                ),
+                AttributeValue.class
             )
         );
     }
