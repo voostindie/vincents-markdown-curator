@@ -6,8 +6,11 @@
         </encoder>
     </appender>
     <logger name="io.methvin.watcher" level="warn"/>
+    <logger name="nl.ulso.curator" level="info"/>
+    <!--    <logger name="nl.ulso.curator.vault.FileSystemVault" level="trace"/>-->
+    <logger name="nl.ulso.vmc" level="info"/>
 
-    <root level="info">
+    <root level="trace">
         <appender-ref ref="stdout"/>
     </root>
 </configuration>
