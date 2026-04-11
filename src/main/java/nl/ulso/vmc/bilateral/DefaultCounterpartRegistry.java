@@ -8,6 +8,7 @@ import nl.ulso.curator.vault.*;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static java.util.Collections.unmodifiableCollection;
 import static nl.ulso.curator.change.Change.*;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.vmc.bilateral.Counterpart.CONTACTS_FOLDER;
@@ -113,7 +114,7 @@ final class DefaultCounterpartRegistry
     @Override
     public Collection<Counterpart> counterparts()
     {
-        return Collections.unmodifiableCollection(counterparts.values());
+        return unmodifiableCollection(counterparts.values());
     }
 
     private static class CounterpartFinder

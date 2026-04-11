@@ -166,7 +166,7 @@ final class DefaultBilateralMeetingRegistry
     {
         var entries = new ArrayList<>(map.entrySet());
         entries.sort(Map.Entry.comparingByValue());
-        var result = new LinkedHashMap<Counterpart, LocalDate>();
+        var result = new LinkedHashMap<Counterpart, LocalDate>(map.size());
         for (var entry : entries)
         {
             result.put(entry.getKey(), entry.getValue());

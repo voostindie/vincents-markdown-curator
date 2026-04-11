@@ -90,7 +90,15 @@ final class BilateralMeetingQuery
         }
         if (date.isAfter(today))
         {
-            return "In " + DAYS.between(today, date) + " day(s)";
+            var days = DAYS.between(today, date);
+            if (days == 1)
+            {
+                return "Tomorrow";
+            }
+            else
+            {
+                return "In " + days + " days";
+            }
         }
         var builder = new StringBuilder();
         var days = DAYS.between(date, today);
@@ -124,10 +132,13 @@ final class BilateralMeetingQuery
         builder.append("Every ");
         if (weeks > 0)
         {
-            builder.append(weeks).append(" week");
-            if (weeks != 1)
+            if (weeks == 1)
             {
-                builder.append("s");
+                builder.append("week");
+            }
+            else
+            {
+                builder.append(weeks).append(" weeks");
             }
         }
         if (weeks > 0 && days > 0)
@@ -136,10 +147,13 @@ final class BilateralMeetingQuery
         }
         if (days > 0)
         {
-            builder.append(days).append(" day");
-            if (days != 1)
+            if (days == 1)
             {
-                builder.append("s");
+                builder.append("day");
+            }
+            else
+            {
+                builder.append(days).append(" days");
             }
         }
         return builder.toString();
