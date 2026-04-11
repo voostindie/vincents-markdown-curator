@@ -4,13 +4,14 @@ import dagger.*;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
-import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
+import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
+import nl.ulso.vmc.bilateral.BilateralMeetingModule;
 import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
@@ -22,8 +23,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
-import static nl.ulso.curator.VaultPaths.pathInUserHome;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
+import static nl.ulso.curator.VaultPaths.pathInUserHome;
 import static nl.ulso.vmc.graph.Shape.HEXAGON;
 import static nl.ulso.vmc.graph.Shape.RECTANGLE;
 import static nl.ulso.vmc.graph.Shape.STADIUM;
@@ -34,6 +35,7 @@ import static nl.ulso.vmc.graph.Shape.STADIUM;
     JournalModule.class,
     ProjectJournalModule.class,
     OmniFocusModule.class,
+    BilateralMeetingModule.class,
     MermaidGraphModule.class
 })
 abstract class RabobankNotesCuratorModule
@@ -41,7 +43,7 @@ abstract class RabobankNotesCuratorModule
     private static final String PROJECT_FOLDER = "Projects";
     private static final String MARKER_SUB_FOLDER = "Markers";
     private static final String JOURNAL_FOLDER = "Journal";
-    private static final String CONTACS_FOLDER = "Contacts";
+    private static final String CONTACTS_FOLDER = "Contacts";
     private static final String TEAMS_FOLDER = "Teams";
     private static final String ACTIVITIES_SECTION = "Activities";
 
@@ -80,10 +82,6 @@ abstract class RabobankNotesCuratorModule
     @IntoSet
     abstract Query bindArchitectureDecisionRecordsQuery(
         ArchitectureDecisionRecordsQuery architectureDecisionRecordsQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindOneOnOneQuery(OneOnOneQuery oneOnOneQuery);
 
     @Binds
     @IntoSet
@@ -143,7 +141,7 @@ abstract class RabobankNotesCuratorModule
     {
         return new MermaidGraphSettings(Set.of(
             new Type("project", PROJECT_FOLDER, RECTANGLE, projectNodeClassifier),
-            new Type("contact", CONTACS_FOLDER, STADIUM),
+            new Type("contact", CONTACTS_FOLDER, STADIUM),
             new Type("team", TEAMS_FOLDER, HEXAGON)
         ));
     }
