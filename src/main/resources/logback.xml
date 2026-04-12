@@ -9,7 +9,7 @@
     <logger name="nl.ulso" level="info"/>
     <logger name="nl.ulso.curator" level="debug"/>
     <!--    <logger name="nl.ulso.curator.vault.FileSystemVault" level="trace"/>-->
-    <logger name="nl.ulso.vmc" level="info"/>
+    <logger name="nl.ulso.vmc" level="debug"/>
 
     <root level="trace">
         <appender-ref ref="stdout"/>
