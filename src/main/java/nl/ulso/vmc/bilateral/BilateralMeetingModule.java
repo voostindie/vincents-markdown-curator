@@ -6,6 +6,7 @@ import dagger.multibindings.IntoSet;
 import nl.ulso.curator.addon.journal.Journal;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
+import nl.ulso.curator.statistics.MeasurementTracker;
 
 /// Module that tracks bilateral meetings with specific contacts - counterparts - in the journal.
 ///
@@ -36,4 +37,9 @@ public abstract class BilateralMeetingModule
     @Binds
     @IntoSet
     abstract Query bindBilateralMeetingQuery(BilateralMeetingQuery bilateralMeetingQuery);
+
+    @Binds
+    @IntoSet
+    abstract MeasurementTracker bindMeasurementTracker(
+        DefaultCounterpartRegistry counterpartRegistry);
 }

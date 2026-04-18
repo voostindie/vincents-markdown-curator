@@ -3,6 +3,8 @@ package nl.ulso.vmc.bilateral;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.*;
+import nl.ulso.curator.statistics.MeasurementCollector;
+import nl.ulso.curator.statistics.MeasurementTracker;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -16,7 +18,7 @@ import static nl.ulso.vmc.bilateral.Counterpart.CONTACTS_FOLDER;
 @Singleton
 final class DefaultCounterpartRegistry
     extends ChangeProcessorTemplate
-    implements CounterpartRegistry
+    implements CounterpartRegistry, MeasurementTracker
 {
     private final Vault vault;
     private final Map<String, Counterpart> counterparts;
@@ -115,6 +117,12 @@ final class DefaultCounterpartRegistry
     public Collection<Counterpart> counterparts()
     {
         return unmodifiableCollection(counterparts.values());
+    }
+
+    @Override
+    public void collectMeasurements(MeasurementCollector collector)
+    {
+        collector.total(Counterpart.class, counterparts.size());
     }
 
     private static class CounterpartFinder

@@ -7,7 +7,7 @@
     </appender>
     <logger name="io.methvin.watcher" level="warn"/>
     <logger name="nl.ulso" level="info"/>
-    <logger name="nl.ulso.curator" level="info"/>
+    <logger name="nl.ulso.curator" level="debug"/>
     <!--    <logger name="nl.ulso.curator.vault.FileSystemVault" level="trace"/>-->
     <logger name="nl.ulso.vmc" level="info"/>
 
