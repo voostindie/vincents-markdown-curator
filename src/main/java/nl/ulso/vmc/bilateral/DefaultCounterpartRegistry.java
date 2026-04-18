@@ -46,7 +46,7 @@ final class DefaultCounterpartRegistry
         return Set.of(
             newChangeHandler(isCreate().and(isCounterpart()), this::createCounterpart),
             newChangeHandler(isUpdate().and(isCounterpart()), this::updateCounterpart),
-            newChangeHandler(isUpdate().and(isCounterpart()), this::deleteCounterpart)
+            newChangeHandler(isDelete().and(isCounterpart()), this::deleteCounterpart)
         );
     }
 

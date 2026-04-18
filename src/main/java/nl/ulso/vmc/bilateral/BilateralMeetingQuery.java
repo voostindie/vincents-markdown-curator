@@ -18,6 +18,8 @@ import static nl.ulso.vmc.bilateral.BilateralMeetingRegistry.FALLBACK_NEVER;
 final class BilateralMeetingQuery
     implements Query
 {
+    private static final String DUE_PREFIX = "<span style=\"color:orange\">";
+    private static final String DUE_POSTFIX = "</span>";
     private static final String OVERDUE_PREFIX = "<span style=\"color:red\">**";
     private static final String OVERDUE_POSTFIX = "**</span>";
     private static final String COLUMN_DATE = "Date";
@@ -29,7 +31,10 @@ final class BilateralMeetingQuery
     private final QueryResultFactory queryResultFactory;
 
     @Inject
-    BilateralMeetingQuery(BilateralMeetingRegistry bilateralMeetingRegistry, QueryResultFactory queryResultFactory)
+    BilateralMeetingQuery(
+        BilateralMeetingRegistry bilateralMeetingRegistry,
+        QueryResultFactory queryResultFactory
+    )
     {
         this.bilateralMeetingRegistry = bilateralMeetingRegistry;
         this.queryResultFactory = queryResultFactory;
@@ -106,10 +111,20 @@ final class BilateralMeetingQuery
         {
             builder.append(OVERDUE_PREFIX);
         }
+        else if (recurrenceInDays - days < 7)
+        {
+            builder.append(DUE_PREFIX);
+        }
         if (days < 7)
         {
-            var multiplier = days == 1 ? "" : "s";
-            builder.append(days).append(" day").append(multiplier).append(" ago");
+            if (days == 1)
+            {
+                builder.append("Yesterday");
+            }
+            else
+            {
+                builder.append(days).append(" days ago");
+            }
         }
         else
         {
@@ -120,6 +135,10 @@ final class BilateralMeetingQuery
         if (days > recurrenceInDays)
         {
             builder.append(OVERDUE_POSTFIX);
+        }
+        else if (recurrenceInDays - days < 7)
+        {
+            builder.append(DUE_POSTFIX);
         }
         return builder.toString();
     }

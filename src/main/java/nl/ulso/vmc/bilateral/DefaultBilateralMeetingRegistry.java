@@ -159,13 +159,15 @@ final class DefaultBilateralMeetingRegistry
         var result = new HashMap<Counterpart, LocalDate>(counterparts.size());
         counterparts.forEach(counterpart ->
             result.put(counterpart, meetings.get(counterpart.name()).last()));
-        return sortByDate(result);
+        return sortBilateralMeetings(result);
     }
 
-    public static Map<Counterpart, LocalDate> sortByDate(Map<Counterpart, LocalDate> map)
+    public static Map<Counterpart, LocalDate> sortBilateralMeetings(Map<Counterpart, LocalDate> map)
     {
         var entries = new ArrayList<>(map.entrySet());
-        entries.sort(Map.Entry.comparingByValue());
+        entries.sort(
+            Map.Entry.<Counterpart, LocalDate>comparingByValue()
+                .thenComparing(Map.Entry.comparingByKey()));
         var result = new LinkedHashMap<Counterpart, LocalDate>(map.size());
         for (var entry : entries)
         {
