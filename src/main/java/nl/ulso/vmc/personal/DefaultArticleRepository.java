@@ -2,91 +2,95 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.*;
-import nl.ulso.curator.vault.Vault;
+import nl.ulso.curator.change.DocumentBasedEntityRepository;
+import nl.ulso.curator.vault.*;
+import nl.ulso.date.LocalDates;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static nl.ulso.curator.change.Change.*;
-import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
+import static java.util.Comparator.naturalOrder;
+import static java.util.regex.Pattern.compile;
 
 @Singleton
 class DefaultArticleRepository
-    extends ChangeProcessorTemplate
+    extends DocumentBasedEntityRepository<String, Article>
     implements ArticleRepository
 {
-    static final Change<?> UPDATE =
-        update(new ArticleRepositoryUpdate(), ArticleRepositoryUpdate.class);
-
-    private final Set<Article> articles;
+    private static final String ARTICLES_FOLDER = "Articles";
+    private static final String CHANGELOG_SECTION = "Changelog";
+    private static final Pattern CHANGELOG_ENTRY_PATTERN =
+        compile("^- \\[\\[(\\d{4}-\\d{2}-\\d{2})]]: .*$");
 
     @Inject
     DefaultArticleRepository()
     {
-        articles = new HashSet<>();
     }
 
     @Override
-    public Set<Class<?>> consumedPayloadTypes()
+    protected Class<Article> entityClass()
     {
-        return Set.of(Vault.class, Article.class);
+        return Article.class;
     }
 
     @Override
-    public Set<Class<?>> producedPayloadTypes()
+    protected boolean isEntity(Document document)
     {
-        return Set.of(ArticleRepositoryUpdate.class);
+        return document.isInPath(ARTICLES_FOLDER);
     }
 
     @Override
-    protected Set<? extends ChangeHandler> createChangeHandlers()
+    protected Article createEntityFrom(Document document)
     {
-        return Set.of(
-           newChangeHandler(isPayloadType(Article.class).and(isCreate()), this::articleCreated),
-           newChangeHandler(isPayloadType(Article.class).and(isUpdate()), this::articleUpdated),
-           newChangeHandler(isPayloadType(Article.class).and(isDelete()), this::articleDeleted)
-        );
+        var dateFinder = new DateFinder();
+        document.accept(dateFinder);
+        return new Article(document.title(), dateFinder.date);
     }
 
     @Override
-    protected void reset(ChangeCollector collector)
+    protected String entityKeyFrom(Document document)
     {
-        if (!articles.isEmpty())
-        {
-            articles.clear();
-            collector.add(UPDATE);
-        }
-    }
-
-    private void articleCreated(Change<?> change, ChangeCollector collector)
-    {
-        articles.add(change.as(Article.class).value());
-        collector.add(UPDATE);
-    }
-
-    private void articleUpdated(Change<?> change, ChangeCollector collector)
-    {
-        articles.remove(change.as(Article.class).oldValue());
-        articles.add(change.as(Article.class).newValue());
-        collector.add(UPDATE);
-    }
-
-    private void articleDeleted(Change<?> change, ChangeCollector collector)
-    {
-        articles.remove(change.as(Article.class).value());
-        collector.add(UPDATE);
-    }
-
-    @Override
-    protected Collection<Change<?>> createChangeCollection()
-    {
-        return new HashSet<>(1);
+        return document.name();
     }
 
     @Override
     public Stream<Article> articles()
     {
-        return articles.stream();
+        return entities().stream();
+    }
+
+    private static class DateFinder
+        extends BreadthFirstVaultVisitor
+    {
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        private Optional<LocalDate> date;
+
+        @Override
+        public void visit(Section section)
+        {
+            if (section.level() == 2
+                && section.sortableTitle().contentEquals(CHANGELOG_SECTION)
+                && !section.fragments().isEmpty()
+                && section.fragments().getFirst() instanceof TextBlock textBlock)
+            {
+                textBlock.accept(this);
+            }
+        }
+
+        @Override
+        public void visit(TextBlock textBlock)
+        {
+            this.date = textBlock.markdown().trim().lines()
+                .map(CHANGELOG_ENTRY_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group(1))
+                .map(LocalDates::parseDateOrNull)
+                .filter(Objects::nonNull)
+                .max(naturalOrder());
+        }
     }
 }

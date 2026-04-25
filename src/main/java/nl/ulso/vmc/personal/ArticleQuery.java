@@ -7,7 +7,6 @@ import nl.ulso.curator.query.*;
 import java.util.*;
 
 import static java.util.Comparator.reverseOrder;
-import static nl.ulso.curator.change.Change.isPayloadType;
 
 public class ArticleQuery
     implements Query
@@ -43,7 +42,7 @@ public class ArticleQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changes().anyMatch(isPayloadType(ArticleRepositoryUpdate.class));
+        return changelog.changesFor(Article.class).findAny().isPresent();
     }
 
     @Override

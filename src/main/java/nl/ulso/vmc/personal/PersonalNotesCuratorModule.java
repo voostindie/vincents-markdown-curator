@@ -11,6 +11,7 @@ import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
+import nl.ulso.curator.statistics.MeasurementTracker;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
@@ -79,11 +80,12 @@ abstract class PersonalNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindArticleProducer(ArticleProducer articleProducer);
+    abstract ChangeProcessor bindArticleProcessor(DefaultArticleRepository articleRepository);
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindArticleRepositoryProcessor(DefaultArticleRepository articleRepository);
+    abstract MeasurementTracker bindArticleMeasurementTracker(
+        DefaultArticleRepository articleRepository);
 
     @Binds
     abstract ArticleRepository bindArticleRepository(DefaultArticleRepository articleRepository);
@@ -91,7 +93,6 @@ abstract class PersonalNotesCuratorModule
     @Binds
     @IntoSet
     abstract Query bindArticleQuery(ArticleQuery articleQuery);
-
 
     @Provides
     static JournalSettings provideJournalSettings()
