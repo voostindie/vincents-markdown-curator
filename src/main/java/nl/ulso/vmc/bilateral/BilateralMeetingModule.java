@@ -10,29 +10,29 @@ import nl.ulso.curator.statistics.MeasurementTracker;
 
 /// Module that tracks bilateral meetings with specific contacts - counterparts - in the journal.
 ///
-/// [Counterpart]s are contacts with a specific marking; see [CounterpartRegistry]. Bilateral
+/// [Counterpart]s are contacts with a specific marking; see [CounterpartRepository]. Bilateral
 /// meetings are meetings with [Counterpart]s in the [Journal] that are recognized by a special
-/// pattern; see [BilateralMeetingRegistry].
+/// pattern; see [BilateralMeetingRepository].
 @Module
 public abstract class BilateralMeetingModule
 {
     @Binds
     @IntoSet
     abstract ChangeProcessor bindCounterpartProcessor(
-        DefaultCounterpartRegistry counterpartRegistry);
+        DefaultCounterpartRepository counterpartRegistry);
 
     @Binds
     @IntoSet
     abstract ChangeProcessor bindBilateralMeetingProcessor(
-        DefaultBilateralMeetingRegistry bilateralMeetingRegistry);
+        DefaultBilateralMeetingRepository bilateralMeetingRegistry);
 
     @Binds
-    abstract CounterpartRegistry bindAttendeeRegistry(
-        DefaultCounterpartRegistry counterpartRegistry);
+    abstract CounterpartRepository bindAttendeeRegistry(
+        DefaultCounterpartRepository counterpartRegistry);
 
     @Binds
-    abstract BilateralMeetingRegistry bindBilateralMeetingRegistry(
-        DefaultBilateralMeetingRegistry bilateralMeetingRegistry);
+    abstract BilateralMeetingRepository bindBilateralMeetingRegistry(
+        DefaultBilateralMeetingRepository bilateralMeetingRegistry);
 
     @Binds
     @IntoSet
@@ -41,5 +41,5 @@ public abstract class BilateralMeetingModule
     @Binds
     @IntoSet
     abstract MeasurementTracker bindMeasurementTracker(
-        DefaultCounterpartRegistry counterpartRegistry);
+        DefaultCounterpartRepository counterpartRegistry);
 }

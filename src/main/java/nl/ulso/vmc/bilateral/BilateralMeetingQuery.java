@@ -12,7 +12,7 @@ import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.Collections.emptyMap;
-import static nl.ulso.vmc.bilateral.BilateralMeetingRegistry.FALLBACK_NEVER;
+import static nl.ulso.vmc.bilateral.BilateralMeetingRepository.FALLBACK_NEVER;
 
 @Singleton
 final class BilateralMeetingQuery
@@ -27,16 +27,16 @@ final class BilateralMeetingQuery
     private static final String COLUMN_WHEN = "When";
     private static final String COLUMN_RECURRENCE = "Recurrence";
 
-    private final BilateralMeetingRegistry bilateralMeetingRegistry;
+    private final BilateralMeetingRepository bilateralMeetingRepository;
     private final QueryResultFactory queryResultFactory;
 
     @Inject
     BilateralMeetingQuery(
-        BilateralMeetingRegistry bilateralMeetingRegistry,
+        BilateralMeetingRepository bilateralMeetingRepository,
         QueryResultFactory queryResultFactory
     )
     {
-        this.bilateralMeetingRegistry = bilateralMeetingRegistry;
+        this.bilateralMeetingRepository = bilateralMeetingRepository;
         this.queryResultFactory = queryResultFactory;
     }
 
@@ -67,7 +67,7 @@ final class BilateralMeetingQuery
     @Override
     public QueryResult run(QueryDefinition definition)
     {
-        var meetings = bilateralMeetingRegistry.resolveBilateralMeetings();
+        var meetings = bilateralMeetingRepository.resolveBilateralMeetings();
         var table = new ArrayList<Map<String, String>>(meetings.size());
         meetings.forEach((counterpart, date) ->
             table.add(Map.of(

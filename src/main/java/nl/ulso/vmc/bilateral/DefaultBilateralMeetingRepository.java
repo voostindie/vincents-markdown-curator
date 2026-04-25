@@ -19,18 +19,18 @@ import static nl.ulso.vmc.bilateral.BilateralRegistryUpdate.BILATERAL_REGISTRY_U
 /// A bilateral meeting is recognized if a line in the daily starts with [#BILATERAL_PREFIX] and
 /// that same line links to a counterpart.
 @Singleton
-final class DefaultBilateralMeetingRegistry
+final class DefaultBilateralMeetingRepository
     extends ChangeProcessorTemplate
-    implements BilateralMeetingRegistry
+    implements BilateralMeetingRepository
 {
-    private final CounterpartRegistry counterpartRegistry;
+    private final CounterpartRepository counterpartRepository;
     private final Journal journal;
     private final Map<String, SortedSet<LocalDate>> meetings;
 
     @Inject
-    DefaultBilateralMeetingRegistry(CounterpartRegistry counterpartRegistry, Journal journal)
+    DefaultBilateralMeetingRepository(CounterpartRepository counterpartRepository, Journal journal)
     {
-        this.counterpartRegistry = counterpartRegistry;
+        this.counterpartRepository = counterpartRepository;
         this.journal = journal;
         this.meetings = new HashMap<>();
     }
@@ -88,7 +88,7 @@ final class DefaultBilateralMeetingRegistry
     protected void reset(ChangeCollector collector)
     {
         meetings.clear();
-        counterpartRegistry.counterparts().forEach(counterpart ->
+        counterpartRepository.counterparts().forEach(counterpart ->
             counterpartCreated(create(counterpart, Counterpart.class), collector));
     }
 
@@ -122,7 +122,7 @@ final class DefaultBilateralMeetingRegistry
     private void dailyCreated(Change<?> change, ChangeCollector collector)
     {
         var daily = change.as(Daily.class).value();
-        counterpartRegistry.counterparts().forEach(counterpart ->
+        counterpartRepository.counterparts().forEach(counterpart ->
         {
             if (hasBilateralMeetingWith(counterpart, daily))
             {
@@ -155,7 +155,7 @@ final class DefaultBilateralMeetingRegistry
     @Override
     public Map<Counterpart, LocalDate> resolveBilateralMeetings()
     {
-        var counterparts = counterpartRegistry.counterparts();
+        var counterparts = counterpartRepository.counterparts();
         var result = new HashMap<Counterpart, LocalDate>(counterparts.size());
         counterparts.forEach(counterpart ->
             result.put(counterpart, meetings.get(counterpart.name()).last()));

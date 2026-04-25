@@ -3,7 +3,7 @@ package nl.ulso.vmc.bilateral;
 import java.time.LocalDate;
 import java.util.Map;
 
-public interface BilateralMeetingRegistry
+public interface BilateralMeetingRepository
 {
     String BILATERAL_PREFIX = "- 1-on-1 ";
 
