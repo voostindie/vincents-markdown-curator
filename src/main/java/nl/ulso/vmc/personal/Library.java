@@ -93,7 +93,7 @@ public class Library
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         authors.clear();
         books.forEach(

@@ -10,7 +10,10 @@ import nl.ulso.curator.vault.Vault;
 import java.time.LocalDate;
 import java.util.*;
 
-import static nl.ulso.curator.change.Change.*;
+import static nl.ulso.curator.change.Change.isCreate;
+import static nl.ulso.curator.change.Change.isDelete;
+import static nl.ulso.curator.change.Change.isPayloadType;
+import static nl.ulso.curator.change.Change.isUpdate;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 import static nl.ulso.vmc.bilateral.BilateralRegistryUpdate.BILATERAL_REGISTRY_UPDATE;
 
@@ -85,11 +88,11 @@ final class DefaultBilateralMeetingRepository
     }
 
     @Override
-    protected void reset(ChangeCollector collector)
+    protected void reset()
     {
         meetings.clear();
-        counterpartRepository.counterparts().forEach(counterpart ->
-            counterpartCreated(create(counterpart, Counterpart.class), collector));
+//        counterpartRepository.counterparts().forEach(counterpart ->
+//            counterpartCreated(create(counterpart, Counterpart.class), collector));
     }
 
     private void counterpartCreated(Change<?> change, ChangeCollector collector)

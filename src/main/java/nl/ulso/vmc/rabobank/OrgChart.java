@@ -41,7 +41,7 @@ public class OrgChart
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         orgUnits.clear();
         var teams = vault.folder(TEAMS_FOLDER).orElse(null);

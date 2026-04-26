@@ -2,7 +2,7 @@ package nl.ulso.vmc.personal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import nl.ulso.curator.change.DocumentBasedEntityRepository;
+import nl.ulso.curator.change.MapBasedEntityRepository;
 import nl.ulso.curator.vault.*;
 import nl.ulso.date.LocalDates;
 
@@ -18,7 +18,7 @@ import static java.util.regex.Pattern.compile;
 
 @Singleton
 class DefaultArticleRepository
-    extends DocumentBasedEntityRepository<String, Article>
+    extends MapBasedEntityRepository<Document, String, Article>
     implements ArticleRepository
 {
     private static final String ARTICLES_FOLDER = "Articles";
@@ -32,7 +32,13 @@ class DefaultArticleRepository
     }
 
     @Override
-    protected Class<Article> entityClass()
+    protected Class<Document> sourceEntityClass()
+    {
+        return Document.class;
+    }
+
+    @Override
+    protected Class<Article> targetEntityClass()
     {
         return Article.class;
     }
@@ -44,7 +50,7 @@ class DefaultArticleRepository
     }
 
     @Override
-    protected Article createEntityFrom(Document document)
+    protected Article createEntityFrom(String name, Document document)
     {
         var dateFinder = new DateFinder();
         document.accept(dateFinder);

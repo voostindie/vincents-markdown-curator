@@ -97,7 +97,7 @@ public class MermaidGraph
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         refreshSelectedMarkers();
         refreshNodes();
@@ -126,7 +126,7 @@ public class MermaidGraph
         {
             // This is a new node. It might refer to other nodes already, and other nodes
             // might refer to it. So, a full refresh is all we can do.
-            reset(collector);
+            //            reset();
         }
     }
 

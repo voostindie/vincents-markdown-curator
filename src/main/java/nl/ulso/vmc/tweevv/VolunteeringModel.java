@@ -70,7 +70,7 @@ public class VolunteeringModel
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         activities.clear();
         contacts.clear();

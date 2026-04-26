@@ -84,7 +84,7 @@ public final class TrainerModel
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         seasons.clear();
         vault.folder(MODEL_FOLDER).ifPresent(modelFolder -> {

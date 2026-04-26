@@ -74,7 +74,7 @@ public class GameCollection
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         games.forEach(
             (_, game) -> {
