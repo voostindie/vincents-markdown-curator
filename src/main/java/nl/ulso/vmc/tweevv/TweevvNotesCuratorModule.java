@@ -5,11 +5,11 @@ import dagger.Module;
 import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
-import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
+import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
@@ -21,8 +21,8 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Set;
 
-import static nl.ulso.curator.VaultPaths.pathInUserHome;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
+import static nl.ulso.curator.VaultPaths.pathInUserHome;
 
 @Module(includes = {
     CuratorModule.class,
@@ -54,7 +54,7 @@ abstract class TweevvNotesCuratorModule
     @Named(WATCH_DOCUMENT_KEY)
     static String watchDocument()
     {
-        return "README";
+        return "WATCHDOC";
     }
 
     @Binds

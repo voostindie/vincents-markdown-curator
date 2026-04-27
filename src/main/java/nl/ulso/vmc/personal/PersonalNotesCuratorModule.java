@@ -55,7 +55,7 @@ abstract class PersonalNotesCuratorModule
     @Named(WATCH_DOCUMENT_KEY)
     static String watchDocument()
     {
-        return "README";
+        return "WATCHDOC";
     }
 
     @Binds
