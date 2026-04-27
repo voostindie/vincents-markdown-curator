@@ -9,12 +9,13 @@ import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
-import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
-import nl.ulso.curator.statistics.MeasurementTracker;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
+import nl.ulso.vmc.personal.gaming.GamingModule;
+import nl.ulso.vmc.personal.reading.ReadingModule;
+import nl.ulso.vmc.personal.writing.WritingModule;
 import nl.ulso.vmc.projectjournal.ProjectJournalModule;
 
 import java.nio.file.Path;
@@ -30,7 +31,10 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     ProjectModule.class,
     JournalModule.class,
     ProjectJournalModule.class,
-    OmniFocusModule.class
+    OmniFocusModule.class,
+    WritingModule.class,
+    ReadingModule.class,
+    GamingModule.class
 })
 abstract class PersonalNotesCuratorModule
 {
@@ -60,39 +64,7 @@ abstract class PersonalNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindLibrary(Library library);
-
-    @Binds
-    @IntoSet
-    abstract Query bindReadingQuery(ReadingQuery readingQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindBooksQuery(BooksQuery booksQuery);
-
-    @Binds
-    @IntoSet
     abstract Query bindHooksQuery(HooksQuery HooksQuery);
-
-    @Binds
-    @IntoSet
-    abstract ChangeProcessor bindGameCollection(GameCollection gameCollection);
-
-    @Binds
-    @IntoSet
-    abstract ChangeProcessor bindArticleProcessor(DefaultArticleRepository articleRepository);
-
-    @Binds
-    @IntoSet
-    abstract MeasurementTracker bindArticleMeasurementTracker(
-        DefaultArticleRepository articleRepository);
-
-    @Binds
-    abstract ArticleRepository bindArticleRepository(DefaultArticleRepository articleRepository);
-
-    @Binds
-    @IntoSet
-    abstract Query bindArticleQuery(ArticleQuery articleQuery);
 
     @Provides
     static JournalSettings provideJournalSettings()

@@ -1,4 +1,4 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.writing;
 
 import jakarta.inject.Inject;
 import nl.ulso.curator.change.Changelog;
@@ -8,14 +8,14 @@ import java.util.*;
 
 import static java.util.Comparator.reverseOrder;
 
-public class ArticleQuery
+final class ArticleQuery
     implements Query
 {
     private final ArticleRepository articleRepository;
     private final QueryResultFactory queryResultFactory;
 
     @Inject
-    public ArticleQuery(ArticleRepository articleRepository, QueryResultFactory queryResultFactory)
+    ArticleQuery(ArticleRepository articleRepository, QueryResultFactory queryResultFactory)
     {
         this.articleRepository = articleRepository;
         this.queryResultFactory = queryResultFactory;

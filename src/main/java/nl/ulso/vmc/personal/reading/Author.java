@@ -1,4 +1,4 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.reading;
 
 import nl.ulso.curator.vault.Document;
 

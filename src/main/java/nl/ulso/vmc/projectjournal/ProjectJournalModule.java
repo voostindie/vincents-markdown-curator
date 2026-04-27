@@ -3,9 +3,10 @@ package nl.ulso.vmc.projectjournal;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.project.ProjectModule;
+import nl.ulso.curator.change.ChangeProcessor;
+import nl.ulso.curator.statistics.MeasurementTracker;
 
 /// Combines the Project and Journal modules by offering additional functionality to extract project
 /// attributes from the journal instead of from front matter.
@@ -18,6 +19,20 @@ import nl.ulso.curator.addon.project.ProjectModule;
 })
 public abstract class ProjectJournalModule
 {
+    @Binds
+    abstract ProjectMarkerRepository provideProjectMarkerRepository(
+        DefaultProjectMarkerRepository repository);
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor provideProjectMarkerProcessor(
+        DefaultProjectMarkerRepository repository);
+
+    @Binds
+    @IntoSet
+    abstract MeasurementTracker provideProjectMarkerMeasurements(
+        DefaultProjectMarkerRepository repository);
+
     @Binds
     @IntoSet
     abstract ChangeProcessor bindProjectJournal(ProjectJournal projectJournal);

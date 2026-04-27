@@ -6,6 +6,7 @@ import nl.ulso.curator.addon.journal.*;
 import nl.ulso.curator.addon.project.*;
 import nl.ulso.curator.change.*;
 import nl.ulso.curator.vault.Document;
+import nl.ulso.curator.vault.Vault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,7 @@ final class ProjectJournal
     private static final int WEIGHT = 100;
 
     private final Journal journal;
+    private final Vault vault;
     private final ProjectRepository projectRepository;
     private final AttributeDefinition leadDefinition;
     private final AttributeDefinition statusDefinition;
@@ -54,10 +56,11 @@ final class ProjectJournal
 
     @Inject
     ProjectJournal(
-        Journal journal, ProjectRepository projectRepository,
+        Journal journal, Vault vault, ProjectRepository projectRepository,
         Map<String, AttributeDefinition> attributeDefinitions)
     {
         this.journal = journal;
+        this.vault = vault;
         this.projectRepository = projectRepository;
         this.leadDefinition = attributeDefinitions.get(LEAD);
         this.statusDefinition = attributeDefinitions.get(STATUS);
@@ -113,7 +116,7 @@ final class ProjectJournal
     }
 
     @Override
-    public void reset(ChangeCollector collector)
+    public void reset()
     {
         this.projectStatuses.clear();
         this.statusMarkers.clear();
@@ -129,15 +132,15 @@ final class ProjectJournal
         {
             processJournal();
         }
-        projectRepository.projects()
-            .forEach(project -> collectProjectChanges(collector, project));
+//        projectRepository.projects()
+//            .forEach(project -> collectProjectChanges(collector, project));
     }
 
     private void processDailyUpdate(Change<?> change, ChangeCollector collector)
     {
 
         var oldDaily = change.as(Daily.class).oldValue();
-        LOGGER.debug("Processing journal entry '{}' for project attributes.", oldDaily.date());
+        LOGGER.trace("Processing journal entry '{}' for project attributes.", oldDaily.date());
         removeAttributesForDate(oldDaily.date(), projectStatuses);
         removeAttributesForDate(oldDaily.date(), projectLeads);
         var newDaily = change.as(Daily.class).newValue();
@@ -161,7 +164,7 @@ final class ProjectJournal
     {
 
         var daily = change.as(Daily.class).value();
-        LOGGER.debug("Processing journal entry '{}' for project attributes.", daily.date());
+        LOGGER.trace("Processing journal entry '{}' for project attributes.", daily.date());
         removeAttributesForDate(daily.date(), projectStatuses);
         removeAttributesForDate(daily.date(), projectLeads);
         for (Project project : projectRepository.projects())
@@ -308,7 +311,7 @@ final class ProjectJournal
     private void updateProjectAttributes(
         String projectName, Map<String, List<MarkedLine>> entries)
     {
-        LOGGER.debug("Extracting attributes of project '{}' from the journal.", projectName);
+        LOGGER.trace("Extracting attributes of project '{}' from the journal.", projectName);
         for (Map.Entry<String, List<MarkedLine>> entry : entries.entrySet())
         {
             var markedLines = entry.getValue();
@@ -384,7 +387,7 @@ final class ProjectJournal
     Optional<Document> leadOf(Project project)
     {
         return valueOf(project, projectLeads)
-            .flatMap(lead -> journal.vault().findDocument(lead));
+            .flatMap(vault::findDocument);
     }
 
     private <T> Optional<T> valueOf(

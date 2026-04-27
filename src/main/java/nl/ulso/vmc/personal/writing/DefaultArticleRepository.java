@@ -1,4 +1,4 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.writing;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -17,7 +17,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.regex.Pattern.compile;
 
 @Singleton
-class DefaultArticleRepository
+final class DefaultArticleRepository
     extends MapBasedEntityRepository<Document, String, Article>
     implements ArticleRepository
 {

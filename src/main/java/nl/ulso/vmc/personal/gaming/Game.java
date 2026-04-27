@@ -1,18 +1,20 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.gaming;
 
 import nl.ulso.curator.vault.Document;
 
 import java.util.Optional;
 
-public class Game
+public final class Game
 {
     private final Document document;
-    private Integer rating;
-    private String cover;
+    private final Integer rating;
+    private final String cover;
 
-    public Game(Document document)
+    Game(Document document, Integer rating, String cover)
     {
         this.document = document;
+        this.rating = rating;
+        this.cover = cover;
     }
 
     public Document document()
@@ -29,15 +31,4 @@ public class Game
     {
         return Optional.ofNullable(rating);
     }
-
-    void setCover(String cover)
-    {
-        this.cover = cover;
-    }
-
-    void setRating(Integer rating)
-    {
-        this.rating = rating;
-    }
 }
-

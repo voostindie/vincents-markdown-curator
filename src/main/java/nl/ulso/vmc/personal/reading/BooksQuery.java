@@ -1,10 +1,12 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.reading;
 
 import jakarta.inject.Inject;
 import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.query.*;
 
 import java.util.Map;
+
+import static nl.ulso.curator.change.Change.isPayloadType;
 
 public class BooksQuery
     implements Query
@@ -40,9 +42,8 @@ public class BooksQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changes().anyMatch(
-            library.isBookDocument().or(library.isAuthorDocument())
-        );
+        return changelog.changes()
+            .anyMatch(isPayloadType(Author.class).or(isPayloadType(Book.class)));
     }
 
     @Override

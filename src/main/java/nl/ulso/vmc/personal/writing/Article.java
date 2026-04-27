@@ -1,4 +1,4 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.writing;
 
 import java.time.LocalDate;
 import java.util.Objects;

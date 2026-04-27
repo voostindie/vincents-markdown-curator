@@ -1,4 +1,4 @@
-package nl.ulso.vmc.personal;
+package nl.ulso.vmc.personal.reading;
 
 import jakarta.inject.Inject;
 import nl.ulso.curator.change.Changelog;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
+import static nl.ulso.curator.change.Change.isPayloadType;
 
 public class ReadingQuery
     implements Query
@@ -44,9 +45,8 @@ public class ReadingQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changes().anyMatch(
-            library.isBookDocument().or(library.isAuthorDocument())
-        );
+        return changelog.changes()
+            .anyMatch(isPayloadType(Author.class).or(isPayloadType(Book.class)));
     }
 
     @Override
@@ -58,14 +58,13 @@ public class ReadingQuery
         {
             return resultFactory.error("No year specified");
         }
-        var sessions = library.readingFor(year);
-        var table = sessions.stream()
+        var table = library.readingFor(year).stream()
             .map(session -> Map.of(
                     "From", session.fromDate().toString(),
                     "To", session.toDate()
                         .map(LocalDate::toString).orElse(""),
                     "Title", session.book().document().link(),
-                    "Author(s)", session.book().authors().stream()
+                    "Author(s)", library.authorsFor(session.book()).stream()
                         .map(author -> author.document().link())
                         .collect(joining(", ")),
                     "Rating", session.book().rating()
