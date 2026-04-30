@@ -37,6 +37,10 @@ public abstract class ReadingModule
     abstract MeasurementTracker bindAuthorTracker(DefaultAuthorRepository tracker);
 
     @Binds
+    @IntoSet
+    abstract ChangeProcessor bookAuthorProcessor(BookAuthorProcessor processor);
+
+    @Binds
     abstract Library bindLibrary(DefaultLibrary library);
 
     @Binds

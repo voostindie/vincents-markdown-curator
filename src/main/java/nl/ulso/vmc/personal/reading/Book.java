@@ -18,4 +18,6 @@ public interface Book
     Optional<String> cover();
 
     Optional<Integer> rating();
+
+    boolean isReadIn(int year);
 }

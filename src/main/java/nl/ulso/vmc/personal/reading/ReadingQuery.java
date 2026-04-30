@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
-import static nl.ulso.curator.change.Change.isPayloadType;
 
 public class ReadingQuery
     implements Query
@@ -45,8 +44,13 @@ public class ReadingQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changes()
-            .anyMatch(isPayloadType(Author.class).or(isPayloadType(Book.class)));
+        var year = definition.configuration().integer("year", -1);
+        if (year == -1)
+        {
+            return false;
+        }
+        return changelog.changesFor(Book.class).anyMatch(change ->
+            change.as(Book.class).values().anyMatch(book -> book.isReadIn(year)));
     }
 
     @Override

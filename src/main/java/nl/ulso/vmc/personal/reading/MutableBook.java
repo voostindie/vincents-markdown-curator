@@ -77,4 +77,14 @@ final class MutableBook
     {
         return Optional.ofNullable(rating);
     }
+
+    @Override
+    public boolean isReadIn(int year)
+    {
+        return readingSessions().stream()
+            .anyMatch(session -> session.fromDate().getYear() <= year
+                                 && session.toDate().map(date -> date.getYear() >= year)
+                                     .orElse(true));
+
+    }
 }

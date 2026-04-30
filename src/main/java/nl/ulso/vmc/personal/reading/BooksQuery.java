@@ -43,7 +43,9 @@ public class BooksQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes()
-            .anyMatch(isPayloadType(Author.class).or(isPayloadType(Book.class)));
+            .anyMatch(isPayloadType(Author.class).and(change ->
+                change.as(Author.class).value().name().equals(definition.document().name())
+            ));
     }
 
     @Override
