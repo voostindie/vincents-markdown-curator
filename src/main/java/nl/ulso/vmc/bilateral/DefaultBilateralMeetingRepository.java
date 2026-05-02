@@ -91,8 +91,6 @@ final class DefaultBilateralMeetingRepository
     protected void reset()
     {
         meetings.clear();
-//        counterpartRepository.counterparts().forEach(counterpart ->
-//            counterpartCreated(create(counterpart, Counterpart.class), collector));
     }
 
     private void counterpartCreated(Change<?> change, ChangeCollector collector)
