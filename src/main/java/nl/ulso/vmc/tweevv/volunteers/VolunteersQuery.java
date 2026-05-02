@@ -1,4 +1,4 @@
-package nl.ulso.vmc.tweevv;
+package nl.ulso.vmc.tweevv.volunteers;
 
 import jakarta.inject.Inject;
 import nl.ulso.curator.change.Changelog;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 
-public class VolunteersQuery
+final class VolunteersQuery
     implements Query
 {
     private final VolunteeringModel model;

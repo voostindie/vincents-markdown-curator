@@ -16,6 +16,7 @@ import nl.ulso.vmc.omnifocus.OmniFocusModule;
 import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.projectjournal.ProjectJournalModule;
 import nl.ulso.vmc.tweevv.trainers.*;
+import nl.ulso.vmc.tweevv.volunteers.VolunteeringModule;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -29,7 +30,8 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     ProjectModule.class,
     JournalModule.class,
     ProjectJournalModule.class,
-    OmniFocusModule.class
+    OmniFocusModule.class,
+    VolunteeringModule.class
 })
 abstract class TweevvNotesCuratorModule
 {
@@ -59,23 +61,7 @@ abstract class TweevvNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindVolunteeringModel(VolunteeringModel volunteeringModel);
-
-    @Binds
-    @IntoSet
     abstract ChangeProcessor bindTrainerModel(TrainerModel trainerModel);
-
-    @Binds
-    @IntoSet
-    abstract Query bindVolunteersQuery(VolunteersQuery volunteersQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindRetiredVolunteersQuery(RetiredVolunteersQuery retiredVolunteersQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindGroupQuery(GroupQuery groupQuery);
 
     @Binds
     @IntoSet

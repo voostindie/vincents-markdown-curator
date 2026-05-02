@@ -1,4 +1,4 @@
-package nl.ulso.vmc.tweevv;
+package nl.ulso.vmc.tweevv.volunteers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -23,7 +23,7 @@ import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 
 /// TODO: rewrite this class using the new primitives, without a reset().
 @Singleton
-public class VolunteeringModel
+final class VolunteeringModel
     extends ChangeProcessorTemplate
 {
     private static final String TEAM_FOLDER = "Teams";

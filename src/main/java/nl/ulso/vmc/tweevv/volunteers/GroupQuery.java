@@ -1,4 +1,4 @@
-package nl.ulso.vmc.tweevv;
+package nl.ulso.vmc.tweevv.volunteers;
 
 import jakarta.inject.Inject;
 import nl.ulso.curator.change.Changelog;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 
-public class GroupQuery
+final class GroupQuery
     implements Query
 {
     private static final int JULY_SEASON_END = 7;
@@ -19,7 +19,7 @@ public class GroupQuery
     private final QueryResultFactory resultFactory;
 
     @Inject
-    public GroupQuery(VolunteeringModel model, QueryResultFactory resultFactory)
+    GroupQuery(VolunteeringModel model, QueryResultFactory resultFactory)
     {
         this.model = model;
         this.resultFactory = resultFactory;
