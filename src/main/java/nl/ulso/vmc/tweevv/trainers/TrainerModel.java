@@ -23,6 +23,7 @@ import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinkTarget
 ///
 /// The season-independent personal data for trainers is written back as property data, for easy
 /// consumption in Obsidian's Base core plugin, and other tools that can act on YAML front matter.
+/// TODO: rewrite this class using the new primitives, without a reset().
 @Singleton
 public final class TrainerModel
     extends ChangeProcessorTemplate

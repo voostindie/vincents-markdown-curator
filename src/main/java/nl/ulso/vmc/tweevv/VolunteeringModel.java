@@ -21,6 +21,7 @@ import static nl.ulso.curator.change.Change.Kind.UPDATE;
 import static nl.ulso.curator.change.Change.isPayloadType;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 
+/// TODO: rewrite this class using the new primitives, without a reset().
 @Singleton
 public class VolunteeringModel
     extends ChangeProcessorTemplate

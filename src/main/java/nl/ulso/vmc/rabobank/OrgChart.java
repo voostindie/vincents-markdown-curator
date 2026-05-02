@@ -15,6 +15,7 @@ import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toSet;
 import static nl.ulso.curator.change.Change.isPayloadType;
 
+/// TODO: rewrite this class using the new primitives, without a reset().
 @Singleton
 public class OrgChart
     extends ChangeProcessorTemplate

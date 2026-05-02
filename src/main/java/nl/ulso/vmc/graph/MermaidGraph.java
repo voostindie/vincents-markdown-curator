@@ -41,6 +41,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 ///
 /// Nodes that are in a subfolder of the type folder are considered to be archived. They are
 /// rendered differently.
+///
+/// TODO: rewrite this class using the new primitives, without a reset().
 @Singleton
 public class MermaidGraph
     extends ChangeProcessorTemplate
