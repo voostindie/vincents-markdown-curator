@@ -1,15 +1,14 @@
-<configuration>
+<configuration scan="true">
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%-8.8X{curator}] %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS}  %.-1level  %-8.8X{curator}  %msg%n</pattern>
         </encoder>
     </appender>
     <logger name="io.methvin.watcher" level="warn"/>
     <logger name="nl.ulso" level="info"/>
     <logger name="nl.ulso.curator" level="debug"/>
-    <!--    <logger name="nl.ulso.curator.vault.FileSystemVault" level="trace"/>-->
-    <logger name="nl.ulso.vmc" level="debug"/>
+    <logger name="nl.ulso.vmc" level="info"/>
 
     <root level="trace">
         <appender-ref ref="stdout"/>

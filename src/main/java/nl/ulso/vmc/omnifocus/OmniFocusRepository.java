@@ -134,7 +134,7 @@ public final class OmniFocusRepository
         {
             result = cache.get();
         }
-        LOGGER.info("Fetched {} projects from OmniFocus.", result.size());
+        LOGGER.debug("Fetched {} projects from OmniFocus.", result.size());
     }
 
     public Collection<OmniFocusProject> projects()
