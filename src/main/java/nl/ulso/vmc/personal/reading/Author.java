@@ -13,4 +13,10 @@ public record Author(Document document)
     {
         return document.link();
     }
+
+    @Override
+    public String toString()
+    {
+        return name();
+    }
 }

@@ -24,6 +24,6 @@ record OmniFocusUpdate()
     @Override
     public String toString()
     {
-        return "OmniFocus";
+        return ".";
     }
 }

@@ -87,4 +87,10 @@ final class MutableBook
                                      .orElse(true));
 
     }
+
+    @Override
+    public String toString()
+    {
+        return name();
+    }
 }

@@ -31,4 +31,10 @@ public final class Game
     {
         return Optional.ofNullable(rating);
     }
+
+    @Override
+    public String toString()
+    {
+        return document.name();
+    }
 }
