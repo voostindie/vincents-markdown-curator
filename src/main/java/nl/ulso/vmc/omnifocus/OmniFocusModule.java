@@ -11,12 +11,9 @@ import nl.ulso.curator.query.Query;
 import nl.ulso.jxa.JavaScriptForAutomationModule;
 
 import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.newAttributeDefinition;
-import static nl.ulso.vmc.omnifocus.OmniFocusAttributeProducer.OMNIFOCUS_URL_ATTRIBUTE;
+import static nl.ulso.vmc.omnifocus.OmniFocusProjectAttributeValueProducer.OMNIFOCUS_URL_ATTRIBUTE;
 
-@Module(includes = {
-    JavaScriptForAutomationModule.class,
-    ProjectModule.class
-})
+@Module(includes = {JavaScriptForAutomationModule.class, ProjectModule.class})
 public abstract class OmniFocusModule
 {
     @Binds
@@ -37,7 +34,8 @@ public abstract class OmniFocusModule
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindOmniFocusAttributeProducer(OmniFocusAttributeProducer producer);
+    abstract ChangeProcessor bindOmniFocusAttributeProducer(
+        OmniFocusProjectAttributeValueProducer producer);
 
     @Binds
     @IntoSet

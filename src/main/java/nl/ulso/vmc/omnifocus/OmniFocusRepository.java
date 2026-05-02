@@ -43,8 +43,8 @@ public final class OmniFocusRepository
     private static final int REFRESH_DELAY_MINUTES = 5;
 
     /// Because fetching projects from OmniFocus is a scheduled activity, it might run in parallel
-    /// with access in the [OmniFocusAttributeProducer]. In practice this can't happen as the access
-    /// from the [OmniFocusAttributeProducer] always comes after the refresh; synchronization is
+    /// with access in the [OmniFocusProjectAttributeValueProducer]. In practice this can't happen as the access
+    /// from the [OmniFocusProjectAttributeValueProducer] always comes after the refresh; synchronization is
     /// done through the [OmniFocusUpdate] change object: this registry creates that object. No
     /// refresh, no object, no access. However, it's better to be safe than sorry.
     private final AtomicReference<Map<String, OmniFocusProject>> cache;

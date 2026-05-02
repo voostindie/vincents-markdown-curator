@@ -8,6 +8,7 @@ import nl.ulso.curator.change.*;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
 import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.PRIORITY;
 import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.STATUS;
 import static nl.ulso.curator.change.Change.isDelete;
@@ -23,7 +24,7 @@ import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
 /// - Priority of the project in OmniFocus
 /// - Status of the project in OmniFocus, but only if the project is "on hold".
 @Singleton
-final class OmniFocusAttributeProducer
+final class OmniFocusProjectAttributeValueProducer
     extends ChangeProcessorTemplate
 {
     static final String OMNIFOCUS_URL_ATTRIBUTE = "omnifocus";
@@ -37,15 +38,15 @@ final class OmniFocusAttributeProducer
     private final OmniFocusMessages messages;
 
     @Inject
-    OmniFocusAttributeProducer(
+    OmniFocusProjectAttributeValueProducer(
         Map<String, ProjectAttributeDefinition> attributeDefinitions,
         ProjectRepository projectRepository,
         OmniFocusRepository omniFocusRepository,
         OmniFocusMessages messages)
     {
-        this.urlAttribute = attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE);
-        this.statusAttribute = attributeDefinitions.get(STATUS);
-        this.priorityAttribute = attributeDefinitions.get(PRIORITY);
+        this.urlAttribute = requireNonNull(attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE));
+        this.statusAttribute = requireNonNull(attributeDefinitions.get(STATUS));
+        this.priorityAttribute = requireNonNull(attributeDefinitions.get(PRIORITY));
         this.projectRepository = projectRepository;
         this.omniFocusRepository = omniFocusRepository;
         this.messages = messages;

@@ -11,7 +11,7 @@ import static nl.ulso.curator.change.Change.update;
 /// is detected. This repository is not a [ChangeProcessor] however, instead it runs autonomously on
 /// its own scheduled thread.
 ///
-/// The [OmniFocusAttributeProducer] triggers on changes of this type and produces attribute values
+/// The [OmniFocusProjectAttributeValueProducer] triggers on changes of this type and produces attribute values
 /// for all available projects.
 ///
 /// The [OmniFocusInitializer] ensures the projects are loaded from OmniFocus at applications
