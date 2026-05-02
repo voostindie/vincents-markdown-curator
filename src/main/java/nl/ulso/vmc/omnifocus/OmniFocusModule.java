@@ -4,13 +4,13 @@ import dagger.*;
 import dagger.Module;
 import dagger.multibindings.*;
 import jakarta.inject.Singleton;
-import nl.ulso.jxa.JavaScriptForAutomationModule;
-import nl.ulso.curator.change.ChangeProcessor;
-import nl.ulso.curator.addon.project.AttributeDefinition;
+import nl.ulso.curator.addon.project.ProjectAttributeDefinition;
 import nl.ulso.curator.addon.project.ProjectModule;
+import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
+import nl.ulso.jxa.JavaScriptForAutomationModule;
 
-import static nl.ulso.curator.addon.project.AttributeDefinition.newAttributeDefinition;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.newAttributeDefinition;
 import static nl.ulso.vmc.omnifocus.OmniFocusAttributeProducer.OMNIFOCUS_URL_ATTRIBUTE;
 
 @Module(includes = {
@@ -26,7 +26,7 @@ public abstract class OmniFocusModule
     @Singleton
     @IntoMap
     @StringKey(OMNIFOCUS_URL_ATTRIBUTE)
-    static AttributeDefinition provideOmniFocusUrl()
+    static ProjectAttributeDefinition provideOmniFocusUrl()
     {
         return newAttributeDefinition(String.class, "omnifocus");
     }

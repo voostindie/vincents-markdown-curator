@@ -8,8 +8,8 @@ import nl.ulso.curator.change.*;
 import java.util.Map;
 import java.util.Set;
 
-import static nl.ulso.curator.addon.project.AttributeDefinition.PRIORITY;
-import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.PRIORITY;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.STATUS;
 import static nl.ulso.curator.change.Change.isDelete;
 import static nl.ulso.curator.change.Change.isPayloadType;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
@@ -29,16 +29,16 @@ final class OmniFocusAttributeProducer
     static final String OMNIFOCUS_URL_ATTRIBUTE = "omnifocus";
     private static final int WEIGHT = 200;
 
-    private final AttributeDefinition urlAttribute;
-    private final AttributeDefinition statusAttribute;
-    private final AttributeDefinition priorityAttribute;
+    private final ProjectAttributeDefinition urlAttribute;
+    private final ProjectAttributeDefinition statusAttribute;
+    private final ProjectAttributeDefinition priorityAttribute;
     private final ProjectRepository projectRepository;
     private final OmniFocusRepository omniFocusRepository;
     private final OmniFocusMessages messages;
 
     @Inject
     OmniFocusAttributeProducer(
-        Map<String, AttributeDefinition> attributeDefinitions,
+        Map<String, ProjectAttributeDefinition> attributeDefinitions,
         ProjectRepository projectRepository,
         OmniFocusRepository omniFocusRepository,
         OmniFocusMessages messages)
@@ -75,7 +75,7 @@ final class OmniFocusAttributeProducer
     @Override
     public Set<Class<?>> producedPayloadTypes()
     {
-        return Set.of(AttributeValue.class);
+        return Set.of(ProjectAttributeValue.class);
     }
 
     @Override
@@ -117,26 +117,26 @@ final class OmniFocusAttributeProducer
         Project project, OmniFocusProject omniFocusProject, ChangeCollector collector)
     {
         collector.create(
-            new AttributeValue(
+            new ProjectAttributeValue(
                 project,
                 urlAttribute,
                 omniFocusProject.link(),
                 WEIGHT
             ),
-            AttributeValue.class
+            ProjectAttributeValue.class
         );
     }
 
     private void deleteUrl(Project project, ChangeCollector collector)
     {
         collector.delete(
-            new AttributeValue(
+            new ProjectAttributeValue(
                 project,
                 urlAttribute,
                 null,
                 WEIGHT
             ),
-            AttributeValue.class
+            ProjectAttributeValue.class
         );
     }
 
@@ -144,52 +144,52 @@ final class OmniFocusAttributeProducer
         Project project, OmniFocusProject omniFocusProject, ChangeCollector collector)
     {
         collector.create(
-            new AttributeValue(
+            new ProjectAttributeValue(
                 project,
                 priorityAttribute,
                 omniFocusProject.priority(),
                 WEIGHT
             ),
-            AttributeValue.class
+            ProjectAttributeValue.class
         );
     }
 
     private void deletePriority(Project project, ChangeCollector collector)
     {
         collector.delete(
-            new AttributeValue(
+            new ProjectAttributeValue(
                 project,
                 priorityAttribute,
                 null,
                 WEIGHT
             ),
-            AttributeValue.class
+            ProjectAttributeValue.class
         );
     }
 
     private void createStatus(Project project, ChangeCollector collector)
     {
         collector.create(
-            new AttributeValue(
+            new ProjectAttributeValue(
                 project,
                 statusAttribute,
                 messages.projectOnHold(),
                 WEIGHT
             ),
-            AttributeValue.class
+            ProjectAttributeValue.class
         );
     }
 
     private void deleteStatus(Project project, ChangeCollector collector)
     {
         collector.delete(
-            new AttributeValue(
+            new ProjectAttributeValue(
                 project,
                 statusAttribute,
                 null,
                 WEIGHT
             ),
-            AttributeValue.class
+            ProjectAttributeValue.class
         );
     }
 }

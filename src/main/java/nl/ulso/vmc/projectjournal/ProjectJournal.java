@@ -14,9 +14,9 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.addon.project.AttributeDefinition.LAST_MODIFIED;
-import static nl.ulso.curator.addon.project.AttributeDefinition.LEAD;
-import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.LAST_MODIFIED;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.LEAD;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.STATUS;
 import static nl.ulso.curator.change.Change.isCreate;
 import static nl.ulso.curator.change.Change.isDelete;
 import static nl.ulso.curator.change.Change.isPayloadType;
@@ -26,7 +26,7 @@ import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinksFrom;
 
 /// Keeps track of project attributes - status, lead and last modification date - in the journal.
 ///
-/// TODO: clean up this code.
+/// TODO: rewrite this class using the new primitives, without a reset().
 @Singleton
 final class ProjectJournal
     extends ChangeProcessorTemplate
@@ -40,9 +40,9 @@ final class ProjectJournal
     private final Journal journal;
     private final Vault vault;
     private final ProjectRepository projectRepository;
-    private final AttributeDefinition leadDefinition;
-    private final AttributeDefinition statusDefinition;
-    private final AttributeDefinition lastModifiedDefinition;
+    private final ProjectAttributeDefinition leadDefinition;
+    private final ProjectAttributeDefinition statusDefinition;
+    private final ProjectAttributeDefinition lastModifiedDefinition;
 
     private final Map<String, NavigableMap<LocalDate, String>> projectStatuses;
     private final Set<String> statusMarkers;
@@ -57,7 +57,7 @@ final class ProjectJournal
     @Inject
     ProjectJournal(
         Journal journal, Vault vault, ProjectRepository projectRepository,
-        Map<String, AttributeDefinition> attributeDefinitions)
+        Map<String, ProjectAttributeDefinition> attributeDefinitions)
     {
         this.journal = journal;
         this.vault = vault;
@@ -106,7 +106,7 @@ final class ProjectJournal
     @Override
     public Set<Class<?>> producedPayloadTypes()
     {
-        return Set.of(AttributeValue.class);
+        return Set.of(ProjectAttributeValue.class);
     }
 
     @Override
@@ -203,62 +203,62 @@ final class ProjectJournal
         statusOf(project).ifPresentOrElse(
             status ->
                 collector.update(
-                    new AttributeValue(
+                    new ProjectAttributeValue(
                         project,
                         statusDefinition,
                         status,
                         WEIGHT
                     ),
-                    AttributeValue.class
+                    ProjectAttributeValue.class
                 ), () ->
                 collector.delete(
-                    new AttributeValue(
+                    new ProjectAttributeValue(
                         project,
                         statusDefinition,
                         null,
                         WEIGHT
                     ),
-                    AttributeValue.class
+                    ProjectAttributeValue.class
                 )
         );
         leadOf(project).ifPresentOrElse(lead ->
             collector.update(
-                new AttributeValue(
+                new ProjectAttributeValue(
                     project,
                     leadDefinition,
                     lead,
                     WEIGHT
                 ),
-                AttributeValue.class
+                ProjectAttributeValue.class
             ), () ->
             collector.delete(
-                new AttributeValue(
+                new ProjectAttributeValue(
                     project,
                     leadDefinition,
                     null,
                     WEIGHT
                 ),
-                AttributeValue.class
+                ProjectAttributeValue.class
             )
         );
         journal.mostRecentMentionOf(project.name()).ifPresentOrElse(date ->
             collector.update(
-                new AttributeValue(
+                new ProjectAttributeValue(
                     project,
                     lastModifiedDefinition,
                     date,
                     WEIGHT
                 ),
-                AttributeValue.class
+                ProjectAttributeValue.class
             ), () ->
             collector.delete(
-                new AttributeValue(
+                new ProjectAttributeValue(
                     project,
                     lastModifiedDefinition,
                     null,
                     WEIGHT
                 ),
-                AttributeValue.class
+                ProjectAttributeValue.class
             )
         );
     }

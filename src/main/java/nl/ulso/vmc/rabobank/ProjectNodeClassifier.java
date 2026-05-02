@@ -9,20 +9,20 @@ import nl.ulso.vmc.graph.Node;
 
 import java.util.*;
 
-import static nl.ulso.curator.addon.project.AttributeDefinition.STATUS;
+import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.STATUS;
 
 @Singleton
 public class ProjectNodeClassifier
     extends DefaultNodeClassifier
 {
     private final ProjectRepository projectRepository;
-    private final AttributeRegistry attributeRegistry;
+    private final ProjectAttributeRepository projectAttributeRepository;
 
     @Inject
-    ProjectNodeClassifier(ProjectRepository projectRepository,  AttributeRegistry attributeRegistry)
+    ProjectNodeClassifier(ProjectRepository projectRepository,  ProjectAttributeRepository projectAttributeRepository)
     {
         this.projectRepository = projectRepository;
-        this.attributeRegistry = attributeRegistry;
+        this.projectAttributeRepository = projectAttributeRepository;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ProjectNodeClassifier
         return super.classify(node).or(() -> {
             var project = projectFor(node.document());
             return project
-                .flatMap(p -> attributeRegistry.valueOf(p, STATUS))
+                .flatMap(p -> projectAttributeRepository.valueOf(p, STATUS))
                 .map(s -> (String) s)
                 .map(this::toMermaid)
                 .or(() -> Optional.of(toMermaid("unknown")));
