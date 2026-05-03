@@ -16,6 +16,12 @@ final class DefaultProjectMarkerRepository
     }
 
     @Override
+    public String toString()
+    {
+        return ProjectMarkerRepository.class.getSimpleName();
+    }
+
+    @Override
     protected Class<Marker> sourceEntityClass()
     {
         return Marker.class;

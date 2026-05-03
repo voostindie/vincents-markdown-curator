@@ -285,6 +285,12 @@ public final class TrainerModel
         return seasons.get(seasonName);
     }
 
+    @Override
+    public String toString()
+    {
+        return TrainerModel.class.getSimpleName();
+    }
+
     private interface SeasonLineProcessor
     {
         void processSeasonLine(Season season, String text);

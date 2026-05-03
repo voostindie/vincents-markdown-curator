@@ -406,6 +406,12 @@ final class ProjectJournal
         return Optional.of(latest.getValue());
     }
 
+    @Override
+    public String toString()
+    {
+        return ProjectJournal.class.getSimpleName();
+    }
+
     private interface LineProcessor
     {
         String processLine(String line, String link, String alias);

@@ -37,6 +37,12 @@ final class OmniFocusProjectAttributeValueProducer
     private final OmniFocusRepository omniFocusRepository;
     private final OmniFocusMessages messages;
 
+    @Override
+    public String toString()
+    {
+        return OmniFocusProjectAttributeValueProducer.class.getSimpleName();
+    }
+
     @Inject
     OmniFocusProjectAttributeValueProducer(
         Map<String, ProjectAttributeDefinition> attributeDefinitions,

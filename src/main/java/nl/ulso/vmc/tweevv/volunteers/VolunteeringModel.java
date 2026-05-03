@@ -71,6 +71,12 @@ final class VolunteeringModel
     }
 
     @Override
+    public String toString()
+    {
+        return VolunteeringModel.class.getSimpleName();
+    }
+
+    @Override
     public void reset()
     {
         activities.clear();
