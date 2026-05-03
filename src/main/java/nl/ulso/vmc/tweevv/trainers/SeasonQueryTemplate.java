@@ -80,6 +80,8 @@ abstract class SeasonQueryTemplate
     /// @return The factor as a percentage, using the Dutch locale.
     protected String toPercentageString(BigDecimal factor)
     {
-        return NumberFormat.getPercentInstance(Locale.of(LANGUAGE)).format(factor.doubleValue());
+        var formatter = NumberFormat.getPercentInstance(Locale.of(LANGUAGE));
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(factor.doubleValue());
     }
 }

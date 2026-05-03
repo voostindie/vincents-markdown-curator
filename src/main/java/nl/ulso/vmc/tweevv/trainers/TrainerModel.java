@@ -54,8 +54,9 @@ public final class TrainerModel
     private static final Pattern MULTI_PRACTICE_PATTERN = Pattern.compile(
         "^\\[\\[.*]] (\\d+) keer per (\\d+) weken$");
     // Trainer: "[[Trainer]] [[Training group]]", "[[Trainer]] [[Training group]] (50%)"
+    // Trainer: "[[Trainer]] [[Training group]]", "[[Trainer]] [[Training group]] (12,50%)"
     private static final Pattern TRAINER_PATTERN = Pattern.compile(
-        "^(\\[\\[.*]]) (\\[\\[.*]])( \\((\\d+)%\\))?$");
+        "^(\\[\\[.*]]) (\\[\\[.*]])( \\((\\d+(,\\d{1,2})?)%\\))?$");
 
     private static final String IBAN_PROPERTY = "iban";
     private static final String EMAIL_PROPERTY = "email";
@@ -203,10 +204,10 @@ public final class TrainerModel
                                 extractInternalLinkTargetNamesFrom(matcher.group(2)).iterator().next();
                             var percentageString = matcher.group(4);
                             var percentage = percentageString != null
-                                             ? parseInt(percentageString)
-                                             : 100;
+                                             ? Double.parseDouble(percentageString.replace(',', '.'))
+                                             : 100.0;
                             season.addAssignment(document, trainingGroupName,
-                                BigDecimal.valueOf(((double) percentage) / 100)
+                                BigDecimal.valueOf(percentage / 100.0)
                             );
                         }
                     )
