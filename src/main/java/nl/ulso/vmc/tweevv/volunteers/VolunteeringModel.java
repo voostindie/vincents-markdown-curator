@@ -76,20 +76,20 @@ final class VolunteeringModel
         activities.clear();
         contacts.clear();
         volunteering.clear();
-        vault.folder(TEAM_FOLDER).ifPresent(folder ->
-        {
-            for (Document document : folder.documents())
-            {
-                addActivity(document);
-            }
-        });
-        vault.folder(CONTACT_FOLDER).ifPresent(folder ->
-        {
-            for (Document document : folder.documents())
-            {
-                addContact(document);
-            }
-        });
+//        vault.folder(TEAM_FOLDER).ifPresent(folder ->
+//        {
+//            for (Document document : folder.documents())
+//            {
+//                addActivity(document);
+//            }
+//        });
+//        vault.folder(CONTACT_FOLDER).ifPresent(folder ->
+//        {
+//            for (Document document : folder.documents())
+//            {
+//                addContact(document);
+//            }
+//        });
     }
 
     private void processTeamUpdate(Change<?> change, ChangeCollector collector)
@@ -276,19 +276,6 @@ final class VolunteeringModel
         }
     }
 
-    public record Contact(Document document)
-    {
-        public String name()
-        {
-            return document.name();
-        }
-
-        public String link()
-        {
-            return document.link();
-        }
-    }
-
     public record ContactActivity(Contact contact, Activity activity, String description)
     {
 
@@ -312,7 +299,7 @@ final class VolunteeringModel
 
         public void process()
         {
-            contact.document.accept(this);
+            contact.document().accept(this);
         }
 
         @Override

@@ -11,10 +11,6 @@ public abstract class VolunteeringModule
 {
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindVolunteeringModel(VolunteeringModel volunteeringModel);
-
-    @Binds
-    @IntoSet
     abstract Query bindVolunteersQuery(VolunteersQuery volunteersQuery);
 
     @Binds
@@ -25,5 +21,22 @@ public abstract class VolunteeringModule
     @IntoSet
     abstract Query bindGroupQuery(GroupQuery groupQuery);
 
+    // TODO: remove the code below
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor bindVolunteeringModel(VolunteeringModel volunteeringModel);
+
+    //    @Binds
+    //    @IntoSet
+    //    abstract ChangeProcessor bindContactProcessor(DefaultContactRepository processor);
+    //
+    //    @Binds
+    //    @IntoSet
+    //    abstract MeasurementTracker bindContactTracker(DefaultContactRepository tracker);
+    //
+    //    @Binds
+    //    abstract ContactRepository bindContactRepository(DefaultContactRepository repository);
+    //
 
 }
