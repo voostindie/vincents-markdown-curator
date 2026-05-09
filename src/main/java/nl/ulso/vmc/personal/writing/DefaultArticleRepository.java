@@ -32,6 +32,12 @@ final class DefaultArticleRepository
     }
 
     @Override
+    public String toString()
+    {
+        return ArticleRepository.class.getSimpleName();
+    }
+
+    @Override
     protected Class<Document> sourceEntityClass()
     {
         return Document.class;
@@ -97,6 +103,12 @@ final class DefaultArticleRepository
                 .map(LocalDates::parseDateOrNull)
                 .filter(Objects::nonNull)
                 .max(naturalOrder());
+        }
+
+        @Override
+        public String toString()
+        {
+            return ArticleRepository.class.getSimpleName();
         }
     }
 }

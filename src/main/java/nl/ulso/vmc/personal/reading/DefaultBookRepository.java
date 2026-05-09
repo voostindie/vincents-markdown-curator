@@ -28,6 +28,12 @@ final class DefaultBookRepository
     }
 
     @Override
+    public String toString()
+    {
+        return BookRepository.class.getSimpleName();
+    }
+
+    @Override
     protected Class<Document> sourceEntityClass()
     {
         return Document.class;

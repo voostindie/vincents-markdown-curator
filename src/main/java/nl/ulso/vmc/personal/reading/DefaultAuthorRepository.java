@@ -20,6 +20,12 @@ final class DefaultAuthorRepository
     }
 
     @Override
+    public String toString()
+    {
+        return AuthorRepository.class.getSimpleName();
+    }
+
+    @Override
     protected Class<Document> sourceEntityClass()
     {
         return Document.class;

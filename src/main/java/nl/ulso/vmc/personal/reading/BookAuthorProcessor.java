@@ -64,4 +64,10 @@ final class BookAuthorProcessor
             .map(Optional::get)
             .forEach(author -> collector.update(author, Author.class));
     }
+
+    @Override
+    public String toString()
+    {
+        return BookAuthorProcessor.class.getSimpleName();
+    }
 }

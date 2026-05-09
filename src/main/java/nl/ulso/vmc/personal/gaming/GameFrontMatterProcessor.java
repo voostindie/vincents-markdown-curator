@@ -50,4 +50,10 @@ final class GameFrontMatterProcessor
             () -> dictionary.removeProperty(COVER_PROPERTY)
         );
     }
+
+    @Override
+    public String toString()
+    {
+        return GameFrontMatterProcessor.class.getSimpleName();
+    }
 }

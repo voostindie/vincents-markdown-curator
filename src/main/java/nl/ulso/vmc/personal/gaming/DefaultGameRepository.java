@@ -22,6 +22,12 @@ final class DefaultGameRepository
     }
 
     @Override
+    public String toString()
+    {
+        return GameRepository.class.getSimpleName();
+    }
+
+    @Override
     protected Class<Document> sourceEntityClass()
     {
         return Document.class;
