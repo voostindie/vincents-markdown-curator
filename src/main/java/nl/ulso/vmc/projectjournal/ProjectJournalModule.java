@@ -9,10 +9,10 @@ import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.statistics.MeasurementTracker;
 
 /// Combines the Project and Journal modules by offering additional functionality to extract project
-/// attributes from the journal instead of from front matter.
+/// attributes from the journal.
 ///
-/// This module overrides the default resolvers for the project lead, status and last modification
-/// date.
+/// This module overrides the default resolvers for the project lead, status, and last modification
+/// date by providing implementations with greater weights.
 @Module(includes = {
     JournalModule.class,
     ProjectModule.class
@@ -20,20 +20,54 @@ import nl.ulso.curator.statistics.MeasurementTracker;
 public abstract class ProjectJournalModule
 {
     @Binds
-    abstract ProjectMarkerRepository provideProjectMarkerRepository(
-        DefaultProjectMarkerRepository repository);
+    @IntoSet
+    abstract ChangeProcessor bindProjectLeadMarkerProcessor(
+        ProjectLeadMarkerRepository
+            processor);
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor provideProjectMarkerProcessor(
-        DefaultProjectMarkerRepository repository);
+    abstract MeasurementTracker bindProjectLeadMarkerTracker(
+        ProjectLeadMarkerRepository
+            tracker);
 
     @Binds
     @IntoSet
-    abstract MeasurementTracker provideProjectMarkerMeasurements(
-        DefaultProjectMarkerRepository repository);
+    abstract ChangeProcessor bindLeadProjectAttributeValueProducer(
+        ProjectLeadAttributeValueProducer producer);
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindProjectJournal(ProjectJournal projectJournal);
+    abstract MeasurementTracker bindLeadProjectAttributeValueTracker(
+        ProjectLeadAttributeValueProducer producer);
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor bindProjectStatusMarkerProcessor(
+        ProjectStatusMarkerRepository processor);
+
+    @Binds
+    @IntoSet
+    abstract MeasurementTracker bindProjectStatusMarkerTracker(
+        ProjectStatusMarkerRepository tracker);
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor bindStatusProjectAttributeValueProducer(
+        ProjectStatusAttributeValueProducer producer);
+
+    @Binds
+    @IntoSet
+    abstract MeasurementTracker bindStatusProjectAttributeValueTracker(
+        ProjectStatusAttributeValueProducer producer);
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor bindLastModifiedProjectAttributeValueProducer(
+        ProjectLastModifiedAttributeValueProducer producer);
+
+    @Binds
+    @IntoSet
+    abstract MeasurementTracker bindLastModifiedProjectAttributeValueTracker(
+        ProjectLastModifiedAttributeValueProducer producer);
 }
