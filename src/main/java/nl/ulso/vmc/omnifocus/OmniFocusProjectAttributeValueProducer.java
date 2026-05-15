@@ -5,8 +5,7 @@ import jakarta.inject.Singleton;
 import nl.ulso.curator.addon.project.*;
 import nl.ulso.curator.change.*;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.PRIORITY;
@@ -59,9 +58,9 @@ final class OmniFocusProjectAttributeValueProducer
     }
 
     @Override
-    protected Set<? extends ChangeHandler> createChangeHandlers()
+    protected List<? extends ChangeHandler> createChangeHandlers()
     {
-        return Set.of(
+        return List.of(
             newChangeHandler(
                 isPayloadType(OmniFocusUpdate.class),
                 this::processOmniFocusProjects

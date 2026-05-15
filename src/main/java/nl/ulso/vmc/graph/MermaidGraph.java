@@ -68,9 +68,9 @@ public class MermaidGraph
     }
 
     @Override
-    protected Set<? extends ChangeHandler> createChangeHandlers()
+    protected List<? extends ChangeHandler> createChangeHandlers()
     {
-        return Set.of(
+        return List.of(
             newChangeHandler(isPayloadType(Daily.class), this::processDailyUpdate),
             newChangeHandler(isNodeEntry(), this::processNodeUpdate)
         );

@@ -28,7 +28,7 @@ final class DefaultBookRepository
     }
 
     @Override
-    public String toString()
+    public String name()
     {
         return BookRepository.class.getSimpleName();
     }

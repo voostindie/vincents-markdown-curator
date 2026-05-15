@@ -49,10 +49,4 @@ public class OmniFocusInitializer
         }
         return emptyChangelog();
     }
-
-    @Override
-    public String toString()
-    {
-        return OmniFocusInitializer.class.getSimpleName();
-    }
 }

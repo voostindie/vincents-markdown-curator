@@ -32,7 +32,7 @@ final class DefaultArticleRepository
     }
 
     @Override
-    public String toString()
+    public String name()
     {
         return ArticleRepository.class.getSimpleName();
     }

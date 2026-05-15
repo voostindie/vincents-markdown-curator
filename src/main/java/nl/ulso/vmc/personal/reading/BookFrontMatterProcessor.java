@@ -58,10 +58,4 @@ final class BookFrontMatterProcessor
             dictionary.setProperty("authors", authors);
         }
     }
-
-    @Override
-    public String toString()
-    {
-        return BookFrontMatterProcessor.class.getSimpleName();
-    }
 }

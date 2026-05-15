@@ -20,7 +20,7 @@ final class DefaultAuthorRepository
     }
 
     @Override
-    public String toString()
+    public String name()
     {
         return AuthorRepository.class.getSimpleName();
     }

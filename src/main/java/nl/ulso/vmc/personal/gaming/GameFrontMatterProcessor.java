@@ -52,7 +52,7 @@ final class GameFrontMatterProcessor
     }
 
     @Override
-    public String toString()
+    public String name()
     {
         return GameFrontMatterProcessor.class.getSimpleName();
     }

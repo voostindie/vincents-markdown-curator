@@ -1,4 +1,4 @@
-<configuration scan="true">
+<configuration>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -8,7 +8,10 @@
     <logger name="io.methvin.watcher" level="warn"/>
     <logger name="nl.ulso" level="info"/>
     <logger name="nl.ulso.curator" level="debug"/>
-    <logger name="nl.ulso.vmc" level="debug"/>
+<!--    <logger name="nl.ulso.curator.change.DefaultChangeCollector" level="trace"/>-->
+<!--    <logger name="nl.ulso.curator.addon.project.ProjectAttributeValueFrontMatterWriter" level="trace"/>-->
+    <logger name="nl.ulso.vmc" level="info"/>
+<!--    <logger name="nl.ulso.vmc.projectjournal.ProjectJournalAttributeValueProducer" level="trace"/>-->
 
     <root level="trace">
         <appender-ref ref="stdout"/>

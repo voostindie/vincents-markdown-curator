@@ -44,9 +44,9 @@ final class VolunteeringModel
     }
 
     @Override
-    protected Set<? extends ChangeHandler> createChangeHandlers()
+    protected List<? extends ChangeHandler> createChangeHandlers()
     {
-        return Set.of(
+        return List.of(
             newChangeHandler(isTeamDocument(), this::processTeamUpdate),
             newChangeHandler(isContactDocument(), this::processContactUpdate)
         );
@@ -71,31 +71,25 @@ final class VolunteeringModel
     }
 
     @Override
-    public String toString()
-    {
-        return VolunteeringModel.class.getSimpleName();
-    }
-
-    @Override
     public void reset()
     {
         activities.clear();
         contacts.clear();
         volunteering.clear();
-//        vault.folder(TEAM_FOLDER).ifPresent(folder ->
-//        {
-//            for (Document document : folder.documents())
-//            {
-//                addActivity(document);
-//            }
-//        });
-//        vault.folder(CONTACT_FOLDER).ifPresent(folder ->
-//        {
-//            for (Document document : folder.documents())
-//            {
-//                addContact(document);
-//            }
-//        });
+        //        vault.folder(TEAM_FOLDER).ifPresent(folder ->
+        //        {
+        //            for (Document document : folder.documents())
+        //            {
+        //                addActivity(document);
+        //            }
+        //        });
+        //        vault.folder(CONTACT_FOLDER).ifPresent(folder ->
+        //        {
+        //            for (Document document : folder.documents())
+        //            {
+        //                addContact(document);
+        //            }
+        //        });
     }
 
     private void processTeamUpdate(Change<?> change, ChangeCollector collector)

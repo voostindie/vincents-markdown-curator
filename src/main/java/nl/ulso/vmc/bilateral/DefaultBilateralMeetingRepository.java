@@ -57,9 +57,9 @@ final class DefaultBilateralMeetingRepository
     }
 
     @Override
-    protected Set<? extends ChangeHandler> createChangeHandlers()
+    protected List<? extends ChangeHandler> createChangeHandlers()
     {
-        return Set.of(
+        return List.of(
             newChangeHandler(
                 isPayloadType(Counterpart.class).and(isCreate()),
                 this::counterpartCreated

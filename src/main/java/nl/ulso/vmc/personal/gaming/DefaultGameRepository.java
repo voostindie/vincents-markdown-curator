@@ -22,7 +22,7 @@ final class DefaultGameRepository
     }
 
     @Override
-    public String toString()
+    public String name()
     {
         return GameRepository.class.getSimpleName();
     }
