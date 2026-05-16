@@ -13,8 +13,7 @@ function run(argv) {
         return {
             id: id,
             name: names[i],
-            status: statuses[i],
-            priority: i++
+            status: statuses[i++],
         };
     });
     return JSON.stringify(items);

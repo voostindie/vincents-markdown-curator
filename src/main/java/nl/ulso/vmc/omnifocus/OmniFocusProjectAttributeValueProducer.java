@@ -4,57 +4,49 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.addon.project.*;
 import nl.ulso.curator.change.*;
+import nl.ulso.curator.statistics.MeasurementCollector;
+import nl.ulso.curator.statistics.MeasurementTracker;
 
 import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.PRIORITY;
-import static nl.ulso.curator.addon.project.ProjectAttributeDefinition.STATUS;
 import static nl.ulso.curator.change.Change.isDelete;
 import static nl.ulso.curator.change.Change.isPayloadType;
 import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
-import static nl.ulso.vmc.omnifocus.Status.ON_HOLD;
+import static nl.ulso.vmc.omnifocus.OmniFocusProject.NULL_PROJECT;
 
 /// Produces attribute values for projects from matching projects in OmniFocus.
 ///
-/// 3 attributes are produced:
+/// 2 attributes are produced:
 ///
-/// - URL to the OmniFocus project
 /// - Priority of the project in OmniFocus
-/// - Status of the project in OmniFocus, but only if the project is "on hold".
+/// - URL to the OmniFocus project
 @Singleton
 final class OmniFocusProjectAttributeValueProducer
     extends ChangeProcessorTemplate
+    implements MeasurementTracker
 {
     static final String OMNIFOCUS_URL_ATTRIBUTE = "omnifocus";
     private static final int WEIGHT = 200;
 
-    private final ProjectAttributeDefinition urlAttribute;
-    private final ProjectAttributeDefinition statusAttribute;
     private final ProjectAttributeDefinition priorityAttribute;
+    private final ProjectAttributeDefinition urlAttribute;
     private final ProjectRepository projectRepository;
-    private final OmniFocusRepository omniFocusRepository;
-    private final OmniFocusMessages messages;
-
-    @Override
-    public String toString()
-    {
-        return OmniFocusProjectAttributeValueProducer.class.getSimpleName();
-    }
+    private final DefaultOmniFocusRepository omniFocusRepository;
+    private final Set<String> knownProjectNames;
 
     @Inject
     OmniFocusProjectAttributeValueProducer(
         Map<String, ProjectAttributeDefinition> attributeDefinitions,
         ProjectRepository projectRepository,
-        OmniFocusRepository omniFocusRepository,
-        OmniFocusMessages messages)
+        DefaultOmniFocusRepository omniFocusRepository)
     {
-        this.urlAttribute = requireNonNull(attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE));
-        this.statusAttribute = requireNonNull(attributeDefinitions.get(STATUS));
         this.priorityAttribute = requireNonNull(attributeDefinitions.get(PRIORITY));
+        this.urlAttribute = requireNonNull(attributeDefinitions.get(OMNIFOCUS_URL_ATTRIBUTE));
         this.projectRepository = projectRepository;
         this.omniFocusRepository = omniFocusRepository;
-        this.messages = messages;
+        this.knownProjectNames = new HashSet<>();
     }
 
     @Override
@@ -63,11 +55,11 @@ final class OmniFocusProjectAttributeValueProducer
         return List.of(
             newChangeHandler(
                 isPayloadType(OmniFocusUpdate.class),
-                this::processOmniFocusProjects
+                this::omniFocusUpdated
             ),
             newChangeHandler(
                 isPayloadType(Project.class).and(isDelete()),
-                this::processProjectDelete
+                this::projectDeleted
             )
         );
     }
@@ -85,117 +77,98 @@ final class OmniFocusProjectAttributeValueProducer
     }
 
     @Override
-    protected boolean isResetRequired(Changelog changelog)
+    protected void reset()
     {
-        return false;
+        knownProjectNames.clear();
     }
 
-    private void processOmniFocusProjects(Change<?> change, ChangeCollector collector)
+    private void omniFocusUpdated(Change<?> change, ChangeCollector collector)
     {
-        omniFocusRepository.projects().forEach(omniFocusProject ->
-        {
-            var project = projectRepository.projectsByName().get(omniFocusProject.name());
-            if (project != null)
-            {
-                createUrl(project, omniFocusProject, collector);
-                createPriority(project, omniFocusProject, collector);
-                if (omniFocusProject.status() == ON_HOLD)
+        projectRepository.projects().forEach(project ->
+            omniFocusRepository.projectNamed(project.name()).ifPresentOrElse(
+                omniFocusProject ->
                 {
-                    createStatus(project, collector);
-                }
-                else
-                {
-                    deleteStatus(project, collector);
-                }
-            }
-        });
+                    if (knownProjectNames.contains(project.name()))
+                    {
+                        updateProjectAttributes(collector, project, omniFocusProject);
+                    }
+                    else
+                    {
+                        createProjectAttributes(collector, project, omniFocusProject);
+                    }
+                },
+                () -> deleteProjectAttributes(project, collector)
+            ));
     }
 
-    private void processProjectDelete(Change<?> change, ChangeCollector collector)
+    private void projectDeleted(Change<?> change, ChangeCollector collector)
     {
         var project = change.as(Project.class).value();
-        deleteUrl(project, collector);
-        deletePriority(project, collector);
-        deleteStatus(project, collector);
+        deleteProjectAttributes(project, collector);
     }
 
-    private void createUrl(
-        Project project, OmniFocusProject omniFocusProject, ChangeCollector collector)
+    private void createProjectAttributes(
+        ChangeCollector collector, Project project, OmniFocusProject omniFocusProject)
     {
+        knownProjectNames.add(project.name());
         collector.create(
-            new ProjectAttributeValue(
-                project,
-                urlAttribute,
-                omniFocusProject.link(),
-                WEIGHT
-            ),
+            priority(project, omniFocusProject),
             ProjectAttributeValue.class
         );
-    }
-
-    private void deleteUrl(Project project, ChangeCollector collector)
-    {
-        collector.delete(
-            new ProjectAttributeValue(
-                project,
-                urlAttribute,
-                null,
-                WEIGHT
-            ),
-            ProjectAttributeValue.class
-        );
-    }
-
-    private void createPriority(
-        Project project, OmniFocusProject omniFocusProject, ChangeCollector collector)
-    {
         collector.create(
-            new ProjectAttributeValue(
-                project,
-                priorityAttribute,
-                omniFocusProject.priority(),
-                WEIGHT
-            ),
+            url(project, omniFocusProject),
             ProjectAttributeValue.class
         );
     }
 
-    private void deletePriority(Project project, ChangeCollector collector)
+    private void updateProjectAttributes(
+        ChangeCollector collector, Project project, OmniFocusProject omniFocusProject)
     {
-        collector.delete(
-            new ProjectAttributeValue(
-                project,
-                priorityAttribute,
-                null,
-                WEIGHT
-            ),
+        collector.update(
+            priority(project, omniFocusProject),
+            ProjectAttributeValue.class
+        );
+        collector.update(
+            url(project, omniFocusProject),
             ProjectAttributeValue.class
         );
     }
 
-    private void createStatus(Project project, ChangeCollector collector)
+    private void deleteProjectAttributes(Project project, ChangeCollector collector)
     {
-        collector.create(
-            new ProjectAttributeValue(
-                project,
-                statusAttribute,
-                messages.projectOnHold(),
-                WEIGHT
-            ),
-            ProjectAttributeValue.class
+        if (knownProjectNames.contains(project.name()))
+        {
+            collector.delete(priority(project, NULL_PROJECT), ProjectAttributeValue.class);
+            collector.delete(url(project, NULL_PROJECT), ProjectAttributeValue.class);
+            knownProjectNames.remove(project.name());
+        }
+    }
+
+    private ProjectAttributeValue url(
+        Project project, OmniFocusProject omniFocusProject)
+    {
+        return new ProjectAttributeValue(
+            project,
+            urlAttribute,
+            omniFocusProject.link(),
+            WEIGHT
         );
     }
 
-    private void deleteStatus(Project project, ChangeCollector collector)
+    private ProjectAttributeValue priority(
+        Project project, OmniFocusProject omniFocusProject)
     {
-        collector.delete(
-            new ProjectAttributeValue(
-                project,
-                statusAttribute,
-                null,
-                WEIGHT
-            ),
-            ProjectAttributeValue.class
+        return new ProjectAttributeValue(
+            project,
+            priorityAttribute,
+            omniFocusProject.priority(),
+            WEIGHT
         );
+    }
+
+    @Override
+    public void collectMeasurements(MeasurementCollector collector)
+    {
+        collector.total(OmniFocusProject.class, knownProjectNames.size());
     }
 }

@@ -19,10 +19,10 @@ import static nl.ulso.curator.change.Changelog.emptyChangelog;
 public class OmniFocusInitializer
     implements ChangeProcessor
 {
-    private final OmniFocusRepository omniFocusRepository;
+    private final DefaultOmniFocusRepository omniFocusRepository;
 
     @Inject
-    public OmniFocusInitializer(OmniFocusRepository omniFocusRepository)
+    public OmniFocusInitializer(DefaultOmniFocusRepository omniFocusRepository)
     {
         this.omniFocusRepository = omniFocusRepository;
     }

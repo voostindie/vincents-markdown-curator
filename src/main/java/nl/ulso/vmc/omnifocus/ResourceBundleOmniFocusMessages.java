@@ -47,10 +47,4 @@ final class ResourceBundleOmniFocusMessages
     {
         return bundle.getString("createProjectInOmniFocus");
     }
-
-    @Override
-    public String projectOnHold()
-    {
-        return bundle.getString("projectOnHold");
-    }
 }

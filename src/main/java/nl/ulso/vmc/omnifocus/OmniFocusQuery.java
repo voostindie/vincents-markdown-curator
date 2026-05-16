@@ -1,9 +1,9 @@
 package nl.ulso.vmc.omnifocus;
 
 import jakarta.inject.Inject;
-import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.addon.project.Project;
 import nl.ulso.curator.addon.project.ProjectRepository;
+import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.query.*;
 import nl.ulso.curator.vault.Document;
 
@@ -15,8 +15,6 @@ import static java.lang.System.lineSeparator;
 import static java.net.URLEncoder.encode;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toSet;
-import static nl.ulso.curator.change.Change.isCreate;
-import static nl.ulso.curator.change.Change.isDelete;
 import static nl.ulso.curator.change.Change.isPayloadType;
 
 /// Reports on inconsistencies between OmniFocus and the projects in this vault.
@@ -62,8 +60,7 @@ public final class OmniFocusQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changes().anyMatch(
-            isPayloadType(Project.class).and(isCreate().or(isDelete()))
-                .or(isPayloadType(OmniFocusUpdate.class))
+            isPayloadType(Project.class).or(isPayloadType(OmniFocusUpdate.class))
         );
     }
 
@@ -80,7 +77,6 @@ public final class OmniFocusQuery
         var documentNames = projectRepository.projectsByName().keySet();
         var omniFocusProjects = omniFocusRepository.projects();
         return omniFocusProjects.stream()
-            .filter(project -> settings.includePredicate().test(project.name()))
             .filter(project -> !documentNames.contains(project.name()))
             .toList();
     }
