@@ -10,7 +10,7 @@
     <logger name="nl.ulso.curator" level="debug"/>
 <!--    <logger name="nl.ulso.curator.change.DefaultChangeCollector" level="trace"/>-->
 <!--    <logger name="nl.ulso.curator.addon.project.ProjectAttributeValueFrontMatterWriter" level="trace"/>-->
-    <logger name="nl.ulso.vmc" level="info"/>
+    <logger name="nl.ulso.vmc" level="debug"/>
 <!--    <logger name="nl.ulso.curator.addon.projectjournal.ProjectJournalAttributeValueProducer" level="trace"/>-->
 
     <root level="trace">

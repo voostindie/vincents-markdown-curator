@@ -11,6 +11,4 @@ public interface OmniFocusMessages
     String documentsWithoutProjectsTitle();
 
     String createProjectInOmniFocus();
-
-    String projectOnHold();
 }
