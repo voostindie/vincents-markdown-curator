@@ -3,7 +3,6 @@ package nl.ulso.vmc.graph;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
-import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
 
 /// Extracts a graph from the journal.
@@ -11,11 +10,15 @@ import nl.ulso.curator.query.Query;
 @Module
 public abstract class MermaidGraphModule
 {
-    @Binds
-    @IntoSet
-    abstract ChangeProcessor bindMermaidGraph(MermaidGraph mermaidGraph);
+//    @Binds
+//    @IntoSet
+//    abstract ChangeProcessor bindMermaidGraph(MermaidGraph mermaidGraph);
+//
+//    @Binds
+//    @IntoSet
+//    abstract Query bindMermaidGraphQuery(MermaidGraphQuery mermaidGraphQuery);
 
     @Binds
     @IntoSet
-    abstract Query bindMermaidGraphQuery(MermaidGraphQuery mermaidGraphQuery);
+    abstract Query bindMermaidGraphQuery(DisabledGraphQuery query);
 }

@@ -10,9 +10,10 @@ import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
-import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
 import nl.ulso.vmc.bilateral.BilateralMeetingModule;
+import nl.ulso.vmc.directory.DirectoryModule;
+import nl.ulso.vmc.directory.DirectorySettings;
 import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.omnifocus.OmniFocusModule;
@@ -36,6 +37,7 @@ import static nl.ulso.vmc.graph.Shape.STADIUM;
     ProjectJournalModule.class,
     OmniFocusModule.class,
     BilateralMeetingModule.class,
+    DirectoryModule.class,
     MermaidGraphModule.class
 })
 abstract class RabobankNotesCuratorModule
@@ -45,7 +47,9 @@ abstract class RabobankNotesCuratorModule
     private static final String JOURNAL_FOLDER = "Journal";
     private static final String CONTACTS_FOLDER = "Contacts";
     private static final String TEAMS_FOLDER = "Teams";
+    private static final String THIRD_PARTIES_FOLDER = "3rd Parties";
     private static final String ACTIVITIES_SECTION = "Activities";
+    private static final String CONTACTS_SECTION = "Contacts";
 
     @Provides
     static Path provideVaultPath()
@@ -68,10 +72,6 @@ abstract class RabobankNotesCuratorModule
 
     @Binds
     @IntoSet
-    abstract ChangeProcessor bindOrgChart(OrgChart orgChart);
-
-    @Binds
-    @IntoSet
     abstract Query bindArticlesQuery(ArticlesQuery articlesQuery);
 
     @Binds
@@ -82,18 +82,6 @@ abstract class RabobankNotesCuratorModule
     @IntoSet
     abstract Query bindArchitectureDecisionRecordsQuery(
         ArchitectureDecisionRecordsQuery architectureDecisionRecordsQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindSubteamsQuery(SubteamsQuery subteamsQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindRolesQuery(RolesQuery rolesQuery);
-
-    @Binds
-    @IntoSet
-    abstract Query bindChapterQuery(ChapterQuery chapterQuery);
 
     @Binds
     @IntoSet
@@ -128,6 +116,17 @@ abstract class RabobankNotesCuratorModule
                           "💼 Various",
                           "💬 Reminders"
                       ).contains(name)
+        );
+    }
+    
+    @Provides
+    static DirectorySettings provideOrganizationSettings()
+    {
+        return new DirectorySettings(
+            TEAMS_FOLDER,
+            CONTACTS_FOLDER,
+            THIRD_PARTIES_FOLDER,
+            CONTACTS_SECTION
         );
     }
 

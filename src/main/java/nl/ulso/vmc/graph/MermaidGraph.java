@@ -43,6 +43,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /// rendered differently.
 ///
 /// TODO: rewrite this class using the new primitives, without a reset().
+/// TODO: for now this module is disabled; I need to completely rebuilt it first.
 @Singleton
 public class MermaidGraph
     extends ChangeProcessorTemplate
