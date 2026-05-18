@@ -7,12 +7,12 @@
     </appender>
     <logger name="io.methvin.watcher" level="warn"/>
     <logger name="nl.ulso" level="info"/>
-    <logger name="nl.ulso.curator" level="debug"/>
+<!--    <logger name="nl.ulso.curator" level="debug"/>-->
 <!--    <logger name="nl.ulso.curator.change.DefaultChangeCollector" level="trace"/>-->
 <!--        <logger name="nl.ulso.curator.addon.projectjournal.ProjectJournalAttributeValueProducer" level="trace"/>-->
 <!--        <logger name="nl.ulso.curator.addon.project.ProjectAttributeValueFrontMatterWriter" level="trace"/>-->
 <!--    <logger name="nl.ulso.curator.main.DefaultQueryOrchestrator" level="trace"/>-->
-    <logger name="nl.ulso.vmc" level="debug"/>
+<!--    <logger name="nl.ulso.vmc" level="debug"/>-->
 <!--    <logger name="nl.ulso.vmc.directory.DefaultDirectory" level="trace"/>-->
 
     <root level="trace">
