@@ -43,6 +43,8 @@ final class DefaultOmniFocusRepository
     private static final String JXA_SCRIPT = "omnifocus-projects";
     private static final ScheduledExecutorService REFRESH_EXECUTOR = newScheduledThreadPool(1);
     private static final int REFRESH_DELAY_MINUTES = 5;
+    private static final long INITIAL_FETCH_TIMEOUT_MILLIS = 10_000L;
+    private static final long INITIAL_FETCH_POLL_MILLIS = 100L;
 
     /// Because fetching projects from OmniFocus is a scheduled activity, it might run in parallel
     /// with access in the [OmniFocusProjectAttributeValueProducer]. In practice this can't happen
@@ -80,26 +82,36 @@ final class DefaultOmniFocusRepository
         REFRESH_EXECUTOR.scheduleAtFixedRate(() ->
             {
                 MDC.put("curator", curatorName);
-                if (lastModified == DATABASE_PATH.lastModified())
+                try
                 {
-                    LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
-                    return;
+                    if (lastModified == DATABASE_PATH.lastModified())
+                    {
+                        LOGGER.debug("No changes in the OmniFocus database; skipping fetch.");
+                        return;
+                    }
+                    var newProjects = fetchProjects(javaScriptForAutomation, settings);
+                    var oldProjects = cache.getAndSet(newProjects);
+                    lastModified = DATABASE_PATH.lastModified();
+                    if (oldProjects == null)
+                    {
+                        LOGGER.debug("Initial fetch from OmniFocus completed.");
+                        return;
+                    }
+                    if (newProjects.equals(oldProjects))
+                    {
+                        LOGGER.debug("No changes in projects from OmniFocus; skipping refresh.");
+                        return;
+                    }
+                    LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh.");
+                    externalChangeHandler.process(OMNIFOCUS_CHANGE);
                 }
-                var newProjects = fetchProjects(javaScriptForAutomation, settings);
-                var oldProjects = cache.getAndSet(newProjects);
-                lastModified = DATABASE_PATH.lastModified();
-                if (oldProjects == null)
+                catch (RuntimeException e)
                 {
-                    LOGGER.debug("Initial fetch from OmniFocus completed.");
-                    return;
+                    // Without this catch, scheduleAtFixedRate would silently cancel all future
+                    // executions, and waitForInitialFetchToComplete would block forever.
+                    LOGGER.warn("OmniFocus refresh failed; will retry in {} minutes.",
+                        REFRESH_DELAY_MINUTES, e);
                 }
-                if (newProjects.equals(oldProjects))
-                {
-                    LOGGER.debug("No changes in projects from OmniFocus; skipping refresh.");
-                    return;
-                }
-                LOGGER.info("Relevant OmniFocus changes detected. Triggering a refresh.");
-                externalChangeHandler.process(OMNIFOCUS_CHANGE);
             }, 0, REFRESH_DELAY_MINUTES, MINUTES
         );
         LOGGER.info(
@@ -131,26 +143,51 @@ final class DefaultOmniFocusRepository
     }
 
     /// If, at system start, the request for data comes before the data from OmniFocus is available,
-    /// the system spins and waits.
+    /// the system polls and waits, up to a bounded timeout. If the timeout elapses without data,
+    /// the cache is initialized to an empty map so callers don't NPE, and a warning is logged. The
+    /// background refresh continues to run, so a successful later fetch will still populate the
+    /// cache and emit a change.
     ///
     /// @see OmniFocusInitializer
     public void waitForInitialFetchToComplete()
     {
-        Map<String, OmniFocusProject> result = null;
-        while (result == null)
+        var deadline = System.currentTimeMillis() + INITIAL_FETCH_TIMEOUT_MILLIS;
+        Map<String, OmniFocusProject> result = cache.get();
+        while (result == null && System.currentTimeMillis() < deadline)
         {
+            try
+            {
+                Thread.sleep(INITIAL_FETCH_POLL_MILLIS);
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+                break;
+            }
             result = cache.get();
         }
-        LOGGER.debug("Fetched {} projects from OmniFocus.", result.size());
+        if (result == null)
+        {
+            LOGGER.warn("Initial OmniFocus fetch did not complete within {} ms. " +
+                        "OmniFocus integration is inactive until a later background refresh succeeds.",
+                INITIAL_FETCH_TIMEOUT_MILLIS);
+            cache.compareAndSet(null, Map.of());
+        }
+        else
+        {
+            LOGGER.debug("Fetched {} projects from OmniFocus.", result.size());
+        }
     }
 
     public Collection<OmniFocusProject> projects()
     {
-        return cache.get().values();
+        var current = cache.get();
+        return current == null ? List.of() : current.values();
     }
 
     public Optional<OmniFocusProject> projectNamed(String name)
     {
-        return Optional.ofNullable(cache.get().get(name));
+        var current = cache.get();
+        return current == null ? Optional.empty() : Optional.ofNullable(current.get(name));
     }
 }

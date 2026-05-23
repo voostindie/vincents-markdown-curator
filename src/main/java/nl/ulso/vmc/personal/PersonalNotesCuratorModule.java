@@ -11,16 +11,14 @@ import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 import nl.ulso.curator.query.Query;
+import nl.ulso.jxa.JavaScriptForAutomationModule;
 import nl.ulso.vmc.hook.HooksQuery;
-import nl.ulso.vmc.omnifocus.OmniFocusModule;
-import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.personal.gaming.GamingModule;
 import nl.ulso.vmc.personal.reading.ReadingModule;
 import nl.ulso.vmc.personal.writing.WritingModule;
 
 import java.nio.file.Path;
 import java.util.Locale;
-import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
@@ -31,7 +29,7 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     ProjectModule.class,
     JournalModule.class,
     ProjectJournalModule.class,
-    OmniFocusModule.class,
+    JavaScriptForAutomationModule.class,
     WritingModule.class,
     ReadingModule.class,
     GamingModule.class
@@ -81,16 +79,5 @@ abstract class PersonalNotesCuratorModule
     static ProjectSettings provideProjectSettings()
     {
         return new ProjectSettings(PROJECT_FOLDER);
-    }
-
-    @Provides
-    static OmniFocusSettings provideOmniFocusSettings()
-    {
-        return new OmniFocusSettings(PROJECT_FOLDER, "👨🏻‍💻 Personal",
-            (name) -> !name.startsWith("⚡️") &&
-                      !Set.of("🤖 Routine",
-                          "👨🏻‍💻 Various"
-                      ).contains(name)
-        );
     }
 }
