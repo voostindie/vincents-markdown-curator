@@ -7,6 +7,8 @@ import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
+import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
+import nl.ulso.curator.addon.omnifocus.OmniFocusSettings;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
@@ -16,8 +18,6 @@ import nl.ulso.vmc.directory.DirectoryModule;
 import nl.ulso.vmc.directory.DirectorySettings;
 import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
-import nl.ulso.vmc.omnifocus.OmniFocusModule;
-import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -107,7 +107,7 @@ abstract class RabobankNotesCuratorModule
     @Provides
     static OmniFocusSettings provideOmniFocusSettings()
     {
-        return new OmniFocusSettings(PROJECT_FOLDER, "💼 Rabobank",
+        return new OmniFocusSettings("💼 Rabobank",
             (name) -> !name.startsWith("⚡️") &&
                       !Set.of("🤖 Routine",
                           "📖 Reading material",
@@ -118,7 +118,7 @@ abstract class RabobankNotesCuratorModule
                       ).contains(name)
         );
     }
-    
+
     @Provides
     static DirectorySettings provideOrganizationSettings()
     {

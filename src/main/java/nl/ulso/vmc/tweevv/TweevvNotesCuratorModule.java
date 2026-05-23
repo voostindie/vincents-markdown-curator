@@ -7,14 +7,14 @@ import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
+import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
+import nl.ulso.curator.addon.omnifocus.OmniFocusSettings;
 import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
 import nl.ulso.vmc.hook.HooksQuery;
-import nl.ulso.vmc.omnifocus.OmniFocusModule;
-import nl.ulso.vmc.omnifocus.OmniFocusSettings;
 import nl.ulso.vmc.tweevv.trainers.*;
 import nl.ulso.vmc.tweevv.volunteers.VolunteeringModule;
 
@@ -108,10 +108,10 @@ abstract class TweevvNotesCuratorModule
     static OmniFocusSettings provideOmniFocusSettings()
     {
         return new OmniFocusSettings(
-            PROJECT_FOLDER,
             "🏐 TweeVV",
             (name) -> !name.startsWith("⚡️") &&
-                      !Set.of("🤖 Routine",
+                      !Set.of(
+                          "🤖 Routine",
                           "🏐 Diversen",
                           "💶 Declaraties",
                           "✉️ Eerstvolgende nieuwsbrief"
