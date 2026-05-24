@@ -16,7 +16,7 @@ public record Counterpart(Document document, int recurrenceInDays)
 {
     static final String CONTACTS_FOLDER = "Contacts";
     static final String BILATERAL_PROPERTY = "1-on-1";
-    static int DEFAULT_RECURRENCE_IN_DAYS = 14;
+    static final int DEFAULT_RECURRENCE_IN_DAYS = 14;
 
     public Counterpart(Document document)
     {

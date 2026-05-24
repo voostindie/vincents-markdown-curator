@@ -81,8 +81,8 @@ public class TrainerCsvQuery
                     trainer.iban().orElse(null),
                     trainer.certificateOfConductDate().map(LocalDate::toString)
                         .orElse(null),
-                    trainer.isUnder16() ? "true" : "false",
-                    trainer.isCoach() ? "true" : "false",
+                    Boolean.toString(trainer.isUnder16()),
+                    Boolean.toString(trainer.isCoach()),
                     trainer.assignments()
                         .sorted(comparing(
                             assignment -> assignment.trainingGroup().name()))

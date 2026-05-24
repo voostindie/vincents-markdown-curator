@@ -29,7 +29,6 @@ final class VolunteeringModel
     private static final String TEAM_FOLDER = "Teams";
     private static final String CONTACT_FOLDER = "Contacten";
 
-    private final Vault vault;
     private final Map<String, Activity> activities;
     private final Map<String, Contact> contacts;
     private final Map<Season, Set<ContactActivity>> volunteering;
@@ -37,7 +36,6 @@ final class VolunteeringModel
     @Inject
     VolunteeringModel(Vault vault)
     {
-        this.vault = vault;
         this.activities = new HashMap<>();
         this.contacts = new HashMap<>();
         this.volunteering = new HashMap<>();
