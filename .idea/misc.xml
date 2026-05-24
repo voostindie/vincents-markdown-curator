@@ -7,6 +7,7 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/../markdown-curator/pom.xml" />
         <option value="$PROJECT_DIR$/../markdown-curator-demo/application/pom.xml" />
+        <option value="$PROJECT_DIR$/../markdown-curator/template-application/pom.xml" />
       </list>
     </option>
   </component>
