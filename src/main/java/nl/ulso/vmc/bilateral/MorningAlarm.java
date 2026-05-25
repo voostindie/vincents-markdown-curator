@@ -28,14 +28,16 @@ final class MorningAlarm
     @Inject
     public MorningAlarm(ExternalChangeHandler externalChangeHandler)
     {
-        this.alarmClock = newSingleThreadScheduledExecutor();
         switch (RunMode.get())
         {
-            case DAEMON -> scheduleDailyMorningAlarm(externalChangeHandler);
-            case ONCE ->
+            case DAEMON ->
             {
-                // Do nothing. In a one-off run mode, the alarm is not needed.
+                this.alarmClock = newSingleThreadScheduledExecutor();
+                scheduleDailyMorningAlarm(externalChangeHandler);
             }
+            case ONCE ->
+                // Do nothing. In a one-off run mode, the alarm is not needed.
+                this.alarmClock = null;
             default -> throw new IllegalArgumentException("Unsupported run mode: " + RunMode.get());
         }
     }
