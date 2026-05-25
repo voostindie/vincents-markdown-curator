@@ -10,5 +10,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../markdown-curator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../markdown-curator-demo" vcs="Git" />
   </component>
 </project>

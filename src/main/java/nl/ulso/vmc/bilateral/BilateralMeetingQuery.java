@@ -33,11 +33,14 @@ final class BilateralMeetingQuery
     @Inject
     BilateralMeetingQuery(
         BilateralMeetingRepository bilateralMeetingRepository,
-        QueryResultFactory queryResultFactory
+        QueryResultFactory queryResultFactory,
+        MorningAlarm morningAlarm
     )
     {
         this.bilateralMeetingRepository = bilateralMeetingRepository;
         this.queryResultFactory = queryResultFactory;
+        // The MorningAlarm is just to make sure the alarm clock is scheduled; if the service is
+        // never injected, it also isn't initialized.
     }
 
     @Override
@@ -61,7 +64,8 @@ final class BilateralMeetingQuery
     @Override
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
-        return changelog.changesFor(BilateralRegistryUpdate.class).findFirst().isPresent();
+        return changelog.changesFor(BilateralRegistryUpdate.class).findFirst().isPresent()
+               || changelog.changesFor(Morning.class).findFirst().isPresent();
     }
 
     @Override
