@@ -11,6 +11,10 @@ public abstract class GamingModule
 {
     @Binds
     @IntoSet
+    abstract ChangeProcessor bindGameProducer(GameProducer producer);
+
+    @Binds
+    @IntoSet
     abstract GameRepository bindGameRepository(DefaultGameRepository repository);
 
     @Binds

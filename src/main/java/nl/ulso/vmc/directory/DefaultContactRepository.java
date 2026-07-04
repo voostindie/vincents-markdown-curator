@@ -3,53 +3,35 @@ package nl.ulso.vmc.directory;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.MapBasedEntityRepository;
-import nl.ulso.curator.vault.Document;
 
 import java.util.Optional;
 
 @Singleton
 final class DefaultContactRepository
-    extends MapBasedEntityRepository<Document, String, Contact>
+    extends MapBasedEntityRepository<String, Contact>
     implements ContactRepository
 {
-    private final String contactFolder;
-
     @Inject
-    DefaultContactRepository(DirectorySettings settings)
+    DefaultContactRepository()
     {
-        this.contactFolder = settings.contactsFolder();
     }
 
     @Override
-    protected Class<Document> sourceEntityClass()
-    {
-        return Document.class;
-    }
-
-    @Override
-    protected Class<Contact> targetEntityClass()
+    protected Class<Contact> entityClass()
     {
         return Contact.class;
     }
 
     @Override
-    protected boolean isEntity(Document document)
+    protected Class<?> repositoryClass()
     {
-        return document.folder().name().contentEquals(contactFolder)
-               && !document.folder().isRoot()
-               && document.folder().parent().isRoot();
+        return ContactRepository.class;
     }
 
     @Override
-    protected String entityKeyFrom(Document document)
+    protected String entityKeyFrom(Contact contact)
     {
-        return document.name();
-    }
-
-    @Override
-    protected Contact createEntityFrom(String name, Document document)
-    {
-        return new Contact(document);
+        return contact.name();
     }
 
     @Override

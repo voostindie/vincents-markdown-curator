@@ -3,6 +3,8 @@ package nl.ulso.vmc.tweevv.volunteers;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.*;
+import nl.ulso.curator.statistics.MeasurementCollector;
+import nl.ulso.curator.statistics.MeasurementTracker;
 import nl.ulso.curator.vault.*;
 
 import java.util.*;
@@ -25,6 +27,7 @@ import static nl.ulso.curator.change.ChangeHandler.newChangeHandler;
 @Singleton
 final class VolunteeringModel
     extends ChangeProcessorTemplate
+    implements MeasurementTracker
 {
     private static final String TEAM_FOLDER = "Teams";
     private static final String CONTACT_FOLDER = "Contacten";
@@ -39,6 +42,12 @@ final class VolunteeringModel
         this.activities = new HashMap<>();
         this.contacts = new HashMap<>();
         this.volunteering = new HashMap<>();
+    }
+
+    @Override
+    public Set<Class<?>> consumedPayloadTypes()
+    {
+        return Set.of(Document.class);
     }
 
     @Override
@@ -168,6 +177,14 @@ final class VolunteeringModel
                     .collect(Collectors.groupingBy(ContactActivity::contact));
             })
             .orElse(emptyMap());
+    }
+
+    @Override
+    public void collectMeasurements(MeasurementCollector collector)
+    {
+        collector.forModule("volunteers")
+            .total(Contact.class, contacts.size())
+            .total(Activity.class, activities.size());
     }
 
     public static class Season

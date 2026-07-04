@@ -17,6 +17,10 @@ public abstract class BilateralMeetingModule
 {
     @Binds
     @IntoSet
+    abstract ChangeProcessor bindCounterpartProducer(CounterpartProducer producer);
+
+    @Binds
+    @IntoSet
     abstract ChangeProcessor bindCounterpartProcessor(
         DefaultCounterpartRepository counterpartRegistry);
 

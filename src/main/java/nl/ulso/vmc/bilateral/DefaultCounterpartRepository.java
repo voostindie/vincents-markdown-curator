@@ -3,13 +3,12 @@ package nl.ulso.vmc.bilateral;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.MapBasedEntityRepository;
-import nl.ulso.curator.vault.Document;
 
 import java.util.Collection;
 
 @Singleton
 final class DefaultCounterpartRepository
-    extends MapBasedEntityRepository<Document, String, Counterpart>
+    extends MapBasedEntityRepository<String, Counterpart>
     implements CounterpartRepository
 {
     @Inject
@@ -18,38 +17,26 @@ final class DefaultCounterpartRepository
     }
 
     @Override
-    protected Class<Document> sourceEntityClass()
+    protected Class<Counterpart> entityClass()
     {
-        return Document.class;
+        return Counterpart.class;
     }
 
     @Override
-    protected Class<Counterpart> targetEntityClass()
+    protected Class<?> repositoryClass()
     {
-        return Counterpart.class;
+        return CounterpartRepository.class;
+    }
+
+    @Override
+    protected String entityKeyFrom(Counterpart counterpart)
+    {
+        return counterpart.name();
     }
 
     @Override
     public Collection<Counterpart> counterparts()
     {
         return entities();
-    }
-
-    @Override
-    protected boolean isEntity(Document document)
-    {
-        return Counterpart.isCounterpart(document);
-    }
-
-    @Override
-    protected String entityKeyFrom(Document document)
-    {
-        return document.name();
-    }
-
-    @Override
-    protected Counterpart createEntityFrom(String name, Document document)
-    {
-        return new Counterpart(document);
     }
 }

@@ -3,53 +3,35 @@ package nl.ulso.vmc.directory;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.MapBasedEntityRepository;
-import nl.ulso.curator.vault.Document;
 
 import java.util.Optional;
 
 @Singleton
 final class DefaultThirdPartyRepository
-    extends MapBasedEntityRepository<Document, String, ThirdParty>
+    extends MapBasedEntityRepository<String, ThirdParty>
     implements ThirdPartyRepository
 {
-    private final String thirdPartiesFolder;
-
     @Inject
-    DefaultThirdPartyRepository(DirectorySettings settings)
+    DefaultThirdPartyRepository()
     {
-        this.thirdPartiesFolder = settings.thirdPartiesFolder();
     }
 
     @Override
-    protected Class<Document> sourceEntityClass()
-    {
-        return Document.class;
-    }
-
-    @Override
-    protected Class<ThirdParty> targetEntityClass()
+    protected Class<ThirdParty> entityClass()
     {
         return ThirdParty.class;
     }
 
     @Override
-    protected boolean isEntity(Document document)
+    protected Class<?> repositoryClass()
     {
-        return document.folder().name().contentEquals(thirdPartiesFolder)
-               && !document.folder().isRoot()
-               && document.folder().parent().isRoot();
+        return ThirdPartyRepository.class;
     }
 
     @Override
-    protected String entityKeyFrom(Document document)
+    protected String entityKeyFrom(ThirdParty thirdParty)
     {
-        return document.name();
-    }
-
-    @Override
-    protected ThirdParty createEntityFrom(String name, Document document)
-    {
-        return new ThirdParty(document);
+        return thirdParty.name();
     }
 
     @Override

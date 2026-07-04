@@ -11,6 +11,11 @@ import nl.ulso.curator.statistics.MeasurementTracker;
 public abstract class ReadingModule
 {
     @Binds
+    @IntoSet
+    abstract ChangeProcessor bindBookProducer(BookProducer producer);
+
+
+    @Binds
     abstract BookRepository bindBookRepository(DefaultBookRepository repository);
 
     @Binds
@@ -27,6 +32,10 @@ public abstract class ReadingModule
 
     @Binds
     abstract AuthorRepository bindAuthorRepository(DefaultAuthorRepository repository);
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor AuthorProducer(AuthorProducer producer);
 
     @Binds
     @IntoSet

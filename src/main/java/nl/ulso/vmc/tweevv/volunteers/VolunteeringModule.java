@@ -5,6 +5,7 @@ import dagger.Module;
 import dagger.multibindings.IntoSet;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
+import nl.ulso.curator.statistics.MeasurementTracker;
 
 @Module
 public abstract class VolunteeringModule
@@ -27,6 +28,14 @@ public abstract class VolunteeringModule
     @IntoSet
     abstract ChangeProcessor bindVolunteeringModel(VolunteeringModel volunteeringModel);
 
+    @Binds
+    @IntoSet
+    abstract MeasurementTracker bindVolunteeringTracker(VolunteeringModel volunteeringModel);
+
+    //    @Binds
+    //    @IntoSet
+    //    abstract ChangeProcessor bindContactProducer(ContactProducer producer);
+    //
     //    @Binds
     //    @IntoSet
     //    abstract ChangeProcessor bindContactProcessor(DefaultContactRepository processor);

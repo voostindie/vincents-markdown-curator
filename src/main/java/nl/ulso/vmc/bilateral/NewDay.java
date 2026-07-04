@@ -13,6 +13,6 @@ record NewDay()
     @Override
     public String toString()
     {
-        return ".";
+        return "⏰";
     }
 }

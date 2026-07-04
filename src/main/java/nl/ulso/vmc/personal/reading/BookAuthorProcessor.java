@@ -22,15 +22,15 @@ final class BookAuthorProcessor
     }
 
     @Override
-    public Set<Class<?>> producedPayloadTypes()
-    {
-        return Set.of(Author.class);
-    }
-
-    @Override
     protected Class<Book> entityClass()
     {
         return Book.class;
+    }
+
+    @Override
+    public Set<Class<?>> producedPayloadTypes()
+    {
+        return Set.of(Author.class);
     }
 
     @Override
@@ -40,7 +40,7 @@ final class BookAuthorProcessor
     }
 
     @Override
-    protected void entityUpdate(Book oldBook, Book newBook, ChangeCollector collector)
+    protected void entityUpdated(Book oldBook, Book newBook, ChangeCollector collector)
     {
         var oldAuthors = new HashSet<>(oldBook.authorNames());
         var newAuthors = new HashSet<>(newBook.authorNames());
@@ -57,7 +57,8 @@ final class BookAuthorProcessor
         updateExistingBookAuthors(oldBook.authorNames(), collector);
     }
 
-    private void updateExistingBookAuthors(Collection<String> authorNames, ChangeCollector collector)
+    private void updateExistingBookAuthors(
+        Collection<String> authorNames, ChangeCollector collector)
     {
         authorNames.stream().map(authorRepository::findByName)
             .filter(Optional::isPresent)

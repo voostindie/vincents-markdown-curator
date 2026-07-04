@@ -22,6 +22,11 @@ public final class Game
         return document;
     }
 
+    public String name()
+    {
+        return document.name();
+    }
+
     public Optional<String> cover()
     {
         return Optional.ofNullable(cover);
@@ -35,6 +40,6 @@ public final class Game
     @Override
     public String toString()
     {
-        return document.name();
+        return name();
     }
 }

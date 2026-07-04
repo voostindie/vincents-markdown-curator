@@ -5,11 +5,11 @@ import jakarta.inject.Singleton;
 import nl.ulso.curator.addon.journal.Daily;
 import nl.ulso.curator.addon.journal.Journal;
 import nl.ulso.curator.change.*;
-import nl.ulso.curator.vault.Vault;
 
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.util.HashSet.newHashSet;
 import static nl.ulso.curator.change.Change.isCreate;
 import static nl.ulso.curator.change.Change.isDelete;
 import static nl.ulso.curator.change.Change.isPayloadType;
@@ -41,7 +41,7 @@ final class DefaultBilateralMeetingRepository
     @Override
     public Set<Class<?>> consumedPayloadTypes()
     {
-        return Set.of(Vault.class, Counterpart.class, Daily.class);
+        return Set.of(Counterpart.class, Daily.class);
     }
 
     @Override
@@ -51,9 +51,15 @@ final class DefaultBilateralMeetingRepository
     }
 
     @Override
-    protected Collection<Change<?>> createChangeCollection()
+    public Set<Class<?>> requiredPayloadTypes()
     {
-        return new HashSet<>(1);
+        return Set.of(CounterpartRepository.class);
+    }
+
+    @Override
+    public Collection<Change<?>> createChangeCollection()
+    {
+        return newHashSet(1);
     }
 
     @Override
@@ -88,7 +94,7 @@ final class DefaultBilateralMeetingRepository
     }
 
     @Override
-    protected void reset()
+    public void reset()
     {
         meetings.clear();
     }
@@ -157,7 +163,7 @@ final class DefaultBilateralMeetingRepository
     public Map<Counterpart, LocalDate> resolveBilateralMeetings()
     {
         var counterparts = counterpartRepository.counterparts();
-        var result = new HashMap<Counterpart, LocalDate>(counterparts.size());
+        var result = HashMap.<Counterpart, LocalDate>newHashMap(counterparts.size());
         counterparts.forEach(counterpart ->
             result.put(counterpart, meetings.get(counterpart.name()).last()));
         return sortBilateralMeetings(result);

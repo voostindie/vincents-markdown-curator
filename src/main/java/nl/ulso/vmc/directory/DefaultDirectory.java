@@ -44,7 +44,13 @@ final class DefaultDirectory
     }
 
     @Override
-    protected void reset()
+    public Set<Class<?>> requiredPayloadTypes()
+    {
+        return Set.of(ContactRepository.class);
+    }
+
+    @Override
+    public void reset()
     {
         units.clear();
         roles.clear();

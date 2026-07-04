@@ -7,6 +7,8 @@ import nl.ulso.curator.main.FrontMatterCollector;
 import nl.ulso.curator.vault.Document;
 import nl.ulso.dictionary.MutableDictionary;
 
+import java.util.Set;
+
 /// Produces custom front matter for [Book]s.
 @Singleton
 final class BookFrontMatterProcessor
@@ -28,6 +30,12 @@ final class BookFrontMatterProcessor
     protected Class<Book> entityClass()
     {
         return Book.class;
+    }
+
+    @Override
+    public Set<Class<?>> requiredPayloadTypes()
+    {
+        return Set.of(BookRepository.class, AuthorRepository.class);
     }
 
     @Override

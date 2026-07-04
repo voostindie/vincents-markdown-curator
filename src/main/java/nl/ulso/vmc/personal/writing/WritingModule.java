@@ -11,6 +11,10 @@ import nl.ulso.curator.statistics.MeasurementTracker;
 public abstract class WritingModule
 {
     @Binds
+    @IntoSet
+    abstract ChangeProcessor bindArticleProducer(ArticleProducer producer);
+
+    @Binds
     abstract ArticleRepository bindArticleRepository(DefaultArticleRepository repository);
 
     @Binds

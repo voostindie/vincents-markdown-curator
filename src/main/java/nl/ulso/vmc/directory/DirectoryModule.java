@@ -11,6 +11,10 @@ import nl.ulso.curator.statistics.MeasurementTracker;
 public abstract class DirectoryModule
 {
     @Binds
+    @IntoSet
+    abstract ChangeProcessor bindContactProducer(ContactProducer producer);
+
+    @Binds
     abstract ContactRepository bindContactRepository(DefaultContactRepository repository);
 
     @Binds
@@ -22,6 +26,10 @@ public abstract class DirectoryModule
     abstract MeasurementTracker bindContactTracker(DefaultContactRepository tracker);
 
     @Binds
+    @IntoSet
+    abstract ChangeProcessor bindTeamProducer(TeamProducer producer);
+
+    @Binds
     abstract TeamRepository bindTeamRepository(DefaultTeamRepository repository);
 
     @Binds
@@ -31,6 +39,10 @@ public abstract class DirectoryModule
     @Binds
     @IntoSet
     abstract MeasurementTracker bindTeamTracker(DefaultTeamRepository tracker);
+
+    @Binds
+    @IntoSet
+    abstract ChangeProcessor bindThirdPartyProducer(ThirdPartyProducer producer);
 
     @Binds
     abstract ThirdPartyRepository bindThirdPartyRepository(DefaultThirdPartyRepository repository);

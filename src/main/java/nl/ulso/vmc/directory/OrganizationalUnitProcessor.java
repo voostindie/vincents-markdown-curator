@@ -37,7 +37,7 @@ abstract class OrganizationalUnitProcessor<E>
     }
 
     @Override
-    protected final void entityUpdate(E oldEntity, E newEntity, ChangeCollector collector)
+    protected final void entityUpdated(E oldEntity, E newEntity, ChangeCollector collector)
     {
         var oldTemp = new TemporaryUnit(resolveDocumentFrom(oldEntity));
         var newTemp = new TemporaryUnit(resolveDocumentFrom(newEntity));
