@@ -8,7 +8,7 @@ import static nl.ulso.curator.change.Change.create;
 /// active.
 record NewDay()
 {
-    static Change<NewDay> NEW_DAY = create(new NewDay(), NewDay.class);
+    static final Change<NewDay> NEW_DAY = create(new NewDay(), NewDay.class);
 
     @Override
     public String toString()
