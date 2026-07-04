@@ -43,7 +43,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /// rendered differently.
 ///
 /// TODO: rewrite this class using the new primitives, without a reset().
-/// TODO: for now this module is disabled; I need to completely rebuilt it first.
+/// TODO: for now this module is disabled; I need to completely rebuild it first.
 @Singleton
 public class MermaidGraph
     extends ChangeProcessorTemplate
@@ -81,13 +81,6 @@ public class MermaidGraph
     public Set<Class<?>> consumedPayloadTypes()
     {
         return Set.of(Document.class, Marker.class, Daily.class);
-    }
-
-    @Override
-    protected boolean isResetRequired(Changelog changelog)
-    {
-        return super.isResetRequired(changelog)
-               || changelog.changes().anyMatch(isPayloadType(Marker.class));
     }
 
     Predicate<Change<?>> isNodeEntry()

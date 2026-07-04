@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
-import static nl.ulso.curator.change.Change.isPayloadType;
 import static nl.ulso.curator.vault.InternalLinkFinder.extractInternalLinkTargetNamesFrom;
 
 /// Manages trainer and trainer-related data across seasons.
@@ -78,11 +77,20 @@ public final class TrainerModel
     }
 
     @Override
-    protected boolean isResetRequired(Changelog changelog)
+    protected List<? extends ChangeHandler> createChangeHandlers()
     {
-        return super.isResetRequired(changelog)
-               ||
-               changelog.changes().anyMatch(isPayloadType(Document.class).and(isFolderInScope()));
+        // TODO: make this much smarter and fine-grained
+        return List.of(
+            ChangeHandler.newChangeHandler(
+                isFolderInScope(), (_,_)  -> reset()
+            )
+        );
+    }
+
+    @Override
+    public Set<Class<?>> consumedPayloadTypes()
+    {
+        return Set.of(Document.class);
     }
 
     @Override
@@ -99,7 +107,7 @@ public final class TrainerModel
         vault.folder(TRAINER_FOLDER).ifPresent(this::updateTrainerFrontMatter);
     }
 
-    Predicate<? super Change<?>> isFolderInScope()
+    Predicate<Change<?>> isFolderInScope()
     {
         return change -> {
             var document = (Document) change.value();
