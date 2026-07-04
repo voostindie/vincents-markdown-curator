@@ -13,6 +13,7 @@ import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 import nl.ulso.curator.query.Query;
+import nl.ulso.vmc.backlink.BacklinkModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.personal.gaming.GamingModule;
 import nl.ulso.vmc.personal.reading.ReadingModule;
@@ -34,7 +35,8 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     OmniFocusModule.class,
     WritingModule.class,
     ReadingModule.class,
-    GamingModule.class
+    GamingModule.class,
+    BacklinkModule.class
 })
 abstract class PersonalNotesCuratorModule
 {

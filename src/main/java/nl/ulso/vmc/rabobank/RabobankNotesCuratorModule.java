@@ -13,6 +13,7 @@ import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 import nl.ulso.curator.query.Query;
+import nl.ulso.vmc.backlink.BacklinkModule;
 import nl.ulso.vmc.bilateral.BilateralMeetingModule;
 import nl.ulso.vmc.directory.DirectoryModule;
 import nl.ulso.vmc.directory.DirectorySettings;
@@ -38,7 +39,8 @@ import static nl.ulso.vmc.graph.Shape.STADIUM;
     OmniFocusModule.class,
     BilateralMeetingModule.class,
     DirectoryModule.class,
-    MermaidGraphModule.class
+    MermaidGraphModule.class,
+    BacklinkModule.class
 })
 abstract class RabobankNotesCuratorModule
 {

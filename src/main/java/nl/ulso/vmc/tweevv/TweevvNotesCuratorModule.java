@@ -14,6 +14,7 @@ import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
+import nl.ulso.vmc.backlink.BacklinkModule;
 import nl.ulso.vmc.hook.HooksQuery;
 import nl.ulso.vmc.tweevv.trainers.*;
 import nl.ulso.vmc.tweevv.volunteers.VolunteeringModule;
@@ -31,7 +32,8 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     JournalModule.class,
     ProjectJournalModule.class,
     OmniFocusModule.class,
-    VolunteeringModule.class
+    VolunteeringModule.class,
+    BacklinkModule.class
 })
 abstract class TweevvNotesCuratorModule
 {
