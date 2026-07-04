@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 
 /// Produces backlinks to documents from other documents, but only for the documents that are
 /// tracked by the [BacklinkQueryReferenceRepository].
@@ -90,10 +90,9 @@ final class BacklinkProducer
         {
             return emptySet();
         }
-        var links = document.findInternalLinks().stream()
+        return document.findInternalLinks().stream()
             .map(InternalLink::targetDocument)
-            .collect(toCollection(HashSet::new));
-        links.retainAll(backlinkDocumentNames);
-        return links;
+            .filter(backlinkDocumentNames::contains)
+            .collect(toSet());
     }
 }
