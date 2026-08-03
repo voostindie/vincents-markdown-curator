@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.query.*;
+import nl.ulso.vmc.newday.NewDayAlarm;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -29,18 +30,18 @@ final class BilateralMeetingQuery
 
     private final BilateralMeetingRepository bilateralMeetingRepository;
     private final QueryResultFactory queryResultFactory;
+    private final NewDayAlarm newDayAlarm;
 
     @Inject
     BilateralMeetingQuery(
         BilateralMeetingRepository bilateralMeetingRepository,
-        QueryResultFactory queryResultFactory,
-        NewDayAlarm newDayAlarm
+        NewDayAlarm newDayAlarm,
+        QueryResultFactory queryResultFactory
     )
     {
         this.bilateralMeetingRepository = bilateralMeetingRepository;
         this.queryResultFactory = queryResultFactory;
-        // The NewDayAlarm is just to make sure the alarm clock is scheduled; if the service is
-        // never injected, it also isn't initialized.
+        this.newDayAlarm = newDayAlarm;
     }
 
     @Override
@@ -65,7 +66,7 @@ final class BilateralMeetingQuery
     public boolean isImpactedBy(Changelog changelog, QueryDefinition definition)
     {
         return changelog.changesFor(BilateralRegistryUpdate.class).findFirst().isPresent()
-               || changelog.changesFor(NewDay.class).findFirst().isPresent();
+               || newDayAlarm.didAlarmTrigger(changelog);
     }
 
     @Override

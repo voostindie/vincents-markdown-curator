@@ -1,8 +1,9 @@
-package nl.ulso.vmc.bilateral;
+package nl.ulso.vmc.newday;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import nl.ulso.curator.RunMode;
+import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.change.ExternalChangeHandler;
 import org.slf4j.*;
 
@@ -12,22 +13,25 @@ import java.util.concurrent.ScheduledExecutorService;
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static nl.ulso.vmc.bilateral.NewDay.NEW_DAY;
+import static nl.ulso.vmc.newday.NewDay.NEW_DAY;
 import static org.slf4j.MDC.getCopyOfContextMap;
 
 /// The new day alarm schedules a task every few minutes, but only really does something once a day.
-/// This is to ensure that the start of a new day is not missed, for example, when the machine
-/// is on standby.
+/// This is to ensure that the start of a new day is not missed, for example, when the machine is on
+/// standby.
+///
+/// When the alarm goes off, it publishes a [NewDay] event to the changelog.
 ///
 /// The question is how often this job should run. It's now scheduled every 15 minutes, which means
-/// that on a computer that's on 24 hours, it only does something useful once out of the 96 times it
-/// is executed. On the other hand, we also want to run the job as close to midnight as possible,
+/// that on a computer that's on 24 hours, it only does something useful 1 time out of the 96 times
+/// it is executed. On the other hand, we also want to run the job as close to midnight as possible,
 /// and those other 95 times it barely does anything: comparing the current date to a date kept in
 /// memory. Every 15 minutes seems like a good balance.
 @Singleton
-final class NewDayAlarm
+final class DefaultNewDayAlarm
+    implements NewDayAlarm
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewDayAlarm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNewDayAlarm.class);
     private static final int INITIAL_DELAY_MINUTES = 15;
     private static final int REFRESH_DELAY_MINUTES = 15;
 
@@ -35,7 +39,7 @@ final class NewDayAlarm
     private LocalDate lastRun;
 
     @Inject
-    public NewDayAlarm(ExternalChangeHandler externalChangeHandler)
+    public DefaultNewDayAlarm(ExternalChangeHandler externalChangeHandler)
     {
         switch (RunMode.get())
         {
@@ -85,5 +89,11 @@ final class NewDayAlarm
                 task.cancel(true);
             })
         );
+    }
+
+    @Override
+    public boolean didAlarmTrigger(Changelog changelog)
+    {
+        return changelog.changesFor(NewDay.class).findFirst().isPresent();
     }
 }

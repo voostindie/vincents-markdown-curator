@@ -6,13 +6,14 @@ import dagger.multibindings.IntoSet;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
 import nl.ulso.curator.statistics.MeasurementTracker;
+import nl.ulso.vmc.newday.NewDayModule;
 
 /// Module that tracks bilateral meetings with specific contacts - counterparts - in the journal.
 ///
 /// [Counterpart]s are contacts with a specific marking; see [CounterpartRepository]. Bilateral
-/// meetings are meetings with [Counterpart]s in the [Journal] that are recognized by a special
-/// pattern; see [BilateralMeetingRepository].
-@Module
+/// meetings are meetings with [Counterpart]s in the [nl.ulso.curator.addon.journal.Journal] that
+/// are recognized by a special pattern; see [BilateralMeetingRepository].
+@Module(includes = {NewDayModule.class})
 public abstract class BilateralMeetingModule
 {
     @Binds
