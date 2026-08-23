@@ -63,7 +63,7 @@ public class HooksQuery
     public QueryResult run(QueryDefinition definition)
     {
         var documentUri = resolveUri(definition.document());
-        return resultFactory.withPerformanceWarning().unorderedList(
+        return resultFactory.unorderedList(
             repository.listHooks(documentUri).stream().map(Hook::toMarkdown).toList());
     }
 
