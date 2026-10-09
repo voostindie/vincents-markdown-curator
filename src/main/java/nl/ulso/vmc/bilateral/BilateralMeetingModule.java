@@ -3,10 +3,10 @@ package nl.ulso.vmc.bilateral;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoSet;
+import nl.ulso.curator.addon.newday.NewDayModule;
 import nl.ulso.curator.change.ChangeProcessor;
 import nl.ulso.curator.query.Query;
 import nl.ulso.curator.statistics.MeasurementTracker;
-import nl.ulso.vmc.newday.NewDayModule;
 
 /// Module that tracks bilateral meetings with specific contacts - counterparts - in the journal.
 ///

@@ -2,9 +2,9 @@ package nl.ulso.vmc.bilateral;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import nl.ulso.curator.addon.newday.NewDayAlarm;
 import nl.ulso.curator.change.Changelog;
 import nl.ulso.curator.query.*;
-import nl.ulso.vmc.newday.NewDayAlarm;
 
 import java.time.LocalDate;
 import java.util.*;
