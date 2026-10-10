@@ -5,17 +5,17 @@ import dagger.Provides;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.alfred.AlfredModule;
-import nl.ulso.curator.addon.alfred.AlfredSettings;
+import nl.ulso.curator.addon.alfred.ExternalLinksQuerySettings;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectSettings;
-import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
 import static nl.ulso.curator.VaultPaths.pathInUserHome;
 
-@Module(includes = {CuratorModule.class, ProjectJournalModule.class, AlfredModule.class})
+@Module(includes = {CuratorModule.class, AlfredModule.class})
 public class DemoCuratorModule
 {
     @Provides
@@ -30,7 +30,6 @@ public class DemoCuratorModule
     {
         return "WATCHDOC";
     }
-
 
     @Provides
     ProjectSettings projectSettings()
@@ -50,8 +49,8 @@ public class DemoCuratorModule
     }
 
     @Provides
-    AlfredSettings alfredSettings()
+    static ExternalLinksQuerySettings provideExternalLinksQuerySettings()
     {
-        return new AlfredSettings("Projects");
+        return new ExternalLinksQuerySettings("Links", Set.of("🔗"));
     }
 }

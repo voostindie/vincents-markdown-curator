@@ -6,14 +6,11 @@ import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.alfred.AlfredModule;
-import nl.ulso.curator.addon.alfred.AlfredSettings;
-import nl.ulso.curator.addon.journal.JournalModule;
+import nl.ulso.curator.addon.alfred.ExternalLinksQuerySettings;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
 import nl.ulso.curator.addon.omnifocus.OmniFocusSettings;
-import nl.ulso.curator.addon.project.ProjectModule;
 import nl.ulso.curator.addon.project.ProjectSettings;
-import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
 import nl.ulso.curator.query.Query;
 import nl.ulso.vmc.backlink.BacklinkModule;
 import nl.ulso.vmc.bilateral.BilateralMeetingModule;
@@ -35,15 +32,12 @@ import static nl.ulso.vmc.graph.Shape.STADIUM;
 
 @Module(includes = {
     CuratorModule.class,
-    ProjectModule.class,
-    JournalModule.class,
-    ProjectJournalModule.class,
+    AlfredModule.class,
     OmniFocusModule.class,
     BilateralMeetingModule.class,
     DirectoryModule.class,
     MermaidGraphModule.class,
-    BacklinkModule.class,
-    AlfredModule.class
+    BacklinkModule.class
 })
 abstract class RabobankNotesCuratorModule
 {
@@ -151,8 +145,8 @@ abstract class RabobankNotesCuratorModule
     }
 
     @Provides
-    static AlfredSettings provideAlfredSettings()
+    static ExternalLinksQuerySettings provideExternalLinksQuerySettings()
     {
-        return new AlfredSettings(PROJECT_FOLDER);
+        return new ExternalLinksQuerySettings("Links", Set.of("🔗"));
     }
 }
