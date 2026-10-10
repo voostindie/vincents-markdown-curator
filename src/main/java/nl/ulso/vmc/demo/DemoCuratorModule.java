@@ -4,6 +4,8 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
+import nl.ulso.curator.addon.alfred.AlfredModule;
+import nl.ulso.curator.addon.alfred.AlfredSettings;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectSettings;
 import nl.ulso.curator.addon.projectjournal.ProjectJournalModule;
@@ -13,7 +15,7 @@ import java.nio.file.Path;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
 import static nl.ulso.curator.VaultPaths.pathInUserHome;
 
-@Module(includes = {CuratorModule.class, ProjectJournalModule.class})
+@Module(includes = {CuratorModule.class, ProjectJournalModule.class, AlfredModule.class})
 public class DemoCuratorModule
 {
     @Provides
@@ -45,5 +47,11 @@ public class DemoCuratorModule
             "Activities",
             "Projects"
         );
+    }
+
+    @Provides
+    AlfredSettings alfredSettings()
+    {
+        return new AlfredSettings("Projects");
     }
 }

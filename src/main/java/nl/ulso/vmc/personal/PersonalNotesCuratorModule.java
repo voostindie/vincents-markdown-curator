@@ -5,6 +5,8 @@ import dagger.Module;
 import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
+import nl.ulso.curator.addon.alfred.AlfredModule;
+import nl.ulso.curator.addon.alfred.AlfredSettings;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
@@ -36,7 +38,8 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     WritingModule.class,
     ReadingModule.class,
     GamingModule.class,
-    BacklinkModule.class
+    BacklinkModule.class,
+    AlfredModule.class
 })
 abstract class PersonalNotesCuratorModule
 {
@@ -95,5 +98,11 @@ abstract class PersonalNotesCuratorModule
                           "👨🏻‍💻 Various"
                       ).contains(name)
         );
+    }
+
+    @Provides
+    static AlfredSettings provideAlfredSettings()
+    {
+        return new AlfredSettings(PROJECT_FOLDER);
     }
 }

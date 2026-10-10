@@ -5,6 +5,8 @@ import dagger.Module;
 import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
+import nl.ulso.curator.addon.alfred.AlfredModule;
+import nl.ulso.curator.addon.alfred.AlfredSettings;
 import nl.ulso.curator.addon.journal.JournalModule;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
@@ -33,7 +35,8 @@ import static nl.ulso.curator.VaultPaths.pathInUserHome;
     ProjectJournalModule.class,
     OmniFocusModule.class,
     VolunteeringModule.class,
-    BacklinkModule.class
+    BacklinkModule.class,
+    AlfredModule.class
 })
 abstract class TweevvNotesCuratorModule
 {
@@ -119,5 +122,11 @@ abstract class TweevvNotesCuratorModule
                           "✉️ Eerstvolgende nieuwsbrief"
                       ).contains(name)
         );
+    }
+
+    @Provides
+    static AlfredSettings provideAlfredSettings()
+    {
+        return new AlfredSettings(PROJECT_FOLDER);
     }
 }
