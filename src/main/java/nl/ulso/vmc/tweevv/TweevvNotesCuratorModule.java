@@ -6,7 +6,6 @@ import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.alfred.AlfredModule;
-import nl.ulso.curator.addon.alfred.ExternalLinksQuerySettings;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
 import nl.ulso.curator.addon.omnifocus.OmniFocusSettings;
@@ -116,11 +115,5 @@ abstract class TweevvNotesCuratorModule
                           "✉️ Eerstvolgende nieuwsbrief"
                       ).contains(name)
         );
-    }
-
-    @Provides
-    static ExternalLinksQuerySettings provideExternalLinksQuerySettings()
-    {
-        return new ExternalLinksQuerySettings("Links", Set.of("🔗"));
     }
 }
