@@ -6,6 +6,7 @@ import dagger.multibindings.IntoSet;
 import jakarta.inject.Named;
 import nl.ulso.curator.CuratorModule;
 import nl.ulso.curator.addon.alfred.AlfredModule;
+import nl.ulso.curator.addon.alfred.AlfredSettings;
 import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.omnifocus.OmniFocusModule;
 import nl.ulso.curator.addon.omnifocus.OmniFocusSettings;
@@ -19,8 +20,7 @@ import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
 
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
@@ -125,6 +125,18 @@ abstract class RabobankNotesCuratorModule
             CONTACTS_FOLDER,
             THIRD_PARTIES_FOLDER,
             CONTACTS_SECTION
+        );
+    }
+
+    @Provides
+    static AlfredSettings provideAlfredSettings()
+    {
+        return new AlfredSettings(
+            Optional.of(PROJECT_FOLDER),
+            Optional.of(CONTACTS_FOLDER),
+            Optional.of(TEAMS_FOLDER),
+            Optional.of(THIRD_PARTIES_FOLDER),
+            Optional.of("Reminders")
         );
     }
 
