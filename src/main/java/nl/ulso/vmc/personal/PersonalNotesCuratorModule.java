@@ -19,7 +19,8 @@ import nl.ulso.vmc.personal.reading.ReadingModule;
 import nl.ulso.vmc.personal.writing.WritingModule;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Locale;
+import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
@@ -96,12 +97,9 @@ abstract class PersonalNotesCuratorModule
     @Provides
     static AlfredSettings provideAlfredSettings()
     {
-        return new AlfredSettings(
-            Optional.of(PROJECT_FOLDER),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.of("Reminders")
-        );
+        return AlfredSettings.builder()
+            .projectsPath(PROJECT_FOLDER)
+            .remindersPath("Reminders")
+            .build();
     }
 }

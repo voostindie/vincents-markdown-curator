@@ -10,7 +10,6 @@ import nl.ulso.curator.addon.journal.JournalSettings;
 import nl.ulso.curator.addon.project.ProjectSettings;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
 import static nl.ulso.curator.VaultPaths.pathInUserHome;
@@ -51,12 +50,8 @@ public class DemoCuratorModule
     @Provides
     static AlfredSettings alfredSettings()
     {
-        return new AlfredSettings(
-            Optional.of("Projects"),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty()
-        );
+        return AlfredSettings.builder()
+            .projectsPath("Projects")
+            .build();
     }
 }

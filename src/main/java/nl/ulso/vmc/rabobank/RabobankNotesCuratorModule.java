@@ -20,7 +20,8 @@ import nl.ulso.vmc.graph.*;
 import nl.ulso.vmc.hook.HooksQuery;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Locale;
+import java.util.Set;
 
 import static java.util.Locale.ENGLISH;
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
@@ -131,13 +132,14 @@ abstract class RabobankNotesCuratorModule
     @Provides
     static AlfredSettings provideAlfredSettings()
     {
-        return new AlfredSettings(
-            Optional.of(PROJECT_FOLDER),
-            Optional.of(CONTACTS_FOLDER),
-            Optional.of(TEAMS_FOLDER),
-            Optional.of(THIRD_PARTIES_FOLDER),
-            Optional.of("Reminders")
-        );
+        return AlfredSettings.builder()
+            .contactsPath(CONTACTS_FOLDER)
+            .projectsPath(PROJECT_FOLDER)
+            .systemsPath("Systems")
+            .remindersPath("Reminders")
+            .teamsPath(TEAMS_FOLDER)
+            .thirdPartiesPath(THIRD_PARTIES_FOLDER)
+            .build();
     }
 
     @Binds

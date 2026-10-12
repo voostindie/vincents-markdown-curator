@@ -19,7 +19,8 @@ import nl.ulso.vmc.tweevv.trainers.*;
 import nl.ulso.vmc.tweevv.volunteers.VolunteeringModule;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Locale;
+import java.util.Set;
 
 import static nl.ulso.curator.CuratorModule.WATCH_DOCUMENT_KEY;
 import static nl.ulso.curator.VaultPaths.pathInUserHome;
@@ -120,12 +121,12 @@ abstract class TweevvNotesCuratorModule
     @Provides
     static AlfredSettings provideAlfredSettings()
     {
-        return new AlfredSettings(
-            Optional.of(PROJECT_FOLDER),
-            Optional.of("Contacten"),
-            Optional.of("Teams"),
-            Optional.of("3e Partijen"),
-            Optional.of("Reminders")
-        );
+        return AlfredSettings.builder()
+            .contactsPath("Contacten")
+            .projectsPath(PROJECT_FOLDER)
+            .remindersPath("Reminders")
+            .teamsPath("Teams")
+            .thirdPartiesPath("3e partijen")
+            .build();
     }
 }
