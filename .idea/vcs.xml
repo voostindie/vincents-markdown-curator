@@ -12,5 +12,6 @@
     <mapping directory="$PROJECT_DIR$/../alfred-markdown-curator-workflow" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../markdown-curator" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../markdown-curator-demo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../obsidian-alfred-trigger-plugin" vcs="Git" />
   </component>
 </project>
