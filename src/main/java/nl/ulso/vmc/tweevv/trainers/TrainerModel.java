@@ -77,7 +77,7 @@ public final class TrainerModel
     }
 
     @Override
-    protected List<? extends ChangeHandler> createChangeHandlers()
+    protected List<ChangeHandler> createChangeHandlers()
     {
         // TODO: make this much smarter and fine-grained
         return List.of(

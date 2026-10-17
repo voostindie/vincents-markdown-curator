@@ -69,7 +69,7 @@ public class MermaidGraph
     }
 
     @Override
-    protected List<? extends ChangeHandler> createChangeHandlers()
+    protected List<ChangeHandler> createChangeHandlers()
     {
         return List.of(
             newChangeHandler(isPayloadType(Daily.class), this::processDailyUpdate),

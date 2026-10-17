@@ -57,7 +57,7 @@ final class DefaultDirectory
     }
 
     @Override
-    protected List<? extends ChangeHandler> createChangeHandlers()
+    protected List<ChangeHandler> createChangeHandlers()
     {
         return List.of(
             newChangeHandler(
