@@ -58,7 +58,7 @@ public final class TrainerModel
         "^(\\[\\[.*]]) (\\[\\[.*]])( \\((\\d+(,\\d{1,2})?)%\\))?$");
 
     private static final String IBAN_PROPERTY = "iban";
-    private static final String EMAIL_PROPERTY = "email";
+    private static final String EMAIL_PROPERTY = "e-mail";
     private static final String RESIDENCY_PROPERTY = "woonplaats";
     private static final String COC_PROPERTY = "vog";
     private static final String UNDER_16_PROPERTY = "onder16";
