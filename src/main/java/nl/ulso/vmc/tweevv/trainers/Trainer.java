@@ -32,6 +32,7 @@ public final class Trainer
     private final String residency;
     private final boolean under16;
     private final boolean coach;
+    private final boolean assistant;
 
     public Trainer(Document document)
     {
@@ -44,6 +45,7 @@ public final class Trainer
         this.residency = finder.residency;
         this.under16 = finder.under16;
         this.coach = finder.coach;
+        this.assistant = finder.assistant;
         this.qualifications = new HashSet<>();
         this.assignments = new HashSet<>();
     }
@@ -91,6 +93,11 @@ public final class Trainer
     public boolean isCoach()
     {
         return coach;
+    }
+
+    public boolean isAssistant()
+    {
+        return assistant;
     }
 
     @Override
@@ -184,6 +191,7 @@ public final class Trainer
         private static final String RESIDENCY_DOCUMENT = "Woonplaats";
         private static final String UNDER_16_DOCUMENT = "Onder 16";
         private static final String COACH_DOCUMENT = "Coach";
+        private static final String ASSISTANT_DOCUMENT = "Assistent";
 
         private String email;
         private String iban;
@@ -191,6 +199,7 @@ public final class Trainer
         private String residency;
         private boolean under16 = false;
         private boolean coach = false;
+        private boolean assistant = false;
 
         @Override
         public void visit(Section section)
@@ -231,6 +240,10 @@ public final class Trainer
                     else if (links.contains(COACH_DOCUMENT))
                     {
                         coach = true;
+                    }
+                    else if (links.contains(ASSISTANT_DOCUMENT))
+                    {
+                        assistant = true;
                     }
                     return;
                 }

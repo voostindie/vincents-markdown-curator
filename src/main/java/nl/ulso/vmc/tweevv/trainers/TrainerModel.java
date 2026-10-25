@@ -63,6 +63,7 @@ public final class TrainerModel
     private static final String COC_PROPERTY = "vog";
     private static final String UNDER_16_PROPERTY = "onder16";
     private static final String COACH_PROPERTY = "coach";
+    private static final String ASSISTANT_PROPERTY = "assistant";
 
     private final Vault vault;
     private final FrontMatterCollector frontMatterCollector;
@@ -260,6 +261,7 @@ public final class TrainerModel
                                 );
                                 dictionary.setProperty(UNDER_16_PROPERTY, trainer.isUnder16());
                                 dictionary.setProperty(COACH_PROPERTY, trainer.isCoach());
+                                dictionary.setProperty(ASSISTANT_PROPERTY, trainer.isAssistant());
                             },
                             () ->
                             {
@@ -269,6 +271,7 @@ public final class TrainerModel
                                 dictionary.removeProperty(COC_PROPERTY);
                                 dictionary.removeProperty(UNDER_16_PROPERTY);
                                 dictionary.removeProperty(COACH_PROPERTY);
+                                dictionary.removeProperty(ASSISTANT_PROPERTY);
                             }
                         )
                 )
